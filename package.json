@@ -1,0 +1,29 @@
+{
+  "name": "wordgriddle",
+  "version": "1.0.0",
+  "description": "Grid based word puzzle",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Motivesoft/wordgriddle.git"
+  },
+  "keywords": [
+    "word",
+    "grid",
+    "puzzle"
+  ],
+  "author": "Ian Brown",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Motivesoft/wordgriddle/issues"
+  },
+  "homepage": "https://github.com/Motivesoft/wordgriddle#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9",
+    "sqlite3": "^5.1.7"
+  }
+}
