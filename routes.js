@@ -17,6 +17,6 @@ router.post('/bonus', bonusWordEndpoints.installWords);
 router.get('/excluded', excludedWordEndpoints.getWords);
 router.post('/excluded', excludedWordEndpoints.installWords);
 
-router.get('/shutdown', adminEndpoints.shutdown);
+router.get('/vacuum', adminEndpoints.vacuum);
 
 module.exports = router;
