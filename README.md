@@ -12,19 +12,83 @@ Grid based word puzzle game
 * Puzzle design is backed by a fixed dictionary, and editable excluded and bonus word lists
 * Each puzzle, in database and on export, is self contained with full word list information
 
+# Development
+* GitHub (code repo, issues, releases, ...)
+* VS Code
+* node.js (version 10/11)
+* node packages:
+  * express
+  * sqlite (initially, consider something more robust later)
+  * passport.js (user management)
+  * nodemon (development assistance, restart server on change)
+
+## Development repositories
+* [wordgriddle](https://github.com/Motivesoft/wordgriddle)
+  * Intended to be the production repo
+  * Slowly developed with ideas/collateral from other repositories
+* [wordgriddle-server](https://github.com/Motivesoft/wordgriddle-server)
+  * Initial proof of concept (pre-alpha)
+  * Working client/server for playing puzzles
+  * Minimal other features, just enough to firm up some ideas
+  * Mostly for play testing and usability work for the word grid itself
+* [wordgriddle-utilities](https://github.com/Motivesoft/wordgriddle-utilities)
+  * Command line tools
+    * grid creation
+    * word search/puzzle solving
+    * word list segregation
+  * Elements of this will go into the puzzle design capabilities
+* [wordgriddle-puzzle-designer](https://github.com/Motivesoft/wordgriddle-puzzle-designer)
+  * Web API endpoints for things related to puzzle design
+    * Word lists 
+      * Bonus and excluded lists need management capabilities
+      * Maintenance (CRUD - create, read, update, delete)
+      * Backup/restore to file
+ 
+
+# Development phases
+* Concepts
+  * Proof of concept (see [Development repositories](#development-repositories))
+    * ~~Basic web services~~
+    * Playable UI
+    * Backend database/files
+    * Controlled set of test puzzles
+    * Puzzle designer ideas and building blocks
+  * UI prototyping for device support 
+  * Newly created puzzles/word lists
+  * Planning subsequent phases
+* Structured
+* Feature complete
+* Testing
+* Maintenance
+
 # Planned phases
 ## Version 0.1 (development version)
 ### Must
 * Playable at home (i.e. self-hosted, no securty/access control)
 * Allow creation of puzzles, although not necessarily glamourous
-* Demonstrate persistence
+  * Includes basic word list use/management as necessary
+* Working puzzle grid
+  * Playable, with word lists and completion
+  * Demonstrating persistence (save/restore progress)
+  * User selectable
+  * Some amount of UI responsive design
 * Start building puzzle catalog
 * Start building word lists
+* Solid foundations for backend server
+  * code structure
+  * version reporting
+  * logging practices
+  * running in IDE
+  * startup/shutdown gracefully 
 
 ### Should
 * Allow basic maintenance of excluded and bonus word lists
 * Develop from branches/issues/PRs
 * Have a separate Test server on network
+* Word lists committed to repos on update
+  * Bonus and excluded both sourced from publishable puzzles
+  * Committed with details about sources (puzzles)
+  * May be seeded manually by general maintenance
 
 ### Could
 
@@ -35,6 +99,10 @@ Grid based word puzzle game
 ## Version 0.2 (internal alpha)
 ### Must
 * Develop from branches/issues/PRs
+* Deployment instructions for new servers
+
+### Should
+* Have database design ideas clear 
 
 ## Version 0.3 (limited release alpha)
 This version may go to family/friends, as a short alpha phase for feedback
@@ -69,11 +137,15 @@ Alternating internal and limited release alpha/beta iterations
 * User registration
 * Guest accounts
 
-## Version .8 (final 'friendly-user' beta, initial public alpha)
+## Version 0.8 (final 'friendly-user' beta, initial public alpha)
 ### Must
 * Have a (small) cache of playable puzzles
 * Have an agreed dictionary
 * Have meaningful excluded and bonus word lists for published puzzles
+
+### Should
+### Could
+* CI/CD
 
 ## Version .9 (public beta)
 ### Must
@@ -83,6 +155,7 @@ Alternating internal and limited release alpha/beta iterations
 
 ### Should
 * A reasonable selection of puzzles ready to release
+* CI/CD
 
 ## Version 1.0 (public release)
 
