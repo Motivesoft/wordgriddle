@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const routes = require('./routes');
 const db = require('./database');
+
+// Doing this allows us to read version info etc.
 var packageInfo = require('./package.json');
 
 // Use this to track for shutdown events so we can try and be graceful about them
@@ -60,7 +62,7 @@ function gracefulShutdown() {
     // If after 10 seconds, forcefully shut down
     setTimeout(() => {
         console.error('Forcing shutdown due to timeout.');
-        
+
         process.exit(1);
     }, 10000);
 }
