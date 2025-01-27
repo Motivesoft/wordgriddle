@@ -43,12 +43,11 @@ Grid based word puzzle game
       * Bonus and excluded lists need management capabilities
       * Maintenance (CRUD - create, read, update, delete)
       * Backup/restore to file
- 
 
 # Development phases
-* Concepts
+* Concepts / Prototypes
   * Proof of concept (see [Development repositories](#development-repositories))
-    * ~~Basic web services~~
+    * Basic web services
     * Playable UI
     * Backend database/files
     * Controlled set of test puzzles
@@ -56,12 +55,21 @@ Grid based word puzzle game
   * UI prototyping for device support 
   * Newly created puzzles/word lists
   * Planning subsequent phases
-* Structured
-* Feature complete
+* Structured, starting with [0.1](#version-01-development-version)
+* Roadmapping
+* Feature complete first version
 * Testing
 * Maintenance
 
 # Planned phases
+## Version 0.0 (scaffolding)
+### Must
+* Repo [wordgriddle](https://github.com/Motivesoft/wordgriddle)
+* Basic stack (node, express, sqlite)
+* Server with routes and static HTML
+* General project structure
+* Select ideas from prototypes
+
 ## Version 0.1 (development version)
 ### Must
 * Playable at home (i.e. self-hosted, no securty/access control)
@@ -114,12 +122,14 @@ This version may go to family/friends, as a short alpha phase for feedback
 * Launch with only unique, approved puzzles - i.e. signed off by someone other than the creator
 * Report version number in UI
 * Publicise a support contact email address
+* Branding (graphics, naming, colours, ...)
 
 ### Should
 * A more robust database
 * Comprehensive backup/restore routine
 * User sign in (rudimentary)
 * Remote hosted
+* Dark mode
 
 ### Could
 
