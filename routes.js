@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const dictionaryWordEndpoints = require('./dictionaryWordEnpoints');
+const dictionaryWordEndpoints = require('./dictionaryWordEndpoints');
 const bonusWordEndpoints = require('./bonusWordEndpoints');
 const excludedWordEndpoints = require('./excludedWordEndpoints');
 const adminEndpoints = require('./adminEndpoints');
