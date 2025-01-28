@@ -5,7 +5,7 @@ const tableName = 'excludedWordList';
 // Route to upload a text file and insert words into the database
 exports.upload = async (req, res) => {
   if (!req.files || !req.files.file) {
-    return res.status(400).send('No file uploaded.');
+    return res.status(400).json({ error: 'No file uploaded.' });
   }
 
   const wordFile = req.files.file;
@@ -41,10 +41,10 @@ exports.upload = async (req, res) => {
 
     await Promise.all(insertPromises);
 
-    res.send('Words uploaded and inserted into the database successfully.');
+    res.json({ message: 'Words uploaded and inserted into the database successfully.' });
   } catch (err) {
     console.error(err);
-    res.status(500).send('An error occurred while processing the file.');
+    res.status(500).json({ error: 'An error occurred while processing the file.' });
   }
 }
 
@@ -61,10 +61,10 @@ exports.count = async (req, res) => {
       });
     });
 
-    res.send(`Total words in the database: ${count}`);
+    res.json({ totalWords: count });
   } catch (err) {
     console.error(err);
-    res.status(500).send('An error occurred while fetching the word count.');
+    res.status(500).json({ error: 'An error occurred while fetching the word count.' });
   }
 }
 
@@ -83,13 +83,9 @@ exports.checkWord = async (req, res) => {
       });
     });
 
-    if (exists) {
-      res.send(`The word "${word}" exists in the database.`);
-    } else {
-      res.send(`The word "${word}" does not exist in the database.`);
-    }
+    res.json({ word, exists });
   } catch (err) {
     console.error(err);
-    res.status(500).send('An error occurred while checking the word.');
+    res.status(500).json({ error: 'An error occurred while checking the word.' });
   }
 }
