@@ -23,6 +23,7 @@
   "homepage": "https://github.com/Motivesoft/wordgriddle#readme",
   "dependencies": {
     "express": "^4.21.2",
+    "express-fileupload": "^1.5.1",
     "nodemon": "^3.1.9",
     "sqlite3": "^5.1.7"
   }

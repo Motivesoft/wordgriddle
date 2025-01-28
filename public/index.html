@@ -1,10 +1,93 @@
-<html>
-    <head>
-        <title>wordgriddle</title>
-    </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wordgriddle - dictionary upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        #uploadForm { margin-bottom: 20px; }
+        #uploadStatus, #fileInfo { margin-top: 10px; }
+        #uploadProgress { width: 100%; }
+    </style>
+</head>
+<body>
+    <h2>Upload Dictionary File</h2>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="file">
+        <button type="submit">Upload</button>
+    </form>
+    <div id="uploadStatus"></div>
+    <progress id="uploadProgress" value="0" max="100" style="display:none;"></progress>
+    <div id="fileInfo"></div>
 
-    <body>
-        <h1>wordgriddle</h1>
-        Hello world!
-    </body>
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Clear any previous information
+            updateProgress(0);
+            updateStatus('');
+            clearFileInfo();
+
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                updateStatus('Please select a file to upload.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/dictionary/upload', true);
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    updateProgress(percentComplete);
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    updateStatus('File uploaded successfully!');
+                } else {
+                    updateStatus('Upload failed. Please try again.');
+                }
+
+                // clear the input field now we've finished with it
+                document.getElementById('fileInput').value = '';
+            };
+
+            xhr.send(formData);
+            updateStatus('Uploading...');
+            showFileInfo(file);
+            document.getElementById('uploadProgress').style.display = 'block';
+        });
+
+        function updateStatus(message) {
+            document.getElementById('uploadStatus').textContent = message;
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('uploadProgress').value = percent;
+        }
+
+        function showFileInfo(file) {
+            const fileInfo = document.getElementById('fileInfo');
+            fileInfo.innerHTML = `
+                <p>File name: ${file.name}</p>
+                <p>File size: ${file.size} bytes</p>
+                <p>File type: ${file.type}</p>
+            `;
+        }
+
+        function clearFileInfo() {
+            const fileInfo = document.getElementById('fileInfo');
+            fileInfo.innerHTML = ``;
+        }
+    </script>
+</body>
 </html>

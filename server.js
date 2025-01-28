@@ -1,5 +1,9 @@
+// External requires
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const path = require('path');
+
+// Internal requires
 const routes = require('./routes');
 const db = require('./database');
 
@@ -13,9 +17,10 @@ let server;
 const port = process.env.PORT || 8996;
 const app = express();
 
-// Serve static files from the "public" directory and a public API
+// Serve static files from the "public" directory, file upload middleware, and a public API
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
 app.use('/api', routes);
 
 // Run the server
