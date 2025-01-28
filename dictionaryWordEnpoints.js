@@ -116,6 +116,17 @@ exports.upload = (req, res) => {
             return res.status(500).send(err);
         }
 
+        try {
+            const result = importWordListFromFile(uploadPath);
+
+            res.json(result);
+        } catch( error ) {
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    });
+}
+
+async function importWordListFromFile(uploadPath) {
         // Import the word list, replacing the current contents, as a transaction
         try {
             // Start a transaction
@@ -141,12 +152,15 @@ exports.upload = (req, res) => {
             await stmt.finalize();
             await db.run('COMMIT');
 
-            res.json({ message: `Processed ${words.length} words`, success: true });
+            return { message: `Processed ${words.length} words`, success: true };
         } catch (error) {
             console.error('Error:', error);
 
             await db.run('ROLLBACK');
-            res.status(500).json({ message: 'An error occurred', error: error.message });
+            throw error;
         }
-    });
+}
+
+function importWordList(words) {
+    
 }
