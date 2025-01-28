@@ -8,8 +8,9 @@ const adminEndpoints = require('./adminEndpoints');
 // Define API routes
 
 // Word list management
-router.get('/dictionary', dictionaryWordEndpoints.getWords);
-router.post('/dictionary', dictionaryWordEndpoints.installWords);
+router.get('/dictionary/match/:word', dictionaryWordEndpoints.match);
+router.get('/dictionary/partial/:letters', dictionaryWordEndpoints.partialMatch);
+router.post('/dictionary/install', dictionaryWordEndpoints.installWords);
 
 router.get('/bonus', bonusWordEndpoints.getWords);
 router.post('/bonus', bonusWordEndpoints.installWords);

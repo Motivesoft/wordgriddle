@@ -7,21 +7,21 @@ const db = new sqlite3.Database(':memory:', (err) => {
     console.log('Connected to the in-memory SQLite database');
 
     db.run(
-        `CREATE TABLE IF NOT EXISTS dictionaryWords (
+        `CREATE TABLE IF NOT EXISTS dictionaryWordList (
             id INTEGER PRIMARY KEY, 
-            name TEXT NOT NULL UNIQUE
+            word TEXT NOT NULL UNIQUE
         )`);
 
         db.run(
-            `CREATE TABLE IF NOT EXISTS bonusWords (
+            `CREATE TABLE IF NOT EXISTS bonusWordList (
                 id INTEGER PRIMARY KEY, 
-                name TEXT NOT NULL UNIQUE
+                word TEXT NOT NULL UNIQUE
             )`);
     
     db.run(
-        `CREATE TABLE IF NOT EXISTS excludedWords (
+        `CREATE TABLE IF NOT EXISTS excludedWordList (
             id INTEGER PRIMARY KEY, 
-            name TEXT NOT NULL UNIQUE
+            word TEXT NOT NULL UNIQUE
         )`);
   }
 });

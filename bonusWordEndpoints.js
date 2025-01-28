@@ -1,7 +1,9 @@
 const db = require('./database');
 
+const tableName = 'bonusWordList';
+
 exports.getWords = (req, res) => {
-  db.all('SELECT * FROM products', [], (err, rows) => {
+  db.all(`SELECT * FROM ${tableName}`, [], (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
@@ -12,7 +14,7 @@ exports.getWords = (req, res) => {
 
 exports.installWords = (req, res) => {
   const { name, price } = req.body;
-  db.run('INSERT INTO products (name, price) VALUES (?, ?)', [name, price], function(err) {
+  db.run(`INSERT INTO ${tableName} (name, price) VALUES (?, ?)`, [name, price], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;

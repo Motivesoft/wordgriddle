@@ -14,7 +14,7 @@ exports.vacuum = (req, res) => {
     });
 };
 
-// Housekeeping
+// Try and do some housekeeping as and when we get asked to shutdown
 
 process.on('SIGINT', () => {
     console.log("SIGINT");

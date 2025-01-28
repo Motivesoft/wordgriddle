@@ -181,3 +181,20 @@ Multiple servers with essentially the same setup where updates are tested on a t
     * Beta test functionality updates/fixes for Public and Admin
     * Beta test new puzzles with limited group
   * Development - used by developer(s) to create updates to push to Test
+
+
+# Data and database tables
+## ```dictionaryList```
+* Sourced from text file, installed via web API
+
+## ```bonusWordList```
+## ```excludedWordList```
+
+# Web API
+## Admin
+### ```dictionary```
+* ```match(word)``` - return ```true``` if ```word``` is in dictionary 
+* ```partialMatch(letters)``` - return ```true``` if one or more words in dictionary start with ```letters```
+* ```installWords``` - replace dictionary content with provided word list
+
+## Game
