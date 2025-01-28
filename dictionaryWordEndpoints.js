@@ -15,56 +15,17 @@ exports.match = (req, res) => {
     console.debug(`Calling /api/dictionary/match/${word}`);
 
     try {
-        const exists = matchWord(word);
+        const exists = matchWord(word, (err, result) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+            }
 
-        return res.json({ word: word, exists: exists });
+            return res.json({ word: word, exists: result });
+        });
     } catch (error) {
         console.error('Error executing query:', error);
 
         res.status(500).json({ error: error.message });
-    }
-}
-
-function matchWord(word) {
-    {
-        
-        try {
-            const stmt = db.prepare('SELECT word FROM dictionaryWordList');
-            const rows = stmt.all();
-
-            rows.forEach(row => {
-                console.log(row.word);
-            });
-        } catch (error) {
-            console.error('Error reading words:', error.message);
-        } finally {
-            db.close();
-        }
-
-    }
-    try {
-        const stt = db.prepare('SELECT * FROM dictionaryWordList');
-        const rows = stt.all();
-
-        rows.forEach(row => {
-            console.log(row.word);
-        });
-
-        // Prepare the SQL statement
-        const stmt = db.prepare(`SELECT COUNT(word) as count FROM ${tableName} WHERE word = ?`);
-
-        // Execute the query and get the result
-        const result = stmt.get(word.toLowerCase().trim());
-
-        const s = db.prepare(`SELECT COUNT(word) AS count FROM ${tableName}`);
-        const x = s.get();
-        console.log(`Count=${x.count}`);
-
-        // Check if the count is greater than 0
-        return result.count > 0;
-    } catch (error) {
-        console.error('Error checking word:', error.message);
-        return false;
     }
 }
 
@@ -168,6 +129,19 @@ exports.upload = (req, res) => {
 
             res.status(500).json({ message: 'An error occurred', error: error.message });
         }
+    });
+}
+
+// Returns a [err, boolean] on whether 'word' is in the dictionary
+async function matchWord(word, callback) {
+    console.debug(`Searching for ${word} in the dictionary`);
+
+    db.get(`SELECT EXISTS (SELECT 1 FROM ${tableName} WHERE word = ?) AS exists_flag`, [word], (err, rows) => {
+        if (err) {
+            return callback(err, null);
+        }
+
+        callback(null, rows.exists_flag === 1);
     });
 }
 
