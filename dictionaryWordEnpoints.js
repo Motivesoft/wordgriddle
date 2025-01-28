@@ -27,6 +27,7 @@ exports.match = (req, res) => {
 // TODO See if this is just impractical from a performance point of view
 // TODO RESTRUCTURE THIS TO UPLOAD THE WHOLE GRID - DO NOT MAKE INDIVIDUAL WEB CALLS TO THIS
 // TODO TURN THIS INTO A REGULAR API CALL FROM A 'SOLVE PUZZLE' ENDPOINT 
+// TODO Can we do a shutdown via API? And if we run with nodemon, would that be a restart?
 exports.partialMatch = (req, res) => {
     const letters = req.params.letters;
 
@@ -77,3 +78,19 @@ exports.installWords = (req, res) => {
 
     res.status(200).json({status: "Complete"});
 };
+
+exports.info = (req, res) => {
+    console.debug(`Get dictionary info`);
+
+    const query = `SELECT COUNT(word) AS count FROM ${tableName}`;
+
+    db.get(query, [], (err, row) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+
+        res.json({words: row.count});
+    });
+}

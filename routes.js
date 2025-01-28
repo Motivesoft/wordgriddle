@@ -11,6 +11,7 @@ const adminEndpoints = require('./adminEndpoints');
 router.get('/dictionary/match/:word', dictionaryWordEndpoints.match);
 router.get('/dictionary/partial/:letters', dictionaryWordEndpoints.partialMatch);
 router.post('/dictionary/install', dictionaryWordEndpoints.installWords);
+router.get('/dictionary/info', dictionaryWordEndpoints.info);
 
 router.get('/bonus', bonusWordEndpoints.getWords);
 router.post('/bonus', bonusWordEndpoints.installWords);
