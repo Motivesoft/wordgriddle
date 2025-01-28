@@ -119,7 +119,10 @@ exports.upload = (req, res) => {
         try {
             console.debug(`Importing words from ${uploadedFile.name}`);
 
-            res.json(await importWordListFromFile(uploadPath));
+            const words = await getWordListFromFile(uploadPath);
+            const results = await importWordList(words);
+
+            res.json(results);
         } catch (error) {
             console.log('Error importing file');
 
@@ -128,7 +131,7 @@ exports.upload = (req, res) => {
     });
 }
 
-async function importWordListFromFile(uploadPath) {
+async function getWordListFromFile(uploadPath) {
     try {
         const data = await fs.readFile(uploadPath, 'utf8');
         const words = data.split(/\s+/).filter(word => word.length > 0);
@@ -137,7 +140,7 @@ async function importWordListFromFile(uploadPath) {
             throw new Error('File does not contain a word list');
         }
 
-        return await importWordList(words);
+        return words;
     } catch (error) {
         console.error('Error importing from word list file:', error);
         throw error;
@@ -163,7 +166,7 @@ async function importWordList(words) {
         await stmt.finalize();
         await db.run('COMMIT');
 
-        return { message: `Processed ${words.length} words`, success: true };
+        return { message: `Import complete`, count: words.length, success: true };
     } catch (error) {
         console.error('Error:', error);
 
