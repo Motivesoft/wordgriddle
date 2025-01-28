@@ -17,8 +17,9 @@ router.post('/dictionary/upload', dictionaryWordEndpoints.upload);
 router.get('/bonus', bonusWordEndpoints.getWords);
 router.post('/bonus', bonusWordEndpoints.installWords);
 
-router.get('/excluded', excludedWordEndpoints.getWords);
-router.post('/excluded', excludedWordEndpoints.installWords);
+router.post('/excluded/upload', excludedWordEndpoints.upload);
+router.get('/excluded/count', excludedWordEndpoints.count);
+router.get('/excluded/check/:word', excludedWordEndpoints.checkWord);
 
 router.get('/vacuum', adminEndpoints.vacuum);
 
