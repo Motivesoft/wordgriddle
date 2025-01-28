@@ -54,7 +54,12 @@
                 if (xhr.status === 200) {
                     updateStatus('File uploaded successfully!');
                 } else {
-                    updateStatus('Upload failed. Please try again.');
+                    const response = JSON.parse(xhr.responseText);
+                    if (response === undefined) {
+                        updateStatus(`Upload failed. ${xhr.responseText}` );
+                    } else {
+                        updateStatus(`Upload failed. ${response.error}` );
+                    }
                 }
 
                 // clear the input field now we've finished with it

@@ -117,50 +117,57 @@ exports.upload = (req, res) => {
         }
 
         try {
-            const result = importWordListFromFile(uploadPath);
+            console.debug(`Importing words from ${uploadedFile.name}`);
 
-            res.json(result);
-        } catch( error ) {
+            res.json(await importWordListFromFile(uploadPath));
+        } catch (error) {
+            console.log('Error importing file');
+
             res.status(500).json({ message: 'An error occurred', error: error.message });
         }
     });
 }
 
 async function importWordListFromFile(uploadPath) {
-        // Import the word list, replacing the current contents, as a transaction
-        try {
-            // Start a transaction
-            // Strictly speaking, we could do this after we've read the file, but that gets messy in the error handler
-            await db.run('BEGIN TRANSACTION');
-    
-            const data = await fs.readFile(uploadPath, 'utf8');
-            const words = data.split(/\s+/).filter(word => word.length > 0);
-        
-            if (words === undefined || words.length == 0 ) {
-                throw new Error('File does not contain a word list');
-            }
+    try {
+        const data = await fs.readFile(uploadPath, 'utf8');
+        const words = data.split(/\s+/).filter(word => word.length > 0);
 
-            // Delete all existing rows
-            await db.run(`DELETE FROM ${tableName}`);
-        
-            const stmt = await db.prepare(`INSERT OR IGNORE INTO ${tableName} (word) VALUES (?)`);
-
-            for (const word of words) {
-                await stmt.run(word);
-            }
-
-            await stmt.finalize();
-            await db.run('COMMIT');
-
-            return { message: `Processed ${words.length} words`, success: true };
-        } catch (error) {
-            console.error('Error:', error);
-
-            await db.run('ROLLBACK');
-            throw error;
+        if (words === undefined || words.length == 0) {
+            throw new Error('File does not contain a word list');
         }
+
+        return await importWordList(words);
+    } catch (error) {
+        console.error('Error importing from word list file:', error);
+        throw error;
+    }
 }
 
-function importWordList(words) {
-    
+async function importWordList(words) {
+    // Import the word list, replacing the current contents, as a transaction
+    try {
+        // Start a transaction
+        // Strictly speaking, we could do this after we've read the file, but that gets messy in the error handler
+        await db.run('BEGIN TRANSACTION');
+
+        // Delete all existing rows
+        await db.run(`DELETE FROM ${tableName}`);
+
+        const stmt = await db.prepare(`INSERT OR IGNORE INTO ${tableName} (word) VALUES (?)`);
+
+        for (const word of words) {
+            await stmt.run(word);
+        }
+
+        await stmt.finalize();
+        await db.run('COMMIT');
+
+        return { message: `Processed ${words.length} words`, success: true };
+    } catch (error) {
+        console.error('Error:', error);
+
+        await db.run('ROLLBACK');
+        throw error;
+    }
 }
