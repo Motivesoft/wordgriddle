@@ -117,18 +117,16 @@ exports.upload = (req, res) => {
             return res.status(500).send(err);
         }
 
-        try {
-            console.debug(`Importing words from ${uploadedFile.name}`);
+        console.debug(`Importing words from ${uploadedFile.name}`);
 
-            const words = await getWordListFromFile(uploadPath);
-            const results = await importWordList(words);
+        const words = await getWordListFromFile(uploadPath);
+        importWordList(words, (err) => {
+            if (err) {
+                res.status(500).json({ message: 'An error occurred', error: err.message });
+            }
 
-            res.json(results);
-        } catch (error) {
-            console.log('Error importing file');
-
-            res.status(500).json({ message: 'An error occurred', error: error.message });
-        }
+            res.status(200).json({ status: "Complete" });
+        });
     });
 }
 
@@ -161,30 +159,33 @@ async function getWordListFromFile(uploadPath) {
     }
 }
 
-async function importWordList(words) {
-    // Import the word list, replacing the current contents, as a transaction
-    try {
-        // Start a transaction
-        // Strictly speaking, we could do this after we've read the file, but that gets messy in the error handler
-        await db.run('BEGIN TRANSACTION');
+// Import the word list, replacing the current contents, as a transaction
+async function importWordList(words, callback) {
+    db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
 
-        // Delete all existing rows
-        await db.run(`DELETE FROM ${tableName}`);
+        db.run(`DELETE FROM ${tableName}`);
 
-        const stmt = await db.prepare(`INSERT OR IGNORE INTO ${tableName} (word) VALUES (?)`);
+        const stmt = db.prepare(`INSERT OR IGNORE INTO ${tableName} (word) VALUES (?)`);
 
         for (const word of words) {
-            await stmt.run(word.toLowerCase().trim());
+            stmt.run(word.toLowerCase().trim(), (err) => {
+                if (err) {
+                    console.error('Error inserting row:', err.message);
+                }
+            });
         }
 
-        await stmt.finalize();
-        await db.run('COMMIT');
+        stmt.finalize();
 
-        return { message: `Import complete`, count: words.length, success: true };
-    } catch (error) {
-        console.error('Error:', error);
-
-        await db.run('ROLLBACK');
-        throw error;
-    }
+        db.run("COMMIT", (err) => {
+            if (err) {
+                console.error('Error committing transaction:', err.message);
+                callback(err);
+            } else {
+                console.log('All inserts completed successfully');
+                callback(null);
+            }
+        });
+    });
 }
