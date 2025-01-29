@@ -209,11 +209,11 @@ curl  http://localhost:8996/api/dictionary/info
 curl  http://localhost:8996/api/bonus/info  
 curl  http://localhost:8996/api/excluded/info  
 
-curl  http://localhost:8996/api/dictionary/match/:word
-curl  http://localhost:8996/api/bonus/match/:word
-curl  http://localhost:8996/api/excluded/match/:word
+curl  http://localhost:8996/api/dictionary/validate/:word
+curl  http://localhost:8996/api/bonus/validate/:word
+curl  http://localhost:8996/api/excluded/validate/:word
 
-curl  http://localhost:8996/api/dictionary/partial/:letters  
-curl  http://localhost:8996/api/bonus/partial/:letters  
-curl  http://localhost:8996/api/excluded/partial/:letters  
+curl  http://localhost:8996/api/dictionary/validate-prefix/:letters  
+curl  http://localhost:8996/api/bonus/validate-prefix/:letters  
+curl  http://localhost:8996/api/excluded/validate-prefix/:letters  
 ```

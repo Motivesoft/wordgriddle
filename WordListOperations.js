@@ -1,40 +1,42 @@
 const { db, dbGet } = require('./database');
 
-class WordListEndpoint {
+class WordListOperations {
     constructor(name, tableName) {
         this.name = name;
         this.tableName = tableName;
     }
 
-    async match(req, res) {
+    // Endpoints
+
+    async validateWord(req, res) {
         const word = req.params.word;
-        console.debug(`Searching for match: '${word}'`);
+        console.debug(`Searching for ${this.name} match: '${word}'`);
 
         try {
-            const exists = await this.matchWord(word);
+            const exists = await this.findWord(word);
             return res.json({ word: word, exists: exists });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
 
-    async partialMatch(req, res) {
+    async validateWordPrefix(req, res) {
         const letters = req.params.letters;
-        console.debug(`Search for partial match: '${letters}'`);
+        console.debug(`Search for ${this.name} partial match: '${letters}'`);
 
         try {
-            const exists = await this.matchPartialWord(letters);
+            const exists = await this.findWordPrefix(letters);
             return res.json({ letters: letters, exists: exists });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
 
-    async info(req, res) {
-        console.debug(`Get dictionary info`);
+    async getInformation(req, res) {
+        console.debug(`Get ${this.name} info`);
 
         try {
-            const count = await this.wordCount();
+            const count = await this.getWordCount();
             res.json({ name: this.name, wordCount: count });
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -47,7 +49,7 @@ class WordListEndpoint {
         }
 
         let uploadedFile = req.files.file;
-        console.debug(`Importing words from: ${uploadedFile.name}`);
+        console.debug(`Uploading ${this.name} words from: ${uploadedFile.name}`);
 
         const data = uploadedFile.data;
         const words = data.toString('utf8').split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
@@ -57,34 +59,54 @@ class WordListEndpoint {
         }
 
         try {
-            const count = await this.importWordList(words);
+            const count = await this.replaceWordList(words);
             res.status(200).json({ status: "Complete", words: words.length, imported: count });
         } catch (err) {
             res.status(500).json({ message: 'An error occurred', error: err.message });
         }
     }
 
-    async matchWord(word) {
-        console.debug(`Searching for ${word} in the dictionary`);
+    // Other methods
+
+    async findWord(word) {
+        if (word === undefined || word.length === 0) {
+            throw new Error("Missing input");
+        }
+
+        console.debug(`Searching for ${word} in ${this.name}`);
+
         const row = await dbGet(`SELECT EXISTS (SELECT 1 FROM ${this.tableName} WHERE word = ?) AS exists_flag`, [word]);
         return row.exists_flag === 1;
     }
 
-    async matchPartialWord(letters) {
-        console.debug(`Searching for ${letters}.* in the dictionary`);
+    async findWordPrefix(letters) {
+        if (letters === undefined || letters.length === 0) {
+            throw new Error("Missing input");
+        }
+
+        console.debug(`Searching for ${letters}.* in ${this.name}`);
+
         const row = await dbGet(`SELECT EXISTS (SELECT 1 FROM ${this.tableName} WHERE word LIKE ?) AS exists_flag`, [`${letters}%`]);
         return row.exists_flag === 1;
     }
 
-    async wordCount() {
-        console.debug(`Getting the word count of the dictionary`);
+    async getWordCount() {
+        console.debug(`Getting the word count of ${this.name}`);
+
         const row = await dbGet(`SELECT COUNT(word) AS count FROM ${this.tableName}`, []);
         return row.count;
     }
 
-    async importWordList(words) {
+    async replaceWordList(words) {
+        if (words === undefined) {
+            throw new Error("Missing input");
+        }
+
+        console.debug(`Replacing ${this.name} with ${words.length} words`);
+
         // Whereas many of the other methods use promisified db methods, that doesn't really work here due
         // to the serialized calls, so manually construct a single promise instead
+
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.run("BEGIN TRANSACTION");
@@ -119,8 +141,8 @@ class WordListEndpoint {
 }
 
 // Declare the individual word lists
-const dictionaryWordEndpoints = new WordListEndpoint('dictionary', 'dictionaryWordList');
-const bonusWordEndpoints = new WordListEndpoint('bonusWords', 'bonusWordList');
-const excludedWordEndpoints = new WordListEndpoint('excludedWords', 'excludedWordList');
+const dictionaryWordOperations = new WordListOperations('Dictionary Words', 'dictionaryWordList');
+const bonusWordOperations = new WordListOperations('Bonus Words', 'bonusWordList');
+const excludedWordOperations = new WordListOperations('Excluded Words', 'excludedWordList');
 
-module.exports = { dictionaryWordEndpoints, bonusWordEndpoints, excludedWordEndpoints };
+module.exports = { dictionaryWordOperations, bonusWordOperations, excludedWordOperations };
