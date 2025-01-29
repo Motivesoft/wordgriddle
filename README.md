@@ -198,3 +198,22 @@ Multiple servers with essentially the same setup where updates are tested on a t
 * ```installWords``` - replace dictionary content with provided word list
 
 ## Game
+
+## Testing
+```
+curl -F "file=@../wordgriddle-utilities/data/dictionary.txt" http://localhost:8996/api/dictionary/upload
+curl -F "file=@../wordgriddle-utilities/data/bonus.txt" http://localhost:8996/api/bonus/upload
+curl -F "file=@../wordgriddle-utilities/data/excluded.txt" http://localhost:8996/api/excluded/upload
+
+curl  http://localhost:8996/api/dictionary/info  
+curl  http://localhost:8996/api/bonus/info  
+curl  http://localhost:8996/api/excluded/info  
+
+curl  http://localhost:8996/api/dictionary/match/:word
+curl  http://localhost:8996/api/bonus/match/:word
+curl  http://localhost:8996/api/excluded/match/:word
+
+curl  http://localhost:8996/api/dictionary/partial/:letters  
+curl  http://localhost:8996/api/bonus/partial/:letters  
+curl  http://localhost:8996/api/excluded/partial/:letters  
+```

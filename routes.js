@@ -2,19 +2,14 @@
 const express = require('express');
 
 const adminEndpoints = require('./adminEndpoints');
-const WordListEndpoint = require('./wordListEndpoints'); 
+const { dictionaryWordEndpoints, bonusWordEndpoints, excludedWordEndpoints } = require('./wordListEndpoints');
 
 const router = express.Router();
 
-
 // Define API routes
 
-// Route to instances. Use the 'arrow function' for readability, but could also use 'instance.method.bind(instance)'
-const dictionaryWordEndpoints = new WordListEndpoint('dictionaryWordList');
-const bonusWordEndpoints = new WordListEndpoint('bonusWordList');
-const excludedWordEndpoints = new WordListEndpoint('excludedWordList');
-
 // Word list management
+// Route to instances. Use the 'arrow function' for readability, but could also use 'instance.method.bind(instance)'
 router.get('/dictionary/info', (req, res) => dictionaryWordEndpoints.info(req, res));
 router.get('/dictionary/match/:word', (req, res) => dictionaryWordEndpoints.match(req, res));
 router.get('/dictionary/partial/:letters', (req, res) => dictionaryWordEndpoints.partialMatch(req, res));

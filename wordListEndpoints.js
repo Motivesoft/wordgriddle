@@ -1,7 +1,8 @@
 const { db, dbGet } = require('./database');
 
 class WordListEndpoint {
-    constructor(tableName) {
+    constructor(name, tableName) {
+        this.name = name;
         this.tableName = tableName;
     }
 
@@ -34,7 +35,7 @@ class WordListEndpoint {
 
         try {
             const count = await this.wordCount();
-            res.json({ wordCount: count });
+            res.json({ name: this.name, wordCount: count });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -82,6 +83,8 @@ class WordListEndpoint {
     }
 
     async importWordList(words) {
+        // Whereas many of the other methods use promisified db methods, that doesn't really work here due
+        // to the serialized calls, so manually construct a single promise instead
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.run("BEGIN TRANSACTION");
@@ -115,4 +118,9 @@ class WordListEndpoint {
     }
 }
 
-module.exports = WordListEndpoint;
+// Declare the individual word lists
+const dictionaryWordEndpoints = new WordListEndpoint('dictionary', 'dictionaryWordList');
+const bonusWordEndpoints = new WordListEndpoint('bonusWords', 'bonusWordList');
+const excludedWordEndpoints = new WordListEndpoint('excludedWords', 'excludedWordList');
+
+module.exports = { dictionaryWordEndpoints, bonusWordEndpoints, excludedWordEndpoints };
