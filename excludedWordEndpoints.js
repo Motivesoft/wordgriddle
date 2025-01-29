@@ -1,5 +1,11 @@
 const db = require('./database');
 
+// API call examples
+// 
+// curl -F "file=@../wordgriddle-utilities/data/bonus.txt" http://localhost:8996/api/excluded/upload
+// curl http://localhost:8996/api/excluded/check/upload                                              
+// curl http://localhost:8996/api/excluded/count       
+
 const tableName = 'excludedWordList';
 
 // Route to upload a text file and insert words into the database
