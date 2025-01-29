@@ -108,25 +108,28 @@ exports.upload = (req, res) => {
         return res.status(400).send('No files were uploaded.');
     }
 
+    // * use uploadedFile.data instead of this mv
+    // * tidy this implementation or get deepseek to write a sync import for one of our other implementationss
+
     // Upload the file to a temp folder and then import it
     let uploadedFile = req.files.file;
-    let uploadPath = path.join(os.tmpdir(), uploadedFile.name);
 
-    uploadedFile.mv(uploadPath, async (err) => {
+    console.debug(`Importing words from ${uploadedFile.name}`);
+
+    // Get the data and split it into an array of 'words' - an unsanitized list at this point
+    const data = uploadedFile.data;
+    const words = data.toString('utf8').split(/\s+/).filter(word => word.length > 0);
+
+    if (words === undefined || words.length == 0) {
+        throw new Error('File does not contain a word list');
+    }
+
+    importWordList(words, (err) => {
         if (err) {
-            return res.status(500).send(err);
+            res.status(500).json({ message: 'An error occurred', error: err.message });
         }
 
-        console.debug(`Importing words from ${uploadedFile.name}`);
-
-        const words = await getWordListFromFile(uploadPath);
-        importWordList(words, (err) => {
-            if (err) {
-                res.status(500).json({ message: 'An error occurred', error: err.message });
-            }
-
-            res.status(200).json({ status: "Complete" });
-        });
+        res.status(200).json({ status: "Complete" });
     });
 }
 
@@ -141,22 +144,6 @@ async function matchWord(word, callback) {
 
         callback(null, rows.exists_flag === 1);
     });
-}
-
-async function getWordListFromFile(uploadPath) {
-    try {
-        const data = await fs.readFile(uploadPath, 'utf8');
-        const words = data.split(/\s+/).filter(word => word.length > 0);
-
-        if (words === undefined || words.length == 0) {
-            throw new Error('File does not contain a word list');
-        }
-
-        return words;
-    } catch (error) {
-        console.error('Error importing from word list file:', error);
-        throw error;
-    }
 }
 
 // Import the word list, replacing the current contents, as a transaction
