@@ -1,17 +1,12 @@
-const db = require('./database');
-const util = require('util');
-
-// Promisify db.get and db.run
-const dbGet = util.promisify(db.get.bind(db));
-const dbRun = util.promisify(db.run.bind(db));
+const {db, dbGet} = require('./database');
 
 exports.match = async (req, res) => {
     const word = req.params.word;
-    console.debug(`Calling /api/dictionary/match/${word}`);
+    console.debug(`Searching for match: '${word}'`);
 
     try {
-        const result = await matchWord(word);
-        return res.json({ word: word, exists: result });
+        const exists = await matchWord(word);
+        return res.json({ word: word, exists: exists });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -19,11 +14,11 @@ exports.match = async (req, res) => {
 
 exports.partialMatch = async (req, res) => {
     const letters = req.params.letters;
-    console.debug(`Calling /api/dictionary/partial/${letters}`);
+    console.debug(`Search for partial match: '${letters}'`);
 
     try {
-        const result = await matchPartialWord(letters);
-        return res.json({ letters: letters, exists: result });
+        const exists = await matchPartialWord(letters);
+        return res.json({ letters: letters, exists: exists });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -31,13 +26,11 @@ exports.partialMatch = async (req, res) => {
 
 exports.info = async (req, res) => {
     console.debug(`Get dictionary info`);
-    const query = `SELECT COUNT(word) AS count FROM dictionaryWordList`;
 
     try {
-        const row = await dbGet(query, []);
-        res.json({ words: row.count });
+        const count = await wordCount();
+        res.json({ wordCount: count });
     } catch (err) {
-        console.error('Error executing query:', err);
         res.status(500).json({ error: err.message });
     }
 };
@@ -48,7 +41,7 @@ exports.upload = async (req, res) => {
     }
 
     let uploadedFile = req.files.file;
-    console.debug(`Importing words from ${uploadedFile.name}`);
+    console.debug(`Importing words from: ${uploadedFile.name}`);
 
     const data = uploadedFile.data;
     const words = data.toString('utf8').split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
@@ -75,6 +68,12 @@ async function matchPartialWord(letters) {
     console.debug(`Searching for ${letters}.* in the dictionary`);
     const row = await dbGet(`SELECT EXISTS (SELECT 1 FROM dictionaryWordList WHERE word LIKE ?) AS exists_flag`, [`${letters}%`]);
     return row.exists_flag === 1;
+}
+
+async function wordCount() {
+    console.debug(`Getting the word count of the dictionary`);
+    const row = await dbGet(`SELECT COUNT(word) AS count FROM dictionaryWordList`,[]);
+    return row.count;
 }
 
 async function importWordList(words) {
