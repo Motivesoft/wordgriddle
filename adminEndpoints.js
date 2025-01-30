@@ -1,4 +1,4 @@
-const db = require('./database');
+const { db } = require('./database');
 
 // GET <ip:port>/api/vacuum
 exports.vacuum = (req, res) => {
