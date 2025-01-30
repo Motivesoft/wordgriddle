@@ -48,7 +48,7 @@ class WordListOperations {
 
     async upload(req, res) {
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(422).json({message:'No files were uploaded.'});
+            return res.status(400).json({message:'No files were uploaded.'});
         }
 
         let uploadedFile = req.files.file;
@@ -58,7 +58,7 @@ class WordListOperations {
         const words = data.toString('utf8').split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
 
         if (words === undefined || words.length == 0) {
-            return res.status(422).json({ message: 'File does not appear to contain a word list.' });
+            return res.status(400).json({ message: 'File does not appear to contain a word list.' });
         }
 
         try {
