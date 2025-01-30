@@ -60,7 +60,7 @@ class WordListOperations {
 
         try {
             const count = await this.replaceWordList(words);
-            res.status(200).json({ status: "Complete", words: words.length, imported: count });
+            res.status(200).json({ status: "complete", uploadedCount: words.length, importedCount: count });
         } catch (err) {
             res.status(500).json({ message: 'An error occurred', error: err.message });
         }
