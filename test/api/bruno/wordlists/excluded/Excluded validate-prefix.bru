@@ -1,0 +1,31 @@
+meta {
+  name: Excluded validate-prefix
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://{{HOST}}/api/excluded/validate-prefix/banan
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+tests {
+  test("Should return the letters", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('letters');
+    expect(data.letters).to.be.a('string');
+    expect(data.letters).to.equal('banan');
+  });
+  
+  test("Should return the result", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('exists');
+    expect(data.exists).to.be.a('boolean');
+  });
+}

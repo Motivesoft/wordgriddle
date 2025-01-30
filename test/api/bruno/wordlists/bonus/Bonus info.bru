@@ -1,0 +1,30 @@
+meta {
+  name: Bonus info
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://{{HOST}}/api/bonus/info
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+tests {
+  test("Should return the name", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('name');
+    expect(data.name).to.equal('Bonus Words');
+  });
+  
+  test("Should return the word count", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('wordCount');
+    expect(data.wordCount).to.be.a('number');
+  });
+}

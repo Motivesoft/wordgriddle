@@ -200,7 +200,16 @@ Multiple servers with essentially the same setup where updates are tested on a t
 ## Game
 
 ## Testing
+### bruno
+```shell
+npm install @usebruno/cli
+
+cd [test folder]
+bru run [.bru file] --env [environment name]
 ```
+
+### curl
+```shell
 curl -F "file=@../wordgriddle-utilities/data/dictionary.txt" http://localhost:8996/api/dictionary/upload
 curl -F "file=@../wordgriddle-utilities/data/bonus.txt" http://localhost:8996/api/bonus/upload
 curl -F "file=@../wordgriddle-utilities/data/excluded.txt" http://localhost:8996/api/excluded/upload
