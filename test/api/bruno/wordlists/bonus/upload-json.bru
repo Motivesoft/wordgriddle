@@ -1,5 +1,5 @@
 meta {
-  name: upload
+  name: upload-json
   type: http
   seq: 6
 }
@@ -10,8 +10,12 @@ post {
   auth: none
 }
 
+headers {
+  : 
+}
+
 body:multipart-form {
-  file: @file(C:\Projects\GitHub\wordgriddle-utilities\data\bonus.txt)
+  file: @file(C:\Projects\GitHub\wordgriddle\test\data\small.json) @contentType(application/json)
 }
 
 assert {

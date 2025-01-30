@@ -1,0 +1,50 @@
+meta {
+  name: upload-json
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://{{HOST}}/api/dictionary/upload
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  : 
+}
+
+body:multipart-form {
+  file: @file(C:\Projects\GitHub\wordgriddle\test\data\small.json) @contentType(application/json)
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+tests {
+  test("Should return the status", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('status');
+    expect(data.status).to.equal('complete');
+  });
+  
+  test("Should return the uploaded words count", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('uploadedCount');
+    expect(data.uploadedCount).to.be.a('number');
+  });
+  
+  test("Should return the imported words count", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('importedCount');
+    expect(data.importedCount).to.be.a('number');
+  });
+  
+  test("Imported count should match upload count", function() {
+    const data = res.getBody();
+    expect(data.importedCount === data.uploadedCount);
+  });
+  
+}

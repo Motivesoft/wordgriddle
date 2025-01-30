@@ -1,7 +1,7 @@
 meta {
-  name: upload
+  name: upload-txt
   type: http
-  seq: 6
+  seq: 7
 }
 
 post {
@@ -11,7 +11,7 @@ post {
 }
 
 body:multipart-form {
-  file: @file(C:\Projects\GitHub\wordgriddle-utilities\data\dictionary.txt)
+  file: @file(C:\Projects\GitHub\wordgriddle-utilities\data\dictionary.txt) @contentType(plain/text)
 }
 
 assert {

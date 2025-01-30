@@ -52,10 +52,28 @@ class WordListOperations {
         }
 
         let uploadedFile = req.files.file;
-        console.debug(`Uploading ${this.name} words from: ${uploadedFile.name}`);
+        console.debug(`Uploading ${this.name} words from: ${uploadedFile.name} (${uploadedFile.mimetype})`);
 
-        const data = uploadedFile.data;
-        const words = data.toString('utf8').split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
+        // Be cautious here
+        const fileData = uploadedFile.data;
+        if (fileData === undefined) {
+            return res.status(400).json({message:'No data was uploaded.'});
+        }
+
+        const data = fileData.toString('utf8');
+
+        let words = [];
+        if (uploadedFile.mimetype === 'application/json') {
+            const parsedData = JSON.parse(data);
+            
+            words = parsedData.words;
+            if (words.length !== parsedData.count) {
+                // Report the difference, but continue anyway - effectively, we ignore the 'count' here
+                console.log(`Uploaded word list does not have expected number of words:- ${words.length} instead of ${parsedData.count}`);
+            }
+        } else { // Default to 'plain/txt'
+            words = data.split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
+        }
 
         if (words === undefined || words.length == 0) {
             return res.status(400).json({ message: 'File does not appear to contain a word list.' });
@@ -72,23 +90,23 @@ class WordListOperations {
 
     async download(req, res) {
         try {
-            // Allow text/plain or JSON download
+            // Allow text/plain or JSON download - will use text/plain if nothing is specified
             const acceptHeader = req.headers['accept'];
 
-            console.log(`Downloading ${this.name} words as '${acceptHeader}' (default: application/json)`);
+            console.log(`Downloading ${this.name} words as '${acceptHeader}'`);
             
             // Get database content as a word array
             const words = await this.getWordList();
 
             // Work out whether text or JSON download and set headers for file download
-            if (acceptHeader === 'text/plain') {
-                res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
-                res.setHeader('Content-Type', 'text/plain');
-                res.send(words.join('\n'));
-            } else {
+            if (acceptHeader === 'application/json') {
                 res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.json"`);
                 res.setHeader('Content-Type', 'application/json');
                 res.send(JSON.stringify({count: words.length, words: words}));
+            } else { // Default to 'plain/text'
+                res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
+                res.setHeader('Content-Type', 'text/plain');
+                res.send(words.join('\n'));
             }
         } catch (error) {
             console.error("Failed to download word list:", error.message);
