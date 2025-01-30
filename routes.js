@@ -9,7 +9,6 @@ const router = express.Router();
 // Define API routes
 
 // Word list management
-// Route to instances. Use the 'arrow function' for readability, but could also use 'instance.method.bind(instance)'
 router.get('/dictionary/info', (req, res) => dictionaryWordOperations.getInformation(req, res));
 router.get('/dictionary/validate/:word', (req, res) => dictionaryWordOperations.validateWord(req, res));
 router.get('/dictionary/validate-prefix/:letters', (req, res) => dictionaryWordOperations.validateWordPrefix(req, res));
@@ -28,6 +27,7 @@ router.get('/excluded/validate-prefix/:letters', (req, res) => excludedWordOpera
 router.get('/excluded/download', (req, res) => excludedWordOperations.download(req, res));
 router.post('/excluded/upload', (req, res) => excludedWordOperations.upload(req, res));
 
+// System admin and management
 router.get('/admin/vacuum', adminEndpoints.vacuum);
 router.get('/admin/shutdown', adminEndpoints.shutdown);
 
