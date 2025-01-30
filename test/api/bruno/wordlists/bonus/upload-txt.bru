@@ -10,12 +10,8 @@ post {
   auth: none
 }
 
-headers {
-  : 
-}
-
 body:multipart-form {
-  file: @file(C:\Projects\GitHub\wordgriddle-utilities\data\bonus.txt) @contentType(plain/text)
+  file: @file(data/bonus.txt) @contentType(plain/text)
 }
 
 assert {

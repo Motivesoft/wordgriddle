@@ -11,7 +11,7 @@ post {
 }
 
 body:multipart-form {
-  file: @file(C:\Projects\GitHub\wordgriddle\test\data\empty.txt)
+  file: @file(data/empty.txt) @contentType(plain/text)
 }
 
 assert {

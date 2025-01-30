@@ -10,12 +10,8 @@ post {
   auth: none
 }
 
-headers {
-  : 
-}
-
 body:multipart-form {
-  file: @file(C:\Projects\GitHub\wordgriddle\test\data\small.json) @contentType(application/json)
+  file: @file(data/small.json) @contentType(application/json)
 }
 
 assert {
