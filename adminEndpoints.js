@@ -1,4 +1,4 @@
-const db = require('./database');
+const { db } = require('./database');
 
 // GET <ip:port>/api/vacuum
 exports.vacuum = (req, res) => {
@@ -14,18 +14,6 @@ exports.vacuum = (req, res) => {
     });
 };
 
-// Try and do some housekeeping as and when we get asked to shutdown
-
-process.on('SIGINT', () => {
-    console.log("SIGINT");
-
-    db.close();
-    process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-    console.log("SIGTERM");
-
-    db.close();
-    process.exit(0);
-});
+exports.shutdown = (req, res) => {
+    process.exit(1);
+}

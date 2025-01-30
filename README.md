@@ -198,3 +198,31 @@ Multiple servers with essentially the same setup where updates are tested on a t
 * ```installWords``` - replace dictionary content with provided word list
 
 ## Game
+
+## Testing
+### bruno
+```shell
+npm install @usebruno/cli
+
+cd [test folder]
+bru run [.bru file] --env [environment name]
+```
+
+### curl
+```shell
+curl -F "file=@../wordgriddle-utilities/data/dictionary.txt" http://localhost:8996/api/dictionary/upload
+curl -F "file=@../wordgriddle-utilities/data/bonus.txt" http://localhost:8996/api/bonus/upload
+curl -F "file=@../wordgriddle-utilities/data/excluded.txt" http://localhost:8996/api/excluded/upload
+
+curl  http://localhost:8996/api/dictionary/info  
+curl  http://localhost:8996/api/bonus/info  
+curl  http://localhost:8996/api/excluded/info  
+
+curl  http://localhost:8996/api/dictionary/validate/:word
+curl  http://localhost:8996/api/bonus/validate/:word
+curl  http://localhost:8996/api/excluded/validate/:word
+
+curl  http://localhost:8996/api/dictionary/validate-prefix/:letters  
+curl  http://localhost:8996/api/bonus/validate-prefix/:letters  
+curl  http://localhost:8996/api/excluded/validate-prefix/:letters  
+```

@@ -1,0 +1,31 @@
+meta {
+  name: validate
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://{{HOST}}/api/bonus/validate/banana
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+tests {
+  test("Should return the word", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('word');
+    expect(data.word).to.be.a('string');
+    expect(data.word).to.equal('banana');
+  });
+  
+  test("Should return the result", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('exists');
+    expect(data.exists).to.be.a('boolean');
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: download
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://{{HOST}}/api/bonus/download
+  body: multipartForm
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains text/plain
+  res.headers['content-disposition']: contains bonusWordList.txt
+}
+
+tests {
+  test("Should return a string", function() {
+    const data = res.getBody();
+    expect(data).to.be.a('string');
+  
+    const snippet = data.slice(0, Math.min(data.length,1000));
+    const regex = /^[a-z\s]+$/;
+    assert(regex.test(snippet),"String contains non-alphabetic characters");
+  });
+}

@@ -5,13 +5,10 @@ const path = require('path');
 
 // Internal requires
 const routes = require('./routes');
-const db = require('./database');
+const { db } = require('./database');
 
 // Doing this allows us to read version info etc.
 var packageInfo = require('./package.json');
-
-// Use this to track for shutdown events so we can try and be graceful about them
-let server;
 
 // Allow the user to configute the network port to use, or use our default
 const port = process.env.PORT || 8996;
@@ -24,7 +21,7 @@ app.use(fileUpload());
 app.use('/api', routes);
 
 // Run the server
-server = app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server ${packageInfo.name} ${packageInfo.version} running at http://localhost:${port}`);
 });
 
@@ -49,7 +46,7 @@ process.on('exit', (code) => {
 // Function to close resources
 function closeResources() {
     console.log('Closing resources...');
-
+    
     db.close();
 }
 
