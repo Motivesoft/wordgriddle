@@ -17,7 +17,7 @@ headers {
 assert {
   res.status: eq 200
   res.headers['content-type']: contains application/json
-  res.headers['content-disposition']: contains dictionaryWordList.json
+  res.headers['content-disposition']: contains dictionaryWords.json
 }
 
 tests {

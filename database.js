@@ -12,19 +12,19 @@ const db = new sqlite3.Database(databaseName, (err) => {
         console.log('Connected to the SQLite database');
 
         db.run(
-            `CREATE TABLE IF NOT EXISTS dictionaryWordList (
+            `CREATE TABLE IF NOT EXISTS dictionaryWords (
             id INTEGER PRIMARY KEY, 
             word TEXT NOT NULL UNIQUE
         )`);
 
         db.run(
-            `CREATE TABLE IF NOT EXISTS bonusWordList (
+            `CREATE TABLE IF NOT EXISTS bonusWords (
                 id INTEGER PRIMARY KEY, 
                 word TEXT NOT NULL UNIQUE
             )`);
 
         db.run(
-            `CREATE TABLE IF NOT EXISTS excludedWordList (
+            `CREATE TABLE IF NOT EXISTS excludedWords (
             id INTEGER PRIMARY KEY, 
             word TEXT NOT NULL UNIQUE
         )`);

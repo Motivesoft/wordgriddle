@@ -184,11 +184,11 @@ Multiple servers with essentially the same setup where updates are tested on a t
 
 
 # Data and database tables
-## ```dictionaryList```
+## ```dictionaryWords```
 * Sourced from text file, installed via web API
 
-## ```bonusWordList```
-## ```excludedWordList```
+## ```bonusWords```
+## ```excludedWords```
 
 # Web API
 ## Admin

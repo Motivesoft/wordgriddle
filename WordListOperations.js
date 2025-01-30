@@ -72,13 +72,14 @@ class WordListOperations {
 
     async download(req, res) {
         try {
-            // Generate database content as text
-            const words = await this.getWordList();
-
             // Allow text/plain or JSON download
             const acceptHeader = req.headers['accept'];
-            console.log(`AcceptHeader: ${acceptHeader}`);
+
+            console.log(`Downloading ${this.name} words as '${acceptHeader}' (default: application/json)`);
             
+            // Get database content as a word array
+            const words = await this.getWordList();
+
             // Work out whether text or JSON download and set headers for file download
             if (acceptHeader === 'text/plain') {
                 res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
@@ -178,8 +179,8 @@ class WordListOperations {
 }
 
 // Declare the individual word lists
-const dictionaryWordOperations = new WordListOperations('Dictionary Words', 'dictionaryWordList');
-const bonusWordOperations = new WordListOperations('Bonus Words', 'bonusWordList');
-const excludedWordOperations = new WordListOperations('Excluded Words', 'excludedWordList');
+const dictionaryWordOperations = new WordListOperations('Dictionary Words', 'dictionaryWords');
+const bonusWordOperations = new WordListOperations('Bonus Words', 'bonusWords');
+const excludedWordOperations = new WordListOperations('Excluded Words', 'excludedWords');
 
 module.exports = { dictionaryWordOperations, bonusWordOperations, excludedWordOperations };

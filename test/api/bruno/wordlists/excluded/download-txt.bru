@@ -17,7 +17,7 @@ headers {
 assert {
   res.status: eq 200
   res.headers['content-type']: contains text/plain
-  res.headers['content-disposition']: contains excludedWordList.txt
+  res.headers['content-disposition']: contains excludedWords.txt
 }
 
 tests {
