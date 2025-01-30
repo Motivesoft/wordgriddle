@@ -78,23 +78,17 @@ class WordListOperations {
             // Allow text/plain or JSON download
             const acceptHeader = req.headers['accept'];
             console.log(`AcceptHeader: ${acceptHeader}`);
-
+            
+            // Work out whether text or JSON download and set headers for file download
             if (acceptHeader === 'text/plain') {
-                console.log(">text/plain");
-                res.writeHead(200, { 'Content-Type': 'text/plain', 'Content-Disposition': `attachment; filename="${this.tableName}.txt"` });
-                res.end(words.join('\n'));
+                res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
+                res.setHeader('Content-Type', 'text/plain');
+                res.send(words.join('\n'));
             } else {
-                console.log(">application/json");
-                res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Disposition': `attachment; filename="${this.tableName}.json"`  });
-                res.end(JSON.stringify({words: words}));
+                res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.json"`);
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify({count: words.length, words: words}));
             }
- 
-            // Set headers for file download
-            // res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
-            // res.setHeader('Content-Type', 'text/plain');
-     
-            // Send the database content as the response
-            // res.send(words);
         } catch (error) {
             console.error("Failed to download word list:", error.message);
             res.status(500).json({ message: 'An error occurred', error: error.message });
@@ -120,7 +114,6 @@ class WordListOperations {
         }
 
         console.debug(`Searching for ${letters}.* in ${this.name}`);
-
         const row = await dbGet(`SELECT EXISTS (SELECT 1 FROM ${this.tableName} WHERE word LIKE ?) AS exists_flag`, [`${letters}%`]);
         return row.exists_flag === 1;
     }
