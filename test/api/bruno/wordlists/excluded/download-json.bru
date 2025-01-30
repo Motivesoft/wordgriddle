@@ -1,0 +1,29 @@
+meta {
+  name: download-json
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://{{HOST}}/api/excluded/download
+  body: multipartForm
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+  res.headers['content-disposition']: contains excludedWordList.json
+}
+
+tests {
+  test("Should return a JSON object", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('words');
+    expect(Array.isArray(data.words)).to.be.true;
+  });
+}

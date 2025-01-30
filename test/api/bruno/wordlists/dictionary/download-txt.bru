@@ -1,19 +1,23 @@
 meta {
-  name: download JSON
+  name: download-text
   type: http
-  seq: 7
+  seq: 2
 }
 
 get {
-  url: http://{{HOST}}/api/bonus/download
+  url: http://{{HOST}}/api/dictionary/download
   body: multipartForm
   auth: none
+}
+
+headers {
+  Accept: text/plain
 }
 
 assert {
   res.status: eq 200
   res.headers['content-type']: contains text/plain
-  res.headers['content-disposition']: contains bonusWordList.txt
+  res.headers['content-disposition']: contains dictionaryWordList.txt
 }
 
 tests {

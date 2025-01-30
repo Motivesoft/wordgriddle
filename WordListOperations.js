@@ -75,12 +75,26 @@ class WordListOperations {
             // Generate database content as text
             const words = await this.getWordList();
 
-            // Set headers for file download
-            res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
-            res.setHeader('Content-Type', 'text/plain');
+            // Allow text/plain or JSON download
+            const acceptHeader = req.headers['accept'];
+            console.log(`AcceptHeader: ${acceptHeader}`);
 
+            if (acceptHeader === 'text/plain') {
+                console.log(">text/plain");
+                res.writeHead(200, { 'Content-Type': 'text/plain', 'Content-Disposition': `attachment; filename="${this.tableName}.txt"` });
+                res.end(words.join('\n'));
+            } else {
+                console.log(">application/json");
+                res.writeHead(200, { 'Content-Type': 'application/json', 'Content-Disposition': `attachment; filename="${this.tableName}.json"`  });
+                res.end(JSON.stringify({words: words}));
+            }
+ 
+            // Set headers for file download
+            // res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
+            // res.setHeader('Content-Type', 'text/plain');
+     
             // Send the database content as the response
-            res.send(words);
+            // res.send(words);
         } catch (error) {
             console.error("Failed to download word list:", error.message);
             res.status(500).json({ message: 'An error occurred', error: error.message });
@@ -163,9 +177,9 @@ class WordListOperations {
     async getWordList() {
         console.debug(`Getting all the words from ${this.name}`);
 
-        // Execute the query and transform the result into a string with each word on a new line
+        // Execute the query and transform the result into a string array
         const rows = await dbAll(`SELECT word FROM ${this.tableName} ORDER BY LENGTH(word), word ASC`);
-        const content = rows.map(row => row.word).join('\n');
+        const content = rows.map(row => row.word);
         return content;
     }
 }
