@@ -1,11 +1,11 @@
 meta {
-  name: Excluded download
+  name: download
   type: http
   seq: 1
 }
 
 get {
-  url: http://{{HOST}}/api/excluded/download
+  url: http://{{HOST}}/api/dictionary/download
   body: multipartForm
   auth: none
 }
@@ -13,7 +13,7 @@ get {
 assert {
   res.status: eq 200
   res.headers['content-type']: contains text/plain
-  res.headers['content-disposition']: contains bonusWordList.txt
+  res.headers['content-disposition']: contains dictionaryWordList.txt
 }
 
 tests {

@@ -1,11 +1,11 @@
 meta {
-  name: Bonus validate-prefix
+  name: validate
   type: http
-  seq: 4
+  seq: 3
 }
 
 get {
-  url: http://{{HOST}}/api/bonus/validate-prefix/banan
+  url: http://{{HOST}}/api/bonus/validate/banana
   body: none
   auth: none
 }
@@ -16,11 +16,11 @@ assert {
 }
 
 tests {
-  test("Should return the letters", function() {
+  test("Should return the word", function() {
     const data = res.getBody();
-    expect(data).to.have.property('letters');
-    expect(data.letters).to.be.a('string');
-    expect(data.letters).to.equal('banan');
+    expect(data).to.have.property('word');
+    expect(data.word).to.be.a('string');
+    expect(data.word).to.equal('banana');
   });
   
   test("Should return the result", function() {

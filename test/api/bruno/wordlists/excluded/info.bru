@@ -1,11 +1,11 @@
 meta {
-  name: Bonus info
+  name: info
   type: http
   seq: 2
 }
 
 get {
-  url: http://{{HOST}}/api/bonus/info
+  url: http://{{HOST}}/api/excluded/info
   body: none
   auth: none
 }
@@ -19,7 +19,7 @@ tests {
   test("Should return the name", function() {
     const data = res.getBody();
     expect(data).to.have.property('name');
-    expect(data.name).to.equal('Bonus Words');
+    expect(data.name).to.equal('Excluded Words');
   });
   
   test("Should return the word count", function() {

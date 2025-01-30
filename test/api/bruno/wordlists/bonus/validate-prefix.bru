@@ -1,11 +1,11 @@
 meta {
-  name: Dictionary validate
+  name: validate-prefix
   type: http
-  seq: 3
+  seq: 4
 }
 
 get {
-  url: http://{{HOST}}/api/dictionary/validate/banana
+  url: http://{{HOST}}/api/bonus/validate-prefix/banan
   body: none
   auth: none
 }
@@ -16,11 +16,11 @@ assert {
 }
 
 tests {
-  test("Should return the word", function() {
+  test("Should return the letters", function() {
     const data = res.getBody();
-    expect(data).to.have.property('word');
-    expect(data.word).to.be.a('string');
-    expect(data.word).to.equal('banana');
+    expect(data).to.have.property('letters');
+    expect(data.letters).to.be.a('string');
+    expect(data.letters).to.equal('banan');
   });
   
   test("Should return the result", function() {
