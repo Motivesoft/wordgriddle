@@ -15,8 +15,9 @@ class WordListOperations {
         try {
             const exists = await this.findWord(word);
             return res.json({ word: word, exists: exists });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
+        } catch (error) {
+            console.error("Failed to validate word:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
         }
     }
 
@@ -27,8 +28,9 @@ class WordListOperations {
         try {
             const exists = await this.findWordPrefix(letters);
             return res.json({ letters: letters, exists: exists });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
+        } catch (error) {
+            console.error("Failed to validate word prefix:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
         }
     }
 
@@ -38,14 +40,15 @@ class WordListOperations {
         try {
             const count = await this.getWordCount();
             res.json({ name: this.name, wordCount: count });
-        } catch (err) {
-            res.status(500).json({ error: err.message });
+        } catch (error) {
+            console.error("Failed to get information:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
         }
     }
 
     async upload(req, res) {
         if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).send('No files were uploaded.');
+            return res.status(422).send('No files were uploaded.');
         }
 
         let uploadedFile = req.files.file;
@@ -55,14 +58,15 @@ class WordListOperations {
         const words = data.toString('utf8').split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
 
         if (words === undefined || words.length == 0) {
-            throw new Error('File does not contain a word list');
+            return res.status(422).send('File does not appear to contain a word list.');
         }
 
         try {
             const count = await this.replaceWordList(words);
             res.status(200).json({ status: "complete", uploadedCount: words.length, importedCount: count });
-        } catch (err) {
-            res.status(500).json({ message: 'An error occurred', error: err.message });
+        } catch (error) {
+            console.error("Failed to upload word list:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
         }
     }
 
@@ -79,8 +83,7 @@ class WordListOperations {
             res.send(words);
         } catch (error) {
             console.error("Failed to download word list:", error.message);
-
-            res.status(500).json({ error: 'Failed to generate database backup' });
+            res.status(500).json({ message: 'An error occurred', error: error.message });
         }
     }
 

@@ -1,0 +1,19 @@
+meta {
+  name: upload empty
+  type: http
+  seq: 6
+}
+
+post {
+  url: http://{{HOST}}/api/dictionary/upload
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  file: @file(C:\Projects\GitHub\wordgriddle\test\data\empty.txt)
+}
+
+assert {
+  res.status: eq 422
+}
