@@ -17,3 +17,10 @@ body:multipart-form {
 assert {
   res.status: eq 422
 }
+
+tests {
+  test("Should return the status", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('message');
+  });
+}

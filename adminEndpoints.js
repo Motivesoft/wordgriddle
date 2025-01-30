@@ -5,12 +5,11 @@ exports.vacuum = (req, res) => {
     db.run('VACUUM', (err) => {
         if (err) {
             console.error('Error running VACUUM:', err.message);
-            res.status(500).json({ error: err.message });
-            return;
+            return res.status(500).json({ error: err.message });
         }
     
         console.log('VACUUM completed successfully');
-        res.status(200).send('VACUUM completed');
+        res.status(200).json({status: 'completed'});
     });
 };
 
