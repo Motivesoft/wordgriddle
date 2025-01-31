@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excluded Word List Manager</title>
+</head>
+<body>
+    <h1>Excluded Word List Manager</h1>
+    
+    <div id="wordList"></div>
+    
+    <button onclick="downloadWordList('excluded')">Download Word List</button>
+    <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList('excluded')">
+    
+    <button onclick="deleteSelectedWords('excluded')">Delete Selected Words</button>
+    
+    <textarea id="newWords" rows="5" cols="30" placeholder="Enter new words, one per line"></textarea>
+    <button onclick="insertNewWords('excluded')">Insert New Words</button>
+
+    <script src="operations.js"></script>
+    <script>
+        // Initial load
+        fetchWordList('excluded');
+    </script>
+</body>
+</html>

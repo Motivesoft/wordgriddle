@@ -1,10 +1,7 @@
 // Fetch and display word list
-async function fetchWordList() {
-    const response = await fetch('/api/bonus/words');
-    console.log("Fetch word list: ", response);
-
+async function fetchWordList(category) {
+    const response = await fetch(`/api/${category}/words`);
     const words = await response.json();
-    console.log("Words: ", words);
     const wordList = document.getElementById('wordList');
     wordList.innerHTML = words.words.map(word => 
         `<div><input type="checkbox" value="${word}"> ${word}</div>`
@@ -12,15 +9,15 @@ async function fetchWordList() {
 }
 
 // Download word list
-function downloadWordList() {
-    fetch('/api/bonus/download')
+function downloadWordList(category) {
+    fetch(`/api/${category}/download`)
         .then(response => response.blob())
         .then(blob => {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.style.display = 'none';
             a.href = url;
-            a.download = 'bonus_word_list.txt';
+            a.download = `${category}_word_list.txt`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -28,42 +25,39 @@ function downloadWordList() {
 }
 
 // Upload word list
-function uploadWordList() {
+function uploadWordList(category) {
     const file = document.getElementById('uploadFile').files[0];
     const formData = new FormData();
     formData.append('file', file);
 
-    fetch('/api/bonus/upload', {
+    fetch(`/api/${category}/upload`, {
         method: 'POST',
         body: formData
-    }).then(() => fetchWordList());
+    }).then(() => fetchWordList(category));
 }
 
 // Delete selected words
-function deleteSelectedWords() {
+function deleteSelectedWords(category) {
     const selectedWords = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
         .map(checkbox => checkbox.value);
 
-    fetch('/api/bonus/remove', {
+    fetch(`/api/${category}/remove`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ words: selectedWords })
-    }).then(() => fetchWordList());
+    }).then(() => fetchWordList(category));
 }
 
 // Insert new words
-function insertNewWords() {
+function insertNewWords(category) {
     const newWords = document.getElementById('newWords').value.split('\n').filter(word => word.trim() !== '');
 
-    fetch('/api/bonus/add', {
+    fetch(`/api/${category}/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ words: newWords })
     }).then(() => {
-        fetchWordList();
+        fetchWordList(category);
         document.getElementById('newWords').value = '';
     });
 }
-
-// Initial load
-fetchWordList();
