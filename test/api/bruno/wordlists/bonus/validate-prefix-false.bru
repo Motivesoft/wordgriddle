@@ -1,0 +1,41 @@
+meta {
+  name: validate-prefix-false
+  type: http
+  seq: 11
+}
+
+get {
+  url: http://{{HOST}}/api/bonus/validate-prefix/:letters
+  body: none
+  auth: none
+}
+
+params:path {
+  letters: comp
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+script:pre-request {
+  // Run as a setup step to guarantee dictionary content
+  //const response = await bru.runRequest('wordlists/bonus/test-setup');
+}
+
+tests {
+  test("Should return the letters", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('letters');
+    expect(data.letters).to.be.a('string');
+    expect(data.letters).to.equal('comp');
+  });
+  
+  test("Should return the result", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('exists');
+    expect(data.exists).to.be.a('boolean');
+    expect(data.exists).to.equal(false);
+  });
+}

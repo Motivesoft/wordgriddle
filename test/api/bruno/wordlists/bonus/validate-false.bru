@@ -1,0 +1,41 @@
+meta {
+  name: validate-false
+  type: http
+  seq: 9
+}
+
+get {
+  url: http://{{HOST}}/api/bonus/validate/:word
+  body: none
+  auth: none
+}
+
+params:path {
+  word: prize
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+script:pre-request {
+  // Run as a setup step to guarantee dictionary content
+  //const response = await bru.runRequest('wordlists/bonus/test-setup');
+}
+
+tests {
+  test("Should return the word", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('word');
+    expect(data.word).to.be.a('string');
+    expect(data.word).to.equal('prize');
+  });
+  
+  test("Should return the result", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('exists');
+    expect(data.exists).to.be.a('boolean');
+    expect(data.exists).to.equal(true);
+  });
+}
