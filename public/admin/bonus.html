@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonus Word List Manager</title>
+    <script src="bonus.js" defer></script>
+</head>
+<body>
+    <h1>Bonus Word List Manager</h1>
+    
+    <div id="wordList"></div>
+    
+    <button onclick="downloadWordList()">Download Word List</button>
+    <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList()">
+    
+    <button onclick="deleteSelectedWords()">Delete Selected Words</button>
+    
+    <textarea id="newWords" rows="5" cols="30" placeholder="Enter new words, one per line"></textarea>
+    <button onclick="insertNewWords()">Insert New Words</button>
+</body>
+</html>
