@@ -1,13 +1,17 @@
 meta {
   name: validate-prefix
   type: http
-  seq: 5
+  seq: 8
 }
 
 get {
-  url: http://{{HOST}}/api/bonus/validate-prefix/banan
+  url: http://{{HOST}}/api/bonus/validate-prefix/:letters
   body: none
   auth: none
+}
+
+params:path {
+  letters: priz
 }
 
 assert {
@@ -15,17 +19,23 @@ assert {
   res.headers['content-type']: contains application/json
 }
 
+script:pre-request {
+  // Run as a setup step to guarantee dictionary content
+  const response = await bru.runRequest('wordlists/bonus/upload-txt');
+}
+
 tests {
   test("Should return the letters", function() {
     const data = res.getBody();
     expect(data).to.have.property('letters');
     expect(data.letters).to.be.a('string');
-    expect(data.letters).to.equal('banan');
+    expect(data.letters).to.equal('priz');
   });
   
   test("Should return the result", function() {
     const data = res.getBody();
     expect(data).to.have.property('exists');
     expect(data.exists).to.be.a('boolean');
+    expect(data.exists).to.equal(true);
   });
 }

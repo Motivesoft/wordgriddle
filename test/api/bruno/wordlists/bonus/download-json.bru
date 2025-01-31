@@ -1,7 +1,7 @@
 meta {
   name: download-json
   type: http
-  seq: 1
+  seq: 4
 }
 
 get {
@@ -20,10 +20,24 @@ assert {
   res.headers['content-disposition']: contains bonusWords.json
 }
 
+script:pre-request {
+  // Run as a setup step to guarantee dictionary content
+  const response = await bru.runRequest('wordlists/bonus/upload-txt');
+}
+
 tests {
   test("Should return a JSON object", function() {
     const data = res.getBody();
+    expect(data).to.have.property('count');
     expect(data).to.have.property('words');
     expect(Array.isArray(data.words)).to.be.true;
   });
+  
+  test("Should return expected results", function() {
+    const data = res.getBody();
+    expect(data.count).to.equal(5);
+    expect(data.words.includes("prize")).to.be.true;
+  });
+  
+  
 }

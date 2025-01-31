@@ -1,7 +1,7 @@
 meta {
   name: download-text
   type: http
-  seq: 2
+  seq: 5
 }
 
 get {
@@ -20,6 +20,11 @@ assert {
   res.headers['content-disposition']: contains bonusWords.txt
 }
 
+script:pre-request {
+  // Run as a setup step to guarantee dictionary content
+  const response = await bru.runRequest('wordlists/bonus/upload-txt');
+}
+
 tests {
   test("Should return a string", function() {
     const data = res.getBody();
@@ -28,5 +33,10 @@ tests {
     const snippet = data.slice(0, Math.min(data.length,1000));
     const regex = /^[a-z\s]+$/;
     assert(regex.test(snippet),"String contains non-alphabetic characters");
+  });
+  
+  test("Should return the expected result", function() {
+    const data = res.getBody();
+    expect(data).to.equal('gift\nbonus\nprize\nreward\ntrophy');
   });
 }
