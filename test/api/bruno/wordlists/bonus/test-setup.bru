@@ -1,0 +1,19 @@
+meta {
+  name: test-setup
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://{{HOST}}/api/bonus/upload
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  file: @file(data/bonus.txt) @contentType(plain/text)
+}
+
+assert {
+  res.status: eq 200
+}

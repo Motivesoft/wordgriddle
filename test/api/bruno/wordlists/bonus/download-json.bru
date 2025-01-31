@@ -1,7 +1,7 @@
 meta {
   name: download-json
   type: http
-  seq: 4
+  seq: 5
 }
 
 get {
@@ -22,7 +22,7 @@ assert {
 
 script:pre-request {
   // Run as a setup step to guarantee dictionary content
-  const response = await bru.runRequest('wordlists/bonus/upload-txt');
+  const response = await bru.runRequest('wordlists/bonus/test-setup');
 }
 
 tests {

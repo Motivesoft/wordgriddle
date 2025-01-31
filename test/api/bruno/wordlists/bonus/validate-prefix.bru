@@ -1,7 +1,7 @@
 meta {
   name: validate-prefix
   type: http
-  seq: 8
+  seq: 9
 }
 
 get {
@@ -21,7 +21,7 @@ assert {
 
 script:pre-request {
   // Run as a setup step to guarantee dictionary content
-  const response = await bru.runRequest('wordlists/bonus/upload-txt');
+  const response = await bru.runRequest('wordlists/bonus/test-setup');
 }
 
 tests {
