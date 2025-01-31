@@ -1,0 +1,50 @@
+meta {
+  name: add-txt
+  type: http
+  seq: 12
+}
+
+post {
+  url: http://{{HOST}}/api/bonus/add
+  body: text
+  auth: none
+}
+
+body:text {
+  alpha
+  beta
+  gamma
+  delta
+  
+}
+
+body:multipart-form {
+  words: alpha @contentType(plain/text)
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+tests {
+  test("Should return the status", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('status');
+    expect(data.status).to.equal('complete');
+  });
+  
+  test("Should return the counts", function() {
+    const data = res.getBody();
+    expect(data).to.have.property('uploadedCount');
+    expect(data.uploadedCount).to.be.a('number');
+    expect(data).to.have.property('importedCount');
+    expect(data.importedCount).to.be.a('number');
+  });
+  
+  test("Should return accurate counts", function() {
+    const data = res.getBody();
+    expect(data.uploadedCount).to.equal(4);
+    expect(data.uploadedCount === data.importedCount);
+  });
+}

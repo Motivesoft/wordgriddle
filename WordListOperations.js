@@ -1,5 +1,8 @@
 const { db, dbAll, dbGet } = require('./database');
 
+const CONTENT_TYPE_APPLICATION_JSON = "application/json";
+const CONTENT_TYPE_TEXT_PLAIN = "text/plain";
+
 class WordListOperations {
     constructor(name, tableName) {
         this.name = name;
@@ -7,6 +10,34 @@ class WordListOperations {
     }
 
     // Endpoints
+
+    async addWords(req, res) {
+        const contentType = req.headers['content-type'] || CONTENT_TYPE_TEXT_PLAIN;
+
+        console.debug(`Add words to ${this.name} from ${contentType} list`);
+
+        // Allow json or plain text
+        let words = [];
+        if (contentType === CONTENT_TYPE_APPLICATION_JSON) {
+            words = req.body.words;
+        } else if (contentType === CONTENT_TYPE_TEXT_PLAIN) {
+            words = req.body.split('\n').filter(word => word.trim() !== '');
+        } else {
+            return res.status(400).json({ message: `Only ${CONTENT_TYPE_TEXT_PLAIN} and ${CONTENT_TYPE_APPLICATION_JSON} are supported` });
+        }
+
+        if (words.length === 0) {
+            return res.status(400).json({ message: 'No words were provided.' });
+        }
+
+        try {
+            const count = await this.insertWords(words);
+            res.status(200).json({ status: "complete", uploadedCount: words.length, importedCount: count });
+        } catch (error) {
+            console.error("Failed to insert words:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
 
     async validateWord(req, res) {
         const word = req.params.word;
@@ -47,31 +78,33 @@ class WordListOperations {
     }
 
     async upload(req, res) {
-        if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).json({message:'No files were uploaded.'});
+            // Allow text (default) or JSON upload
+            if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ message: 'No files were uploaded.' });
         }
 
         let uploadedFile = req.files.file;
         console.debug(`Uploading ${this.name} words from: ${uploadedFile.name} (${uploadedFile.mimetype})`);
 
-        // Be cautious here
         const fileData = uploadedFile.data;
         if (fileData === undefined) {
-            return res.status(400).json({message:'No data was uploaded.'});
+            return res.status(400).json({ message: 'No data was uploaded.' });
         }
 
         const data = fileData.toString('utf8');
+        const mimetype = uploadedFile.mimetype || CONTENT_TYPE_TEXT_PLAIN;
 
         let words = [];
-        if (uploadedFile.mimetype === 'application/json') {
+        if (mimetype === CONTENT_TYPE_APPLICATION_JSON) {
             const parsedData = JSON.parse(data);
-            
+
             words = parsedData.words;
             if (words.length !== parsedData.count) {
                 // Report the difference, but continue anyway - effectively, we ignore the 'count' here
                 console.log(`Uploaded word list does not have expected number of words:- ${words.length} instead of ${parsedData.count}`);
             }
-        } else { // Default to 'plain/txt'
+        } else { 
+            // Handle as 'plain/txt'
             words = data.split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
         }
 
@@ -80,7 +113,7 @@ class WordListOperations {
         }
 
         try {
-            const count = await this.replaceWordList(words);
+            const count = await this.replaceAllWords(words);
             res.status(200).json({ status: "complete", uploadedCount: words.length, importedCount: count });
         } catch (error) {
             console.error("Failed to upload word list:", error.message);
@@ -90,22 +123,23 @@ class WordListOperations {
 
     async download(req, res) {
         try {
-            // Allow text/plain or JSON download - will use text/plain if nothing is specified
-            const acceptHeader = req.headers['accept'];
+            // Allow text (default) or JSON download
+            const acceptHeader = req.headers['accept'] || CONTENT_TYPE_TEXT_PLAIN;
 
             console.log(`Downloading ${this.name} words as '${acceptHeader}'`);
-            
+
             // Get database content as a word array
-            const words = await this.getWordList();
+            const words = await this.getWords();
 
             // Work out whether text or JSON download and set headers for file download
-            if (acceptHeader === 'application/json') {
+            if (acceptHeader === CONTENT_TYPE_APPLICATION_JSON) {
                 res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.json"`);
-                res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify({count: words.length, words: words}));
-            } else { // Default to 'plain/text'
+                res.setHeader('Content-Type', CONTENT_TYPE_APPLICATION_JSON);
+                res.send(JSON.stringify({ count: words.length, words: words }));
+            } else { 
+                // Handle as 'plain/text'
                 res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
-                res.setHeader('Content-Type', 'text/plain');
+                res.setHeader('Content-Type', CONTENT_TYPE_TEXT_PLAIN);
                 res.send(words.join('\n'));
             }
         } catch (error) {
@@ -144,12 +178,21 @@ class WordListOperations {
         return row.count;
     }
 
-    async replaceWordList(words) {
+    async getWords() {
+        console.debug(`Getting all the words from ${this.name}`);
+
+        // Execute the query and transform the result into a string array
+        const rows = await dbAll(`SELECT word FROM ${this.tableName} ORDER BY LENGTH(word), word ASC`);
+        const content = rows.map(row => row.word);
+        return content;
+    }
+
+    async insertWords(words) {
         if (words === undefined) {
             throw new Error("Missing input");
         }
 
-        console.debug(`Replacing ${this.name} with ${words.length} words`);
+        console.debug(`Inserting ${words.length} words into ${this.name}`);
 
         // Whereas many of the other methods use promisified db methods, that doesn't really work here due
         // to the serialized calls, so manually construct a single promise instead
@@ -157,7 +200,6 @@ class WordListOperations {
         return new Promise((resolve, reject) => {
             db.serialize(() => {
                 db.run("BEGIN TRANSACTION");
-                db.run(`DELETE FROM ${this.tableName}`);
                 const stmt = db.prepare(`INSERT OR IGNORE INTO ${this.tableName} (word) VALUES (?)`);
 
                 let counter = 0;
@@ -176,7 +218,15 @@ class WordListOperations {
                 db.run("COMMIT", (err) => {
                     if (err) {
                         console.error('Error committing transaction:', err.message);
-                        reject(err);
+
+                        // If the commit fails, roll back
+                        db.run("ROLLBACK", (rollbackError) => {
+                            if (rollbackError) {
+                                console.error('Error rolling back transaction:', rollbackError.message);
+                            }
+
+                            reject(err);
+                        });
                     } else {
                         console.log('All inserts completed successfully');
                         resolve(counter);
@@ -186,13 +236,59 @@ class WordListOperations {
         });
     }
 
-    async getWordList() {
-        console.debug(`Getting all the words from ${this.name}`);
+    async replaceAllWords(words) {
+        if (words === undefined) {
+            throw new Error("Missing input");
+        }
 
-        // Execute the query and transform the result into a string array
-        const rows = await dbAll(`SELECT word FROM ${this.tableName} ORDER BY LENGTH(word), word ASC`);
-        const content = rows.map(row => row.word);
-        return content;
+        console.debug(`Replacing ${this.name} with ${words.length} words`);
+
+        // Whereas many of the other methods use promisified db methods, that doesn't really work here due
+        // to the serialized calls, so manually construct a single promise instead
+
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.run("BEGIN TRANSACTION");
+
+                // Delete existing data
+                db.run(`DELETE FROM ${this.tableName}`);
+
+                // Insert new data using a prepared statement for performance
+                const stmt = db.prepare(`INSERT OR IGNORE INTO ${this.tableName} (word) VALUES (?)`);
+
+                let counter = 0;
+                for (const word of words) {
+                    stmt.run(word.toLowerCase().trim(), (err) => {
+                        if (err) {
+                            console.error('Error inserting row:', err.message);
+                        } else {
+                            counter++;
+                        }
+                    });
+                }
+
+                // Finalise the transaction and commit - with explicit rollback in the event of an error
+                stmt.finalize();
+
+                db.run("COMMIT", (err) => {
+                    if (err) {
+                        console.error('Error committing transaction:', err.message);
+
+                        // If the commit fails, roll back
+                        db.run("ROLLBACK", (rollbackError) => {
+                            if (rollbackError) {
+                                console.error('Error rolling back transaction:', rollbackError.message);
+                            }
+
+                            reject(err);
+                        });
+                    } else {
+                        console.log('All inserts completed successfully');
+                        resolve(counter);
+                    }
+                });
+            });
+        });
     }
 }
 
