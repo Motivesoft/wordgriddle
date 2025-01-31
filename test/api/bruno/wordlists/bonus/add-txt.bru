@@ -36,15 +36,15 @@ tests {
   
   test("Should return the counts", function() {
     const data = res.getBody();
-    expect(data).to.have.property('uploadedCount');
-    expect(data.uploadedCount).to.be.a('number');
-    expect(data).to.have.property('importedCount');
-    expect(data.importedCount).to.be.a('number');
+    expect(data).to.have.property('wordCount');
+    expect(data.wordCount).to.be.a('number');
+    expect(data).to.have.property('processedCount');
+    expect(data.processedCount).to.be.a('number');
   });
   
   test("Should return accurate counts", function() {
     const data = res.getBody();
-    expect(data.uploadedCount).to.equal(4);
-    expect(data.uploadedCount === data.importedCount);
+    expect(data.wordCount).to.equal(4);
+    expect(data.wordCount === data.processedCount);
   });
 }

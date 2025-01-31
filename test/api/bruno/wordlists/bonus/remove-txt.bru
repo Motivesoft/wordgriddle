@@ -1,24 +1,13 @@
 meta {
-  name: add-json
+  name: remove-txt
   type: http
-  seq: 13
+  seq: 14
 }
 
 post {
-  url: http://{{HOST}}/api/bonus/add
-  body: json
+  url: http://{{HOST}}/api/bonus/remove
+  body: text
   auth: none
-}
-
-body:json {
-  {
-    "words": [
-      "alpha",
-      "beta",
-      "gamma",
-      "delta"
-    ]
-  }
 }
 
 body:text {
@@ -26,6 +15,7 @@ body:text {
   beta
   gamma
   delta
+  
 }
 
 body:multipart-form {

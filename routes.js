@@ -21,6 +21,7 @@ router.get('/bonus/validate-prefix/:letters', (req, res) => bonusWordOperations.
 router.get('/bonus/download', (req, res) => bonusWordOperations.download(req, res));
 router.post('/bonus/upload', (req, res) => bonusWordOperations.upload(req, res));
 router.post('/bonus/add', (req, res) => bonusWordOperations.addWords(req, res));
+router.post('/bonus/remove', (req, res) => bonusWordOperations.removeWords(req, res));
 
 router.get('/excluded/info', (req, res) => excludedWordOperations.getInformation(req, res));
 router.get('/excluded/validate/:word', (req, res) => excludedWordOperations.validateWord(req, res));

@@ -14,7 +14,7 @@ class WordListOperations {
     async addWords(req, res) {
         const contentType = req.headers['content-type'] || CONTENT_TYPE_TEXT_PLAIN;
 
-        console.debug(`Add words to ${this.name} from ${contentType} list`);
+        console.debug(`Add words to ${this.name} using ${contentType} list`);
 
         // Allow json or plain text
         let words = [];
@@ -32,9 +32,37 @@ class WordListOperations {
 
         try {
             const count = await this.insertWords(words);
-            res.status(200).json({ status: "complete", uploadedCount: words.length, importedCount: count });
+            res.status(200).json({ status: "complete", wordCount: words.length, processedCount: count });
         } catch (error) {
             console.error("Failed to insert words:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
+
+    async removeWords(req, res) {
+        const contentType = req.headers['content-type'] || CONTENT_TYPE_TEXT_PLAIN;
+
+        console.debug(`Remove words from ${this.name} using ${contentType} list`);
+
+        // Allow json or plain text
+        let words = [];
+        if (contentType === CONTENT_TYPE_APPLICATION_JSON) {
+            words = req.body.words;
+        } else if (contentType === CONTENT_TYPE_TEXT_PLAIN) {
+            words = req.body.split('\n').filter(word => word.trim() !== '');
+        } else {
+            return res.status(400).json({ message: `Only ${CONTENT_TYPE_TEXT_PLAIN} and ${CONTENT_TYPE_APPLICATION_JSON} are supported` });
+        }
+
+        if (words.length === 0) {
+            return res.status(400).json({ message: 'No words were provided.' });
+        }
+
+        try {
+            const count = await this.deleteWords(words);
+            res.status(200).json({ status: "complete", wordCount: words.length, processedCount: count });
+        } catch (error) {
+            console.error("Failed to delete words:", error.message);
             res.status(500).json({ message: 'An error occurred', error: error.message });
         }
     }
@@ -114,7 +142,7 @@ class WordListOperations {
 
         try {
             const count = await this.replaceAllWords(words);
-            res.status(200).json({ status: "complete", uploadedCount: words.length, importedCount: count });
+            res.status(200).json({ status: "complete", wordCount: words.length, processedCount: count });
         } catch (error) {
             console.error("Failed to upload word list:", error.message);
             res.status(500).json({ message: 'An error occurred', error: error.message });
@@ -185,6 +213,55 @@ class WordListOperations {
         const rows = await dbAll(`SELECT word FROM ${this.tableName} ORDER BY LENGTH(word), word ASC`);
         const content = rows.map(row => row.word);
         return content;
+    }
+
+    async deleteWords(words) {
+        if (words === undefined) {
+            throw new Error("Missing input");
+        }
+
+        console.debug(`Deleting ${words.length} words from ${this.name}`);
+
+        // Whereas many of the other methods use promisified db methods, that doesn't really work here due
+        // to the serialized calls, so manually construct a single promise instead
+
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.run("BEGIN TRANSACTION");
+                const stmt = db.prepare(`DELETE FROM ${this.tableName} WHERE word = ?`);
+
+                let counter = 0;
+                for (const word of words) {
+                    stmt.run(word.toLowerCase().trim(), (err) => {
+                        if (err) {
+                            console.error('Error deleting row:', err.message);
+                        } else {
+                            counter++;
+                        }
+                    });
+                }
+
+                stmt.finalize();
+
+                db.run("COMMIT", (err) => {
+                    if (err) {
+                        console.error('Error committing transaction:', err.message);
+
+                        // If the commit fails, roll back
+                        db.run("ROLLBACK", (rollbackError) => {
+                            if (rollbackError) {
+                                console.error('Error rolling back transaction:', rollbackError.message);
+                            }
+
+                            reject(err);
+                        });
+                    } else {
+                        console.log('All deletes completed successfully');
+                        resolve(counter);
+                    }
+                });
+            });
+        });
     }
 
     async insertWords(words) {
