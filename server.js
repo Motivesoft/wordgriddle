@@ -16,6 +16,7 @@ const app = express();
 
 // Serve static files from the "public" directory, file upload middleware, and a public API
 app.use(express.json());
+app.use(express.text());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 app.use('/api', routes);
