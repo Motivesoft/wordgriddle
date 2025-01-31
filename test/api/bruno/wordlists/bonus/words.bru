@@ -1,0 +1,28 @@
+meta {
+  name: words
+  type: http
+  seq: 8
+}
+
+get {
+  url: http://{{HOST}}/api/bonus/words
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+tests {
+  test("Should return a JSON word list", function() {
+    const data = res.getBody();
+    expect(data).to.be.json;
+    expect(data).to.have.property('words');
+    expect(data.words).to.be.a('array');
+    expect(data).to.have.property('wordCount');
+    expect(data.wordCount).to.be.a('number');
+  });
+  
+}

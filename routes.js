@@ -19,6 +19,7 @@ router.get('/bonus/info', (req, res) => bonusWordOperations.getInformation(req, 
 router.get('/bonus/validate/:word', (req, res) => bonusWordOperations.validateWord(req, res));
 router.get('/bonus/validate-prefix/:letters', (req, res) => bonusWordOperations.validateWordPrefix(req, res));
 router.get('/bonus/download', (req, res) => bonusWordOperations.download(req, res));
+router.get('/bonus/words', (req, res) => bonusWordOperations.getWordList(req, res));
 router.post('/bonus/upload', (req, res) => bonusWordOperations.upload(req, res));
 router.post('/bonus/add', (req, res) => bonusWordOperations.addWords(req, res));
 router.post('/bonus/remove', (req, res) => bonusWordOperations.removeWords(req, res));

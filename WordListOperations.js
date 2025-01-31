@@ -105,6 +105,18 @@ class WordListOperations {
         }
     }
 
+    async getWordList(req, res) {
+        console.debug(`Get ${this.name} list`);
+
+        try {
+            const words = await this.getWords();
+            res.json({ words: words, wordCount: words.length });
+        } catch (error) {
+            console.error("Failed to get word list:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
+
     async upload(req, res) {
             // Allow text (default) or JSON upload
             if (!req.files || Object.keys(req.files).length === 0) {
