@@ -48,6 +48,11 @@ function deleteSelectedWords(category) {
     const selectedWords = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
         .map(checkbox => checkbox.value);
 
+    if (selectedWords.length === 0) {
+        alert("Select at least one word to delete. Select words by checking the boxes next to them.");
+        return;
+    }
+
     fetch(`/api/${category}/remove`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,8 +61,8 @@ function deleteSelectedWords(category) {
 }
 
 // Insert new words
-function insertNewWords(category) {
-    const newWords = document.getElementById('newWords').value.split('\n').filter(word => word.trim() !== '');
+function insertNewWords(category, wordList) {
+    const newWords = wordList.split('\n').filter(word => word.trim() !== '');
 
     fetch(`/api/${category}/add`, {
         method: 'POST',
@@ -65,6 +70,5 @@ function insertNewWords(category) {
         body: JSON.stringify({ words: newWords })
     }).then(() => {
         fetchWordList(category);
-        document.getElementById('newWords').value = '';
     });
 }

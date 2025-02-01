@@ -1,8 +1,16 @@
+:root {
+    --button-bg-color: #2563EB;
+    --button-text-color: white;
+    --button-hover-bg-color: #00BFFF;
+  }
+  
 body {
     font-family: Arial, sans-serif;
     margin: 0 auto;
     padding: 20px;
 }
+
+/* TODO Styles from index.html when we were prototyping file upload. See if we still need them */
 
 #uploadForm {
     margin-bottom: 20px;
@@ -22,11 +30,11 @@ body {
 #wordListContainer {
     max-height: 400px;
     /* Adjust this value as needed */
-    max-width: 200px;
+    min-width: 200px;
     overflow-y: auto;
     border: 1px solid #ccc;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 #wordList div {
@@ -61,3 +69,103 @@ body {
     font-weight: bold;
     cursor: pointer;
 }
+
+/* Button styling */
+
+button {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 8px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    width: 200px; /* Set a fixed width for consistency */
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--button-hover-bg-color);
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+button:active {
+    transform: scale(0.95);
+  }
+
+/* Input element styling */
+
+ input {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: 2px solid #04AA6D;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    /* width: 200px; */
+    outline: none;
+  }
+  
+  input:focus {
+    border-color: #045a3b;
+    box-shadow: 0 0 8px rgba(4, 170, 109, 0.5);
+  }
+  
+  input:hover {
+    background-color: var(--button-hover-bg-color);
+  } 
+  
+  input[type="file"]::file-selector-button {
+    background-color: #04AA6D;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  input[type="file"]::file-selector-button:hover {
+    background-color: #045a3b;
+  }
+  
+  /* Container stuff for button arrangement */
+
+  .container {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .button-stack {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    height: 100%;
+    border-style: dotted;
+  }
+
+  .top-buttons, .bottom-buttons {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .spacer {
+    flex-grow: 1;
+    min-height: 40px;
+  }
+
+  .wordlist-stack {
+    display: flex;
+    flex-direction: column;
+    border-style: dotted;
+  }
+
+  .button-stack button {
+    margin-bottom: 10px;
+  }
+  

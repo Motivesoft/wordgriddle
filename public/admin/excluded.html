@@ -14,25 +14,39 @@
     <a href="/admin/excluded.html">Excluded</a>
     <h1>Excluded Word List Manager</h1>
 
-    <div id="wordListContainer">
-        <div id="wordList"></div>
+    <div class="container">
+        <div class="button-stack">
+            <div id="wordListContainer">
+                <div id="wordList"></div>
+            </div>
+            <div id="wordCountDisplay"></div>
+        </div>
+        <div class="button-stack">
+            <div class="top-buttons">
+                <button onclick="openModal()">Insert</button>
+                <button onclick="deleteSelectedWords('excluded')">Delete</button>
+            </div>
+            <div class="spacer"></div>
+            <div class="bottom-buttons">
+                <button onclick="document.getElementById('uploadFile').click()">Upload</button>
+                <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList('excluded')"
+                    style="display:none">
+                <button onclick="downloadWordList('excluded')">Download</button>
+            </div>
+        </div>
     </div>
-    <div id="wordCountDisplay"></div>
 
-    <button onclick="downloadWordList('excluded')">Download Word List</button>
-    <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList('excluded')">
+    <!--
+        Buttons for managing the word list.
+        
+        Note that the <input> element for Upload is set to be hidden so that we can use a button
+        in the style of our other buttons for the desired behaviour
+    -->
 
-    <button onclick="deleteSelectedWords('excluded')">Delete Selected Words</button>
-
-    <textarea id="newWords" rows="5" cols="30" placeholder="Enter new words, one per line"></textarea>
-    <button onclick="insertNewWords('excluded')">Insert New Words</button>
-
-    <button onclick="openModal()">Open Modal</button>
-
-    <div id="myModal" class="modal">
+    <div id="insertWordsModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Enter words, one per line, to add to the list</h2>
+            <h2>Enter new words, one per line</h2>
             <textarea id="multilineInput" rows="5" cols="50"></textarea>
             <div style="padding-top: 8px;">
                 <button onclick="closeModal()">Cancel</button>
@@ -44,18 +58,17 @@
     <script src="operations.js"></script>
     <script>
         function openModal() {
-            document.getElementById("myModal").style.display = "block";
+            document.getElementById("insertWordsModal").style.display = "block";
         }
 
         function closeModal() {
-            document.getElementById("myModal").style.display = "none";
+            document.getElementById("insertWordsModal").style.display = "none";
             document.getElementById("multilineInput").value = "";
         }
 
         function submitText() {
             var text = document.getElementById("multilineInput").value;
-            document.getElementById('newWords').value = text;
-            insertNewWords('excluded')
+            insertNewWords('excluded', text);
             closeModal();
         }
 
