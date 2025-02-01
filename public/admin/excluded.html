@@ -32,9 +32,12 @@
     <div id="myModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Enter your text</h2>
+            <h2>Enter words, one per line, to add to the list</h2>
             <textarea id="multilineInput" rows="5" cols="50"></textarea>
-            <button onclick="submitText()">Submit</button>
+            <div style="padding-top: 8px;">
+                <button onclick="closeModal()">Cancel</button>
+                <button onclick="submitText()">Insert</button>
+            </div>
         </div>
     </div>
 
@@ -46,13 +49,14 @@
 
         function closeModal() {
             document.getElementById("myModal").style.display = "none";
+            document.getElementById("multilineInput").value = "";
         }
 
         function submitText() {
             var text = document.getElementById("multilineInput").value;
-            closeModal();
             document.getElementById('newWords').value = text;
             insertNewWords('excluded')
+            closeModal();
         }
 
         // Initial load
