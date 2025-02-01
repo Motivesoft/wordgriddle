@@ -1,0 +1,33 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#uploadForm {
+    margin-bottom: 20px;
+}
+
+#uploadStatus,
+#fileInfo {
+    margin-top: 10px;
+}
+
+#uploadProgress {
+    width: 100%;
+}
+
+/* Allows a list of words to be scrollable */
+
+#wordListContainer {
+    max-height: 400px; /* Adjust this value as needed */
+    max-width: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+#wordList div {
+    margin-bottom: 5px;
+}

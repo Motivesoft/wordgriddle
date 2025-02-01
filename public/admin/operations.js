@@ -1,14 +1,21 @@
 // Fetch and display word list
 async function fetchWordList(category) {
+    // Get the list of words
     const response = await fetch(`/api/${category}/words`);
     const words = await response.json();
+
+    // Populate the word list panel with the words and a checkbox for each one
     const wordList = document.getElementById('wordList');
     wordList.innerHTML = words.words.map(word => 
-        `<div><input type="checkbox" value="${word}"> ${word}</div>`
+        `<div><input type="checkbox" value="${word}">&nbsp;${word}</div>`
     ).join('');
+
+    // Display the number of words in the list
+    const wordCountDisplay = document.getElementById('wordCountDisplay');
+    wordCountDisplay.innerHTML = `Word count: ${words.wordCount}`;
 }
 
-// Download word list
+// Download word list - as text/plain (the default on the server)
 function downloadWordList(category) {
     fetch(`/api/${category}/download`)
         .then(response => response.blob())
@@ -24,7 +31,7 @@ function downloadWordList(category) {
         });
 }
 
-// Upload word list
+// Upload word list - text/plain (the default on the server)
 function uploadWordList(category) {
     const file = document.getElementById('uploadFile').files[0];
     const formData = new FormData();

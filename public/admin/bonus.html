@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/style.css">
     <title>Bonus Word List Manager</title>
 </head>
+
 <body>
+    <a href="/index.html">Home</a>
+    <a href="/admin/bonus.html">Bonus</a>
+    <a href="/admin/excluded.html">Excluded</a>
     <h1>Bonus Word List Manager</h1>
     
-    <div id="wordList"></div>
-    
+    <div id="wordListContainer">
+        <div id="wordList"></div>
+    </div>
+    <div id="wordCountDisplay"></div>
+
     <button onclick="downloadWordList('bonus')">Download Word List</button>
     <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList('bonus')">
     
