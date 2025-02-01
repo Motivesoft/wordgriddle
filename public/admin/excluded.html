@@ -49,13 +49,6 @@
         </div>
     </div>
 
-    <!--
-        Buttons for managing the word list.
-        
-        Note that the <input> element for Upload is set to be hidden so that we can use a button
-        in the style of our other buttons for the desired behaviour
-    -->
-
     <div id="insertWordsModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeInsertWordsModal()">&times;</span>
@@ -94,6 +87,10 @@
     </div>
 
     <script src="operations.js"></script>
+    <script>
+        // Initial load
+        fetchWordList('excluded');
+    </script>
 </body>
 
 </html>
