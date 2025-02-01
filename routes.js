@@ -3,6 +3,7 @@ const express = require('express');
 
 const adminEndpoints = require('./adminEndpoints');
 const { dictionaryWordOperations, bonusWordOperations, excludedWordOperations } = require('./WordListOperations');
+const { puzzleDesignerOperations } = require('./PuzzleDesignerOperations');
 
 const router = express.Router();
 
@@ -36,6 +37,9 @@ router.get('/excluded/download', (req, res) => excludedWordOperations.download(r
 router.post('/excluded/upload', (req, res) => excludedWordOperations.upload(req, res));
 router.post('/excluded/add', (req, res) => excludedWordOperations.addWords(req, res));
 router.post('/excluded/remove', (req, res) => excludedWordOperations.removeWords(req, res));
+
+// Puzzle design
+router.post('/designer/puzzle-list', (req, res) => puzzleDesignerOperations.getPuzzleList(req, res));
 
 // System admin and management
 router.get('/admin/vacuum', adminEndpoints.vacuum);
