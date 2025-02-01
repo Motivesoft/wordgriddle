@@ -1,171 +1,204 @@
 :root {
-    --button-bg-color: #2563EB;
-    --button-text-color: white;
-    --button-hover-bg-color: #00BFFF;
-  }
-  
+  --button-bg-color: #2563EB;
+  --button-text-color: white;
+  --button-hover-bg-color: #00BFFF;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 0 auto;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Links bar */
+
+nav {
+  background-color: #333;
+  padding: 10px 0;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+nav li {
+  margin: 0 15px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #ffd700;
 }
 
 /* TODO Styles from index.html when we were prototyping file upload. See if we still need them */
 
 #uploadForm {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 #uploadStatus,
 #fileInfo {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 #uploadProgress {
-    width: 100%;
+  width: 100%;
 }
 
 /* Allows a list of words to be scrollable */
 
 #wordListContainer {
-    max-height: 400px;
-    min-height: 200px;
-    /* Adjust this value as needed */
-    min-width: 220px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
+  max-height: 400px;
+  min-height: 200px;
+  /* Adjust this value as needed */
+  min-width: 220px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 #wordList div {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 /* Styles for popup dialogs */
 
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: max-content; /* 80% is a good number, toos*/
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: max-content;
+  /* 80% is a good number, toos*/
 }
 
 .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 /* Button styling */
 
 button {
-    background-color: var(--button-bg-color);
-    color: var(--button-text-color);
-    border: none;
-    /* padding: 15px 32px; */
-    padding: 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    border-radius: 8px;
-    transition-duration: 0.4s;
-    cursor: pointer;
-    width: 150px; /* Set a fixed width for consistency */
-    transition: all 0.3s ease;
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  /* padding: 15px 32px; */
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 8px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  width: 150px;
+  /* Set a fixed width for consistency */
+  transition: all 0.3s ease;
 }
 
 button:hover {
-    background-color: var(--button-hover-bg-color);
-    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+  background-color: var(--button-hover-bg-color);
+  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
 
 button:active {
-    transform: scale(0.95);
-  }
+  transform: scale(0.95);
+}
 
 /* Input element styling */
 
- input {
-    background-color: var(--button-bg-color);
-    color: var(--button-text-color);
-    border: 2px solid #04AA6D;
-    padding: 10px 15px;
-    font-size: 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    /* width: 200px; */
-    outline: none;
-  }
-  
-  input:focus {
-    border-color: #045a3b;
-    box-shadow: 0 0 8px rgba(4, 170, 109, 0.5);
-  }
-  
-  input:hover {
-    background-color: var(--button-hover-bg-color);
-  } 
-  
-  input[type="file"]::file-selector-button {
-    background-color: #04AA6D;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  input[type="file"]::file-selector-button:hover {
-    background-color: #045a3b;
-  }
-  
-  /* Container stuff for button arrangement */
+input {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: 2px solid #04AA6D;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  /* width: 200px; */
+  outline: none;
+}
 
-  .container {
-    display: flex;
-    justify-content: flex-start;
-  }
+input:focus {
+  border-color: #045a3b;
+  box-shadow: 0 0 8px rgba(4, 170, 109, 0.5);
+}
 
-  .button-stack {
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-    height: 100%;
-  }
+input:hover {
+  background-color: var(--button-hover-bg-color);
+}
 
-  .top-buttons, .bottom-buttons {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .spacer {
-    flex-grow: 1;
-    min-height: 36px;
-  }
+input[type="file"]::file-selector-button {
+  background-color: #04AA6D;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-  .wordlist-stack {
-    display: flex;
-    flex-direction: column;
-  }
+input[type="file"]::file-selector-button:hover {
+  background-color: #045a3b;
+}
 
-  .button-stack button {
-    margin-bottom: 10px;
-  }
-  
+/* Container stuff for button arrangement */
+
+.container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.button-stack {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  height: 100%;
+}
+
+.top-buttons,
+.bottom-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.spacer {
+  flex-grow: 1;
+  min-height: 36px;
+}
+
+.wordlist-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-stack button {
+  margin-bottom: 10px;
+}

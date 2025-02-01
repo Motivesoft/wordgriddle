@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/style.css">
     <title>wordgriddle - dictionary upload</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
-        #uploadForm { margin-bottom: 20px; }
-        #uploadStatus, #fileInfo { margin-top: 10px; }
-        #uploadProgress { width: 100%; }
-    </style>
 </head>
+
 <body>
-    <a href="/index.html">Home</a>
-    <a href="/admin/dictionary.html">Dictionary Words</a>
-    <a href="/admin/bonus.html">Bonus Words</a>
-    <a href="/admin/excluded.html">Excluded Words</a>
-    <h1>Upload Dictionary File</h>
+    <nav>
+        <ul>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/admin/dictionary.html">Dictionary Words</a></li>
+            <li><a href="/admin/bonus.html">Bonus Words</a></li>
+            <li><a href="/admin/excluded.html">Excluded Words</a></li>
+            <li><a href="/admin/designer.html">Puzzle Designer</a></li>
+        </ul>
+    </nav>
+
+    <h1>Upload Dictionary File</h1>
+
     <form id="uploadForm" enctype="multipart/form-data">
         <input type="file" id="fileInput" name="file">
         <button type="submit">Upload</button>
@@ -26,7 +30,7 @@
     <div id="fileInfo"></div>
 
     <script>
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             // Clear any previous information
@@ -45,24 +49,24 @@
             formData.append('file', file);
 
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/api/dictionary/upload', true);
+            xhr.open('POST', '/api/bonus/upload', true);
 
-            xhr.upload.onprogress = function(e) {
+            xhr.upload.onprogress = function (e) {
                 if (e.lengthComputable) {
                     const percentComplete = (e.loaded / e.total) * 100;
                     updateProgress(percentComplete);
                 }
             };
 
-            xhr.onload = function() {
+            xhr.onload = function () {
                 if (xhr.status === 200) {
                     updateStatus('File uploaded successfully!');
                 } else {
                     const response = JSON.parse(xhr.responseText);
                     if (response === undefined) {
-                        updateStatus(`Upload failed. ${xhr.responseText}` );
+                        updateStatus(`Upload failed. ${xhr.responseText}`);
                     } else {
-                        updateStatus(`Upload failed. ${response.error}` );
+                        updateStatus(`Upload failed. ${response.error}`);
                     }
                 }
 
@@ -99,4 +103,5 @@
         }
     </script>
 </body>
+
 </html>
