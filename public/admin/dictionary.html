@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <title>Dictionary Word List Manager</title>
+</head>
+
+<body>
+    <a href="/index.html">Home</a>
+    <a href="/admin/dictionary.html">Dictionary Words</a>
+    <a href="/admin/bonus.html">Bonus Words</a>
+    <a href="/admin/excluded.html">Excluded Words</a>
+    <h1>Dictionary Word List Manager</h1>
+
+    <div class="container">
+        <div class="button-stack">
+            <div id="wordListContainer">
+                <div id="wordList"></div>
+            </div>
+            <div id="wordCountDisplay"></div>
+        </div>
+        <div class="button-stack">
+            <div class="top-buttons">
+                <button onclick="document.getElementById('uploadFile').click()">Upload</button>
+                <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList('dictionary')"
+                    style="display:none">
+                <button onclick="downloadWordList('dictionary')">Download</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="operations.js"></script>
+    <script>
+        // Initial load
+        fetchWordList('dictionary');
+    </script>
+</body>
+
+</html>

@@ -4,10 +4,13 @@ async function fetchWordList(category) {
     const response = await fetch(`/api/${category}/words`);
     const words = await response.json();
 
+    // Ugly bit of hard-coding
+    const selectable = category !== "dictionary";
+
     // Populate the word list panel with the words and a checkbox for each one
     const wordList = document.getElementById('wordList');
     wordList.innerHTML = words.words.map(word => 
-        `<div><input type="checkbox" value="${word}">&nbsp;${word}</div>`
+        selectable ? `<div><input type="checkbox" value="${word}">&nbsp;${word}</div>` : `<div>${word}</div>`
     ).join('');
 
     // Display the number of words in the list
