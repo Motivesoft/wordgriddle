@@ -1,5 +1,7 @@
 // Fetch and display word list
 async function fetchWordList(category) {
+    showBusyIndicator();
+
     // Get the list of words
     const response = await fetch(`/api/${category}/words`);
     const words = await response.json();
@@ -16,6 +18,7 @@ async function fetchWordList(category) {
     // Display the number of words in the list
     const wordCountDisplay = document.getElementById('wordCountDisplay');
     wordCountDisplay.innerHTML = `Word count: ${words.wordCount}`;
+    hideBusyIndicator();
 }
 
 // Download word list - as text/plain (the default on the server)
@@ -86,3 +89,13 @@ function openModal(modalId) {
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = "none";
 }
+
+// Busy spinner
+function showBusyIndicator() {
+    document.getElementById('busy-indicator').style.display = 'block';
+}
+
+function hideBusyIndicator() {
+    document.getElementById('busy-indicator').style.display = 'none';
+}
+
