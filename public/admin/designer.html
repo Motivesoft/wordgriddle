@@ -20,6 +20,65 @@
     </nav>
 
     <h1>Puzzle Designer</h1>
+
+    <div class="designer-container">
+        <div class="designer-column">
+            <div class="button-stack">
+                <div>
+                    <p>ABCDE</p>
+                    <p>ABCDE</p>
+                    <p>ABCDE</p>
+                    <p>ABCDE</p>
+                    <p>ABCDE</p>
+                </div>
+                <div class="bottom-buttons">
+                    <button onclick="openInsertWordsModal()">Solve</button>
+                    <button onclick="performDelete()">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="designer-column">
+            <div class="button-stack">
+                <div id="wordListContainer">
+                    <div id="requiredWordList"></div>
+                </div>
+                <div id="requiredWordCountDisplay"></div>
+                <div class="bottom-buttons">
+                    <button onclick="openInsertWordsModal()">Make Bonus →</button>
+                    <button onclick="performDelete()">Make Excluded →</button>
+                </div>
+            </div>
+        </div>
+        <div class="designer-column">
+            <div class="button-stack">
+                <div id="wordListContainer">
+                    <div id="bonusWordList"></div>
+                </div>
+                <div id="bonusWordCountDisplay"></div>
+                <div class="bottom-buttons">
+                    <button onclick="openInsertWordsModal()">← Make Required</button>
+                    <button onclick="performDelete()">Make Excluded →</button>
+                </div>
+            </div>
+        </div>
+        <div class="designer-column">
+            <div class="button-stack">
+                <div id="wordListContainer">
+                    <div id="excludedWordList"></div>
+                </div>
+                <div id="excludedWordCountDisplay"></div>
+                <div class="bottom-buttons">
+                    <button onclick="openInsertWordsModal()">← Make Required</button>
+                    <button onclick="performDelete()">← Make Bonus</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="puzzle.js"></script> 
+    <script>
+        fetchWordLists();
+    </script>
 </body>
 
 </html>

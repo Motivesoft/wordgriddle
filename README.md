@@ -226,3 +226,33 @@ curl  http://localhost:8996/api/dictionary/validate-prefix/:letters
 curl  http://localhost:8996/api/bonus/validate-prefix/:letters  
 curl  http://localhost:8996/api/excluded/validate-prefix/:letters  
 ```
+
+## Puzzle Page
+Layout:
+- 4 columns (40% for grid and metadata, 3x20% for word lists)
+
+Button->New puzzle
+ - size
+ - name
+ - author
+ - created date
+
+Button->Lock/Unlock
+Button->Load
+Button->Save  (disabled if puzzle locked)
+button->Solve (disabled if puzzle locked)
+
+Button->Make Bonus (Required, Excluded)
+Button->Make Excluded (Required Bonus)
+Button->Make Required (Bonus, Excluded)
+Button->Save Changes (Bonus)
+Button->Save Changes (Excluded)
+
+Words only have checkboxes if never saved to a list before???
+
+Concern:
+- Words may end up in both bonus and excluded lists. Either:
+  1 Ignore this
+  1 Try and automate data integrity on update
+  1 Provide an API to allow manually invoking a housekeeping method to resolve this
+  1 One of the above __AND__ make sure puzzle solver checks excluded list first
