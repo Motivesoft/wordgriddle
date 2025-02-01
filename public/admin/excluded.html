@@ -13,24 +13,51 @@
     <a href="/admin/bonus.html">Bonus</a>
     <a href="/admin/excluded.html">Excluded</a>
     <h1>Excluded Word List Manager</h1>
-    
+
     <div id="wordListContainer">
         <div id="wordList"></div>
     </div>
     <div id="wordCountDisplay"></div>
-    
+
     <button onclick="downloadWordList('excluded')">Download Word List</button>
     <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList('excluded')">
-    
+
     <button onclick="deleteSelectedWords('excluded')">Delete Selected Words</button>
-    
+
     <textarea id="newWords" rows="5" cols="30" placeholder="Enter new words, one per line"></textarea>
     <button onclick="insertNewWords('excluded')">Insert New Words</button>
 
+    <button onclick="openModal()">Open Modal</button>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Enter your text</h2>
+            <textarea id="multilineInput" rows="5" cols="50"></textarea>
+            <button onclick="submitText()">Submit</button>
+        </div>
+    </div>
+
     <script src="operations.js"></script>
     <script>
+        function openModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        function submitText() {
+            var text = document.getElementById("multilineInput").value;
+            closeModal();
+            document.getElementById('newWords').value = text;
+            insertNewWords('excluded')
+        }
+
         // Initial load
         fetchWordList('excluded');
     </script>
 </body>
+
 </html>
