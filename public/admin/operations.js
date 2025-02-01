@@ -44,31 +44,45 @@ function uploadWordList(category) {
 }
 
 // Delete selected words
-function deleteSelectedWords(category) {
-    const selectedWords = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-        .map(checkbox => checkbox.value);
-
-    if (selectedWords.length === 0) {
-        alert("Select at least one word to delete. Select words by checking the boxes next to them.");
+function deleteWords(category, wordList) {
+    // Defensive move. Caller should check and notify user
+    if (wordList.length === 0) {
+        console.log("Call to deleteWords with no words provided")
         return;
     }
 
     fetch(`/api/${category}/remove`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ words: selectedWords })
+        body: JSON.stringify({ words: wordList })
     }).then(() => fetchWordList(category));
 }
 
 // Insert new words
-function insertNewWords(category, wordList) {
-    const newWords = wordList.split('\n').filter(word => word.trim() !== '');
+function insertWords(category, wordList) {
+    // Defensive move. Caller should check and notify user
+    if (wordList === undefined || wordList.length === 0) {
+        console.log("Call to insertWords with no words provided")
+        return;
+    }
 
     fetch(`/api/${category}/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ words: newWords })
+        body: JSON.stringify({ words: wordList })
     }).then(() => {
         fetchWordList(category);
     });
 }
+
+// Modal dialog functions
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = "block";
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+}
+
+// Initial load
+fetchWordList('excluded');

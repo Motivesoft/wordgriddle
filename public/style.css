@@ -29,6 +29,7 @@ body {
 
 #wordListContainer {
     max-height: 400px;
+    min-height: 200px;
     /* Adjust this value as needed */
     min-width: 200px;
     overflow-y: auto;
@@ -59,7 +60,7 @@ body {
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
+    width: max-content; /* 80% is a good number, toos*/
 }
 
 .close {
@@ -76,7 +77,8 @@ button {
     background-color: var(--button-bg-color);
     color: var(--button-text-color);
     border: none;
-    padding: 15px 32px;
+    /* padding: 15px 32px; */
+    padding: 10px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -84,7 +86,7 @@ button {
     border-radius: 8px;
     transition-duration: 0.4s;
     cursor: pointer;
-    width: 200px; /* Set a fixed width for consistency */
+    width: 150px; /* Set a fixed width for consistency */
     transition: all 0.3s ease;
 }
 
@@ -146,7 +148,6 @@ button:active {
     flex-direction: column;
     padding: 10px;
     height: 100%;
-    border-style: dotted;
   }
 
   .top-buttons, .bottom-buttons {
@@ -156,13 +157,12 @@ button:active {
   
   .spacer {
     flex-grow: 1;
-    min-height: 40px;
+    min-height: 36px;
   }
 
   .wordlist-stack {
     display: flex;
     flex-direction: column;
-    border-style: dotted;
   }
 
   .button-stack button {

@@ -23,8 +23,21 @@
         </div>
         <div class="button-stack">
             <div class="top-buttons">
-                <button onclick="openModal()">Insert</button>
-                <button onclick="deleteSelectedWords('excluded')">Delete</button>
+                <button onclick="openInsertWordsModal()">Insert</button>
+                <button onclick="performDelete()">Delete</button>
+                <script>
+                    function performDelete() {
+                        const selectedWords = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                            .map(checkbox => checkbox.value);
+
+                        if (selectedWords.length === 0) {
+                            alert("Select at least one word to delete. Select words by checking the boxes next to them.");
+                            return;
+                        }
+
+                        deleteWords('excluded', selectedWords);
+                    }
+                </script>
             </div>
             <div class="spacer"></div>
             <div class="bottom-buttons">
@@ -45,36 +58,42 @@
 
     <div id="insertWordsModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
+            <span class="close" onclick="closeInsertWordsModal()">&times;</span>
             <h2>Enter new words, one per line</h2>
-            <textarea id="multilineInput" rows="5" cols="50"></textarea>
+            <textarea id="multilineInput" rows="10" cols="40"></textarea>
             <div style="padding-top: 8px;">
-                <button onclick="closeModal()">Cancel</button>
-                <button onclick="submitText()">Insert</button>
+                <button onclick="closeInsertWordsModal()">Cancel</button>
+                <button onclick="submitInsertWordsModal()">Insert</button>
             </div>
+            <script>
+                function openInsertWordsModal() {
+                    resetInsertWordsModal();
+                    openModal("insertWordsModal");
+                }
+                function submitInsertWordsModal() {
+                    var text = document.getElementById("multilineInput").value;
+                    const newWords = text.split('\n').filter(word => word.trim() !== '');
+
+                    if (newWords.length === 0) {
+                        alert("Provide at least one word to insert.");
+                        return;
+                    }
+
+                    insertWords('excluded', newWords);
+                    closeInsertWordsModal();
+                }
+                function resetInsertWordsModal() {
+                    document.getElementById("multilineInput").value = "";
+                }
+                function closeInsertWordsModal() {
+                    closeModal("insertWordsModal");
+                    resetInsertWordsModal();
+                }
+            </script>
         </div>
     </div>
 
     <script src="operations.js"></script>
-    <script>
-        function openModal() {
-            document.getElementById("insertWordsModal").style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById("insertWordsModal").style.display = "none";
-            document.getElementById("multilineInput").value = "";
-        }
-
-        function submitText() {
-            var text = document.getElementById("multilineInput").value;
-            insertNewWords('excluded', text);
-            closeModal();
-        }
-
-        // Initial load
-        fetchWordList('excluded');
-    </script>
 </body>
 
 </html>
