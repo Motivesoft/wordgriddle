@@ -1,8 +1,6 @@
 const { db, dbAll, dbGet } = require('./database');
 
-const PUZZLE_LABEL_PREFIX = "wordgriddle #";
-const PUZZLE_LABEL_MIDDLE = "(";
-const PUZZLE_LABEL_SUFFIX = ")";
+const PUZZLE_NAME = "wordgriddle";
 
 class PuzzleOperations {
     constructor(name, publishedStatus) {
@@ -56,7 +54,7 @@ class PuzzleOperations {
         //return await dbGet(`INSERT INTO puzzleLabels (label) VALUES (SELECT MAX(id) FROM puzzleLabels)+1)`,[today]);
         return await dbGet(`
             INSERT INTO puzzleLabels (label)
-                VALUES (CONCAT(?, '-', COALESCE((SELECT MAX(id) FROM puzzleLabels), 0) + 1))
+                VALUES (CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM puzzleLabels), 0) + 1, ' - ', ?))
                 RETURNING id, label
         `,[today]);
     }
