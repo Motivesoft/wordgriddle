@@ -2,8 +2,8 @@ const sqlite3 = require('sqlite3').verbose();
 const util = require('util');
 
 // Toggle between in-memory and file-based database
-const databaseName = ':memory:';
-//const databaseName = './wordgriddle.db';
+//const databaseName = ':memory:';
+const databaseName = './wordgriddle.db';
 
 const db = new sqlite3.Database(databaseName, (err) => {
     if (err) {

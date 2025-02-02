@@ -1,5 +1,9 @@
 const { db, dbAll, dbGet } = require('./database');
 
+const PUZZLE_LABEL_PREFIX = "wordgriddle #";
+const PUZZLE_LABEL_MIDDLE = "(";
+const PUZZLE_LABEL_SUFFIX = ")";
+
 class PuzzleOperations {
     constructor(name, publishedStatus) {
         this.name = name;
@@ -42,13 +46,19 @@ class PuzzleOperations {
     }
 
     async createNewPuzzleLabel() {
-        console.debug(`Getting all ${this.name} puzzles`);
+        console.debug(`Creating a new puzzle label`);
 
         // Get date as a (sortable) string in the form yyyy-mm-dd
         const today = new Date().toISOString().slice(0, 10); 
 
         // Execute the query and transform the result into a string array
-        return await dbGet(`INSERT INTO puzzleLabels (label) VALUES (? || '-' || COALESCE((SELECT MAX(id) FROM puzzleLabels), 0) + 1)`,[today]);
+        // return await dbGet(`INSERT INTO puzzleLabels (label) VALUES CONCAT(?, '-', COALESCE((SELECT MAX(id) FROM puzzleLabels), 0) + 1)`,[today]);
+        //return await dbGet(`INSERT INTO puzzleLabels (label) VALUES (SELECT MAX(id) FROM puzzleLabels)+1)`,[today]);
+        return await dbGet(`
+            INSERT INTO puzzleLabels (label)
+                VALUES (CONCAT(?, '-', COALESCE((SELECT MAX(id) FROM puzzleLabels), 0) + 1))
+                RETURNING id, label
+        `,[today]);
     }
 }
 
