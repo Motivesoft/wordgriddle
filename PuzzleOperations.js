@@ -54,7 +54,7 @@ class PuzzleOperations {
         //return await dbGet(`INSERT INTO puzzleLabels (label) VALUES (SELECT MAX(id) FROM puzzleLabels)+1)`,[today]);
         return await dbGet(`
             INSERT INTO puzzleLabels (label)
-                VALUES (CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM puzzleLabels), 0) + 1, ' - ', ?))
+                VALUES (CONCAT('${PUZZLE_NAME}', ' #', (SELECT MAX(id) FROM puzzleLabels) + 1, ' - ', ?))
                 RETURNING id, label
         `,[today]);
     }
