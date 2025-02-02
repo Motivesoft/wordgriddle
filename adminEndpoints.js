@@ -1,7 +1,7 @@
 const { db } = require('./database');
 
 // GET <ip:port>/api/vacuum
-exports.vacuum = (req, res) => {
+exports.vacuumEndpoint = (req, res) => {
     db.run('VACUUM', (err) => {
         if (err) {
             console.error('Error running VACUUM:', err.message);
@@ -13,6 +13,7 @@ exports.vacuum = (req, res) => {
     });
 };
 
-exports.shutdown = (req, res) => {
+exports.shutdownEndpoint = (req, res) => {
+    console.log('Shutting down');
     process.exit(1);
 }

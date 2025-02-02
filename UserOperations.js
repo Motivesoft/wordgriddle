@@ -6,7 +6,7 @@ class UserOperations {
 
     // Endpoints
 
-    async getUserList(req, res) {
+    async getUsersEndpoint(req, res) {
         try {
             console.log(this);
             const users = await this.getUsers();

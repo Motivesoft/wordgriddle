@@ -12,7 +12,7 @@ class PuzzleOperations {
 
     // Endpoints
 
-    async getPuzzleList(req, res) {
+    async getPuzzlesEndpoint(req, res) {
         try {
             const puzzles = await this.getPuzzles();
             res.status(200).json({ status: "complete", puzzleCount: puzzles.length, puzzles: puzzles });
@@ -22,9 +22,9 @@ class PuzzleOperations {
         }
     }
 
-    async createPuzzleLabel(req, res) {
+    async createPuzzleLabelEndpoint(req, res) {
         try {
-            const label = await this.createNewPuzzleLabel();
+            const label = await this.createPuzzleLabel();
             res.status(200).json({ label: label });
         } catch (error) {
             console.error("Failed to create puzzle label:", error.message);
@@ -34,8 +34,10 @@ class PuzzleOperations {
 
     // Other methods
 
-    async getPuzzlesMetadata() {
+    async getPuzzles() {
         console.debug(`Getting all ${this.name} puzzles`);
+
+        // TODO needs tablename and WHERE for puzzle status
 
         // Execute the query and transform the result into a string array
         const rows = await dbAll(`SELECT word FROM ${this.tableName} ORDER BY LENGTH(word), word ASC`);
@@ -43,8 +45,8 @@ class PuzzleOperations {
         return content;
     }
 
-    async createNewPuzzleLabel() {
-        console.debug(`Creating a new puzzle label`);
+    async createPuzzleLabel() {
+        console.debug(`Create a puzzle label`);
 
         // Get date as a (sortable) string in the form yyyy-mm-dd
         const today = new Date().toISOString().slice(0, 10); 
