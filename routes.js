@@ -4,6 +4,7 @@ const express = require('express');
 const adminEndpoints = require('./adminEndpoints');
 const { dictionaryWordOperations, bonusWordOperations, excludedWordOperations } = require('./WordListOperations');
 const { puzzleDesignerOperations } = require('./PuzzleDesignerOperations');
+const { userOperations } = require('./UserOperations');
 
 const router = express.Router();
 
@@ -38,11 +39,15 @@ router.post('/excluded/upload', (req, res) => excludedWordOperations.upload(req,
 router.post('/excluded/add', (req, res) => excludedWordOperations.addWords(req, res));
 router.post('/excluded/remove', (req, res) => excludedWordOperations.removeWords(req, res));
 
-// Puzzle design
-router.post('/designer/puzzle-list', (req, res) => puzzleDesignerOperations.getPuzzleList(req, res));
+// User management
+// TODO consider merging this with 'admin' stuff
+router.get('/admin/users', (req, res) => userOperations.getUsers(req, res));
 
 // System admin and management
 router.get('/admin/vacuum', adminEndpoints.vacuum);
 router.get('/admin/shutdown', adminEndpoints.shutdown);
+
+// Puzzle design
+router.post('/designer/puzzle-list', (req, res) => puzzleDesignerOperations.getPuzzleList(req, res));
 
 module.exports = router;
