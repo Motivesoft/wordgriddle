@@ -66,7 +66,7 @@ const db = new sqlite3.Database(databaseName, (err) => {
                 label TEXT NOT NULL UNIQUE
             )`);
 
-            // Make sure there is at least one entry
+            // Make sure there is at least one entry so we don't need to worry at first use
             db.run(`INSERT OR IGNORE INTO puzzleLabels (id, label) VALUES (0, "**Unused**" )`);
 
             // A single table for all puzzles, with 'status' being the key to its editable/locked/published status
