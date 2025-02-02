@@ -11,7 +11,7 @@ class WordListOperations {
 
     // Endpoints
 
-    async addWords(req, res) {
+    async addWordsEndpoint(req, res) {
         const contentType = req.headers['content-type'] || CONTENT_TYPE_TEXT_PLAIN;
 
         console.debug(`Add words to ${this.name} using ${contentType} list`);
@@ -31,7 +31,7 @@ class WordListOperations {
         }
 
         try {
-            const count = await this.insertWords(words);
+            const count = await this.addWords(words);
             res.status(200).json({ status: "complete", wordCount: words.length, processedCount: count });
         } catch (error) {
             console.error("Failed to insert words:", error.message);
@@ -39,7 +39,7 @@ class WordListOperations {
         }
     }
 
-    async removeWords(req, res) {
+    async removeWordsEndpoint(req, res) {
         const contentType = req.headers['content-type'] || CONTENT_TYPE_TEXT_PLAIN;
 
         console.debug(`Remove words from ${this.name} using ${contentType} list`);
@@ -59,7 +59,7 @@ class WordListOperations {
         }
 
         try {
-            const count = await this.deleteWords(words);
+            const count = await this.removeWords(words);
             res.status(200).json({ status: "complete", wordCount: words.length, processedCount: count });
         } catch (error) {
             console.error("Failed to delete words:", error.message);
@@ -67,12 +67,12 @@ class WordListOperations {
         }
     }
 
-    async validateWord(req, res) {
+    async validateWordEndpoint(req, res) {
         const word = req.params.word;
         console.debug(`Searching for ${this.name} match: '${word}'`);
 
         try {
-            const exists = await this.findWord(word);
+            const exists = await this.validateWord(word);
             return res.json({ word: word, exists: exists });
         } catch (error) {
             console.error("Failed to validate word:", error.message);
@@ -80,12 +80,12 @@ class WordListOperations {
         }
     }
 
-    async validateWordPrefix(req, res) {
+    async validateWordPrefixEndpoint(req, res) {
         const letters = req.params.letters;
         console.debug(`Search for ${this.name} partial match: '${letters}'`);
 
         try {
-            const exists = await this.findWordPrefix(letters);
+            const exists = await this.validateWordPrefix(letters);
             return res.json({ letters: letters, exists: exists });
         } catch (error) {
             console.error("Failed to validate word prefix:", error.message);
@@ -93,11 +93,11 @@ class WordListOperations {
         }
     }
 
-    async getInformation(req, res) {
+    async getInformationEndpoint(req, res) {
         console.debug(`Get ${this.name} info`);
 
         try {
-            const count = await this.getWordCount();
+            const count = await this.getInformation();
             res.json({ name: this.name, wordCount: count });
         } catch (error) {
             console.error("Failed to get information:", error.message);
@@ -105,7 +105,7 @@ class WordListOperations {
         }
     }
 
-    async getWordList(req, res) {
+    async getWordsEndpoint(req, res) {
         console.debug(`Get ${this.name} list`);
 
         try {
@@ -117,7 +117,7 @@ class WordListOperations {
         }
     }
 
-    async upload(req, res) {
+    async uploadEndpoint(req, res) {
             // Allow text (default) or JSON upload
             if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).json({ message: 'No files were uploaded.' });
@@ -153,7 +153,7 @@ class WordListOperations {
         }
 
         try {
-            const count = await this.replaceAllWords(words);
+            const count = await this.replaceWords(words);
             res.status(200).json({ status: "complete", wordCount: words.length, processedCount: count });
         } catch (error) {
             console.error("Failed to upload word list:", error.message);
@@ -161,7 +161,7 @@ class WordListOperations {
         }
     }
 
-    async download(req, res) {
+    async downloadEndpoint(req, res) {
         try {
             // Allow text (default) or JSON download
             const acceptHeader = req.headers['accept'] || CONTENT_TYPE_TEXT_PLAIN;
@@ -190,7 +190,8 @@ class WordListOperations {
 
     // Other methods
 
-    async findWord(word) {
+    // See if the provided word is in the list
+    async validateWord(word) {
         if (word === undefined || word.length === 0) {
             throw new Error("Missing input");
         }
@@ -201,7 +202,8 @@ class WordListOperations {
         return row.exists_flag === 1;
     }
 
-    async findWordPrefix(letters) {
+    // Look to see whether any words in the list start with 'letters' 
+    async validateWordPrefix(letters) {
         if (letters === undefined || letters.length === 0) {
             throw new Error("Missing input");
         }
@@ -211,13 +213,15 @@ class WordListOperations {
         return row.exists_flag === 1;
     }
 
-    async getWordCount() {
+    // Return interesting information
+    async getInformation() {
         console.debug(`Getting the word count of ${this.name}`);
 
         const row = await dbGet(`SELECT COUNT(word) AS count FROM ${this.tableName}`, []);
         return row.count;
     }
 
+    // Return an array of all words in this list
     async getWords() {
         console.debug(`Getting all the words from ${this.name}`);
 
@@ -227,7 +231,8 @@ class WordListOperations {
         return content;
     }
 
-    async deleteWords(words) {
+    // Remove the provided words from the list
+    async removeWords(words) {
         if (words === undefined) {
             throw new Error("Missing input");
         }
@@ -276,7 +281,8 @@ class WordListOperations {
         });
     }
 
-    async insertWords(words) {
+    // Add the provided new words to the existing list contents
+    async addWords(words) {
         if (words === undefined) {
             throw new Error("Missing input");
         }
@@ -325,7 +331,8 @@ class WordListOperations {
         });
     }
 
-    async replaceAllWords(words) {
+    // Replace the entire contents with the provided new words
+    async replaceWords(words) {
         if (words === undefined) {
             throw new Error("Missing input");
         }
