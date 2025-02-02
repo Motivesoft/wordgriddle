@@ -41,7 +41,7 @@ router.post('/excluded/remove', (req, res) => excludedWordOperations.removeWords
 
 // User management
 // TODO consider merging this with 'admin' stuff
-router.get('/admin/users', (req, res) => userOperations.getUsers(req, res));
+router.get('/user/users', (req, res) => userOperations.getUserList(req, res));
 
 // System admin and management
 router.get('/admin/vacuum', adminEndpoints.vacuum);

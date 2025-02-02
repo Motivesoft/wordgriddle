@@ -5,7 +5,26 @@ meta {
 }
 
 get {
-  url: http://{{HOST}}/api/admin/users
+  url: http://{{HOST}}/api/user/users
   body: none
   auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.headers['content-type']: contains application/json
+}
+
+tests {
+  test("Should return the count and an array of users", function() {
+    const data = res.getBody();
+    expect(data).to.be.json;
+    expect(data).to.have.property('userCount');
+    expect(data.userCount).to.be.a('number');
+  
+    expect(data).to.have.property('users');
+    expect(data.users).to.be.a('array');
+  });
+  
+  
 }

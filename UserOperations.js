@@ -10,10 +10,10 @@ class UserOperations {
 
     // Endpoints
 
-    async getUsers(req, res) {
+    async getUserList(req, res) {
         try {
             console.log(this);
-            const users = await this.getUserList();
+            const users = await this.getUsers();
             res.status(200).json({ userCount: users.length, users: users });
         } catch (error) {
             console.error("Failed to get user list:", error.message);
@@ -23,7 +23,7 @@ class UserOperations {
 
     // Other methods
 
-    async getUserList() {
+    async getUsers() {
         console.debug(`Getting all users`);
 
         return await dbAll(`SELECT id, name FROM users ORDER BY name ASC`);
