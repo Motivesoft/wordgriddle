@@ -3,7 +3,7 @@ const express = require('express');
 
 const adminEndpoints = require('./adminEndpoints');
 const { dictionaryWordOperations, bonusWordOperations, excludedWordOperations } = require('./WordListOperations');
-const { puzzleDesignerOperations } = require('./PuzzleDesignerOperations');
+const { editablePuzzleOperations, publishedPuzzleOperations } = require('./PuzzleOperations');
 const { userOperations } = require('./UserOperations');
 
 const router = express.Router();
@@ -48,6 +48,7 @@ router.get('/admin/vacuum', adminEndpoints.vacuum);
 router.get('/admin/shutdown', adminEndpoints.shutdown);
 
 // Puzzle design
-router.post('/designer/puzzle-list', (req, res) => puzzleDesignerOperations.getPuzzleList(req, res));
+router.get('/designer/puzzles', (req, res) => editablePuzzleOperations.getPuzzleList(req, res));
+router.get('/designer/label', (req, res) => editablePuzzleOperations.createPuzzleLabel(req, res));
 
 module.exports = router;

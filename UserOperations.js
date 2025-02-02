@@ -2,10 +2,6 @@ const { db, dbAll, dbGet } = require('./database');
 
 class UserOperations {
     constructor() {
-        // Insert some hard-wired entries
-        db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (1, "Ian" )`);
-        db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (2, "Catherine" )`);
-        db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (3, "Squaredle" )`);
     }
 
     // Endpoints

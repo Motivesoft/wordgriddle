@@ -2,8 +2,8 @@ const sqlite3 = require('sqlite3').verbose();
 const util = require('util');
 
 // Toggle between in-memory and file-based database
-//const databaseName = ':memory:';
-const databaseName = './wordgriddle.db';
+const databaseName = ':memory:';
+//const databaseName = './wordgriddle.db';
 
 const db = new sqlite3.Database(databaseName, (err) => {
     if (err) {
@@ -11,47 +11,74 @@ const db = new sqlite3.Database(databaseName, (err) => {
     } else {
         console.log('Connected to the SQLite database');
 
-        // Word list tables
-
-        db.run(`
+        db.serialize(() => {
+            // Word list tables
+            db.run(`
             CREATE TABLE IF NOT EXISTS dictionaryWords (
                 id INTEGER PRIMARY KEY, 
                 word TEXT NOT NULL UNIQUE
-        )`);
+            )`);
 
-        db.run(`
+            db.run(`
             CREATE TABLE IF NOT EXISTS bonusWords (
                 id INTEGER PRIMARY KEY, 
                 word TEXT NOT NULL UNIQUE
             )`);
 
-        db.run(`
+            db.run(`
             CREATE TABLE IF NOT EXISTS excludedWords (
                 id INTEGER PRIMARY KEY, 
                 word TEXT NOT NULL UNIQUE
-        )`);
+            )`);
 
-        // Users tables
+            // Users tables
 
-        db.run(`
+            db.run(`
             CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY,
                 name TEXT NOT NULL UNIQUE
-            )
-        `);
+            )`);
 
-        // Puzzle tables
+            // Insert some hard-wired entries
+            db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (1, "Ian" )`);
+            db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (2, "Catherine" )`);
+            db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (3, "Squaredle" )`);
 
-        db.run(`
+
+            // Puzzle tables
+
+            // Puzzle status - editable, published, ...
+            db.run(`
+            CREATE TABLE IF NOT EXISTS puzzleStatus (
+                id INTEGER PRIMARY KEY,
+                name TEXT NOT NULL
+            )`);
+
+            // Insert some hard-wired entries so we can have guaranteed IDs
+            db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (1, "Editable" )`);    // still being worked on
+            db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (2, "Locked" )`);      // e.g. for beta testing, e.g. playable but results not stored
+            db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (3, "Published" )`);   // released to users, no longer editable
+
+            db.run(`
+            CREATE TABLE IF NOT EXISTS puzzleLabels (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                label TEXT NOT NULL UNIQUE
+            )`);
+
+            // A single table for all puzzles, with 'status' being the key to its editable/locked/published status
+            db.run(`
             CREATE TABLE IF NOT EXISTS puzzles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                label INTEGER,
+                alternateName TEXT,
                 author INTEGER NOT NULL,
                 letters TEXT,
-                created INTEGER,
-                FOREIGN KEY (author) REFERENCES users(id)
-            )
-        `);    
+                status INTEGER,
+                FOREIGN KEY (label) REFERENCES puzzleLabels(id),
+                FOREIGN KEY (author) REFERENCES users(id),
+                FOREIGN KEY (status) REFERENCES puzzleStatus(id)
+            )`);
+        });
     }
 });
 
@@ -61,4 +88,4 @@ const dbGet = util.promisify(db.get.bind(db));
 const dbRun = util.promisify(db.run.bind(db));
 
 // Exports
-module.exports = {db, dbAll, dbGet, dbRun};
+module.exports = { db, dbAll, dbGet, dbRun };
