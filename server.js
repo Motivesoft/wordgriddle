@@ -65,7 +65,7 @@ function gracefulShutdown() {
     // If after 10 seconds, forcefully shut down
     setTimeout(() => {
         console.error('Forcing shutdown due to timeout.');
-
+        
         process.exit(1);
     }, 10000);
 }

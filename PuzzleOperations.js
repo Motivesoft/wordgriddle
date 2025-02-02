@@ -1,4 +1,4 @@
-const { db, dbAll, dbGet } = require('./database');
+const { dbAll, dbGet } = require('./database');
 
 const PUZZLE_NAME = "wordgriddle";
 
