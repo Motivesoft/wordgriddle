@@ -3,7 +3,7 @@ const util = require('util');
 
 // Toggle between in-memory and file-based database
 const databaseName = ':memory:';
-//const databaseName = './wordgriddle.db';
+// const databaseName = './wordgriddle.db';
 
 const db = new sqlite3.Database(databaseName, (err) => {
     if (err) {
@@ -58,6 +58,7 @@ function createUserTables() {
             )`);
 
     // Insert some hard-wired entries for puzzle creations
+    db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (0, "Anonymous" )`);
     db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (1, "Ian" )`);
     db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (2, "Catherine" )`);
     db.run(`INSERT OR IGNORE INTO users (id, name) VALUES (3, "Squaredle" )`);
@@ -65,6 +66,7 @@ function createUserTables() {
 
 // Create tables used to support the main puzzle tables
 function createPuzzleSupportTables() {
+    // TODO is this redundant?
     // Puzzle status - editable, published, ...
     db.run(`
             CREATE TABLE IF NOT EXISTS puzzleStatus (
@@ -73,10 +75,11 @@ function createPuzzleSupportTables() {
             )`);
 
     // Insert some hard-wired entries so we can have guaranteed IDs
-    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (0, "Unsaved" )`); // no details on server
+    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (0, "Unsaved/New" )`); // brand new, incomplete details on server
     db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (1, "Editable" )`); // still being worked on
     db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (2, "Locked" )`); // e.g. for beta testing, e.g. playable but results not stored
     db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (3, "Published" )`); // released to users, no longer editable
+    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (4, "Withdrawn" )`); // no longer available
 
     // Table that is used to create and store auto-generated puzzle labels, e.g. "wordgriddle #10 - 2025-12-25"
     db.run(`
@@ -92,14 +95,29 @@ function createPuzzleSupportTables() {
 // Create tables for the puzzles themselves
 function createPuzzleTables() {
     db.run(`
-            CREATE TABLE IF NOT EXISTS puzzles (
+            CREATE TABLE IF NOT EXISTS editablePuzzles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                label INTEGER,
-                alternateName TEXT,
-                author INTEGER NOT NULL,
-                letters TEXT,
-                status INTEGER,
-                FOREIGN KEY (label) REFERENCES puzzleLabels(id),
+                label TEXT NOT NULL,
+                alternateName TEXT DEFAULT '',
+                author INTEGER DEFAULT 0,
+                letters TEXT DEFAULT '',
+                status INTEGER DEFAULT 0,
+                created STRING NOT NULL,
+                updated STRING NOT NULL,
+                FOREIGN KEY (author) REFERENCES users(id),
+                FOREIGN KEY (status) REFERENCES puzzleStatus(id)
+            )`);
+
+    db.run(`
+            CREATE TABLE IF NOT EXISTS publishedPuzzles (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                origin INTEGER,
+                title TEXT NOT NULL,
+                author INTEGER DEFAULT 0,
+                letters TEXT DEFAULT '',
+                status INTEGER DEFAULT 0,
+                created STRING NOT NULL,
+                FOREIGN KEY (origin) REFERENCES editablePuzzles(id),
                 FOREIGN KEY (author) REFERENCES users(id),
                 FOREIGN KEY (status) REFERENCES puzzleStatus(id)
             )`);
