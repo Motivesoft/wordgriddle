@@ -14,6 +14,16 @@ function createGrid(size) {
     }
   }
   
+  // Function to update word counts
+  function updateWordCounts() {
+    const lists = ["list1", "list2", "list3"];
+    lists.forEach((listId) => {
+      const list = document.getElementById(listId).querySelector("ul");
+      const countElement = document.getElementById(`count${listId.slice(-1)}`);
+      countElement.textContent = list.children.length;
+    });
+  }
+  
   // Function to move selected words to another list
   function moveSelected(fromListId, toListId) {
     const fromList = document.getElementById(fromListId).querySelector("ul");
@@ -27,7 +37,32 @@ function createGrid(size) {
       toList.appendChild(listItem); // Move to the target list
       checkbox.checked = false; // Uncheck the checkbox
     });
+  
+    // Update word counts
+    updateWordCounts();
+  }
+  
+  // Button handlers
+  function handleNew() {
+    alert("New button clicked");
+  }
+  
+  function handleLoad() {
+    alert("Load button clicked");
+  }
+  
+  function handleSave() {
+    alert("Save button clicked");
+  }
+  
+  function handleSolve() {
+    alert("Solve button clicked");
+  }
+  
+  function handlePublic() {
+    alert("Public button clicked");
   }
   
   // Initialize with a default grid
   createGrid(3);
+  updateWordCounts(); // Set initial word counts
