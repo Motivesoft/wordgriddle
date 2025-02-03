@@ -20,29 +20,41 @@
 
     <!-- Lists Section -->
     <div class="lists-section">
-      <div class="word-list">
+      <div class="word-list" id="list1">
         <h2>List 1</h2>
         <ul>
-          <li>Word 1</li>
-          <li>Word 2</li>
-          <li>Word 3</li>
+          <li><label><input type="checkbox"> Word 1</label></li>
+          <li><label><input type="checkbox"> Word 2</label></li>
+          <li><label><input type="checkbox"> Word 3</label></li>
         </ul>
+        <div class="list-controls">
+          <button onclick="moveSelected('list1', 'list2')">Move to List 2</button>
+          <button onclick="moveSelected('list1', 'list3')">Move to List 3</button>
+        </div>
       </div>
-      <div class="word-list">
+      <div class="word-list" id="list2">
         <h2>List 2</h2>
         <ul>
-          <li>Word 4</li>
-          <li>Word 5</li>
-          <li>Word 6</li>
+          <li><label><input type="checkbox"> Word 4</label></li>
+          <li><label><input type="checkbox"> Word 5</label></li>
+          <li><label><input type="checkbox"> Word 6</label></li>
         </ul>
+        <div class="list-controls">
+          <button onclick="moveSelected('list2', 'list1')">Move to List 1</button>
+          <button onclick="moveSelected('list2', 'list3')">Move to List 3</button>
+        </div>
       </div>
-      <div class="word-list">
+      <div class="word-list" id="list3">
         <h2>List 3</h2>
         <ul>
-          <li>Word 7</li>
-          <li>Word 8</li>
-          <li>Word 9</li>
+          <li><label><input type="checkbox"> Word 7</label></li>
+          <li><label><input type="checkbox"> Word 8</label></li>
+          <li><label><input type="checkbox"> Word 9</label></li>
         </ul>
+        <div class="list-controls">
+          <button onclick="moveSelected('list3', 'list1')">Move to List 1</button>
+          <button onclick="moveSelected('list3', 'list2')">Move to List 2</button>
+        </div>
       </div>
     </div>
   </div>

@@ -14,5 +14,20 @@ function createGrid(size) {
     }
   }
   
+  // Function to move selected words to another list
+  function moveSelected(fromListId, toListId) {
+    const fromList = document.getElementById(fromListId).querySelector("ul");
+    const toList = document.getElementById(toListId).querySelector("ul");
+  
+    // Get all checked items
+    const checkedItems = fromList.querySelectorAll("input[type='checkbox']:checked");
+  
+    checkedItems.forEach((checkbox) => {
+      const listItem = checkbox.closest("li"); // Get the parent <li> element
+      toList.appendChild(listItem); // Move to the target list
+      checkbox.checked = false; // Uncheck the checkbox
+    });
+  }
+  
   // Initialize with a default grid
   createGrid(3);
