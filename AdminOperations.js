@@ -25,7 +25,6 @@ class AdminOperations {
 
     async getUsersEndpoint(req, res) {
         try {
-            console.log(this);
             const users = await this.getUsers();
             res.status(200).json({ userCount: users.length, users: users });
         } catch (error) {
