@@ -118,8 +118,8 @@ class WordListOperations {
     }
 
     async uploadEndpoint(req, res) {
-            // Allow text (default) or JSON upload
-            if (!req.files || Object.keys(req.files).length === 0) {
+        // Allow text (default) or JSON upload
+        if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).json({ message: 'No files were uploaded.' });
         }
 
@@ -143,7 +143,7 @@ class WordListOperations {
                 // Report the difference, but continue anyway - effectively, we ignore the 'count' here
                 console.log(`Uploaded word list does not have expected number of words:- ${words.length} instead of ${parsedData.count}`);
             }
-        } else { 
+        } else {
             // Handle as 'plain/txt'
             words = data.split(/\s+/).filter(word => word.length > 0 && /^[a-zA-Z]*$/.test(word));
         }
@@ -176,7 +176,7 @@ class WordListOperations {
                 res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.json"`);
                 res.setHeader('Content-Type', CONTENT_TYPE_APPLICATION_JSON);
                 res.send(JSON.stringify({ count: words.length, words: words }));
-            } else { 
+            } else {
                 // Handle as 'plain/text'
                 res.setHeader('Content-Disposition', `attachment; filename="${this.tableName}.txt"`);
                 res.setHeader('Content-Type', CONTENT_TYPE_TEXT_PLAIN);
