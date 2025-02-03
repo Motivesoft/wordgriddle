@@ -118,9 +118,9 @@ function createGrid(size) {
     }
   }
   
-  // Function to handle the Public button
-  function handlePublic() {
-    alert("Public button clicked");
+  // Function to handle the Publish button
+  function handlePublish() {
+    alert("Publish button clicked");
   }
   
   // Initialize with a default grid

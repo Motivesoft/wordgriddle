@@ -95,6 +95,7 @@ button {
   border: none;
   /* padding: 15px 32px; */
   padding: 10px;
+  margin: 10px 0px 10px 0px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -102,7 +103,7 @@ button {
   border-radius: 8px;
   transition-duration: 0.4s;
   cursor: pointer;
-  width: 150px;
+  min-width: 120px;
   /* Set a fixed width for consistency */
   transition: all 0.3s ease;
 }
@@ -114,43 +115,6 @@ button:hover {
 
 button:active {
   transform: scale(0.95);
-}
-
-/* Input element styling */
-
-input {
-  background-color: var(--button-bg-color);
-  color: var(--button-text-color);
-  border: 2px solid #04AA6D;
-  padding: 10px 15px;
-  font-size: 16px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  /* width: 200px; */
-  outline: none;
-}
-
-input:focus {
-  border-color: #045a3b;
-  box-shadow: 0 0 8px rgba(4, 170, 109, 0.5);
-}
-
-input:hover {
-  background-color: var(--button-hover-bg-color);
-}
-
-input[type="file"]::file-selector-button {
-  background-color: #04AA6D;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-input[type="file"]::file-selector-button:hover {
-  background-color: #045a3b;
 }
 
 /* Container stuff for button arrangement */

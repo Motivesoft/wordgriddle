@@ -1,21 +1,27 @@
+// External requires
+
+// Internal requires
 const { dbAll, dbGet } = require('./database');
+const { PUZZLE_STATUS_CONSTANTS } = require('./constants');
 
 const PUZZLE_NAME = "wordgriddle";
 
 class PuzzleOperations {
+    // Parameters:
+    // - readable name for log statements etc
+    // - database table name (e.g. designer or published)
+    // - whether the table is for published puzzles only
     constructor(name, tableName, published) {
         this.name = name;
         this.tableName = tableName;
         this.published = published;
-
-        // TODO also pass in other behaviours?
     }
 
     // Endpoints
 
     async getPuzzlesEndpoint(req, res) {
         try {
-            console.log(`Get list from ${this.name}`);
+            console.log(`Get puzzle list from ${this.name}`);
 
             const puzzles = await this.getPuzzles();
             res.status(200).json({ puzzleCount: puzzles.length, puzzles: puzzles });
@@ -79,7 +85,7 @@ class PuzzleOperations {
     async getPuzzles() {
         console.debug(`List of all ${this.name}`);
 
-        // Execute the query and transform the result into a string array
+        // Execute the query and transform the result into an array
         return await dbAll(`SELECT * FROM ${this.tableName}`,[]);
     }
 
@@ -107,8 +113,40 @@ class PuzzleOperations {
                     letters = ?,
                     updated = ?
                 WHERE id = ?
-                RETURNING id, label, alternateName, author, letters, created, updated, status 
+                RETURNING *
         `,[puzzle.alternateName, puzzle.author, puzzle.letters, today.toJSON(), puzzle.id]);
+    }
+
+    // Update the status of a puzzle between locked and editable
+    async changeLockStatus(id, lock) {
+        console.log(`Change status of #${id} in ${this.name} to ${lock ? "locked":"unlocked"}`);
+
+        // Get update date
+        const today = new Date();
+        const status = lock ? PUZZLE_STATUS_CONSTANTS.LOCKED : PUZZLE_STATUS_CONSTANTS.EDITABLE;
+
+        return await dbGet(`
+            UPDATE ${this.tableName} SET 
+                    status = ?,
+                    updated = ?
+                WHERE id = ?
+                RETURNING *
+        `,[status, today.toJSON(), id]);
+    }
+
+    async changePuzzleStatus(id, status) {
+        console.log(`Change status of #${id} in ${this.name}`);
+
+        // Get update date
+        const today = new Date();
+
+        return await dbGet(`
+            UPDATE ${this.tableName} SET 
+                    status = ?,
+                    updated = ?
+                WHERE id = ?
+                RETURNING *
+        `,[status, today.toJSON(), id]);
     }
 
     async createPuzzle() {
@@ -124,10 +162,10 @@ class PuzzleOperations {
                     0,
                     ?,
                     ?,
-                    0
+                    ?
                 )
-                RETURNING id, label, alternateName, author, letters, created, updated, status 
-        `,[today.toISOString().slice(0, 10), today.toJSON(), today.toJSON()]);
+                RETURNING *
+        `,[today.toISOString().slice(0, 10), today.toJSON(), today.toJSON(), PUZZLE_STATUS_CONSTANTS.EDITABLE]);
     }
 }
 

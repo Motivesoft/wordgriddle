@@ -24,86 +24,94 @@
     <div class="grid-container">
         <!-- Grid Section -->
         <div class="grid-section">
-          <!-- Controls Above the Grid -->
-          <div class="grid-top-controls">
-            <button onclick="handleNew()">New</button>
-            <button onclick="handleLoad()">Load...</button>
-            <div class="input-group">
-              <label for="title">Title:</label>
-              <input type="text" id="title" placeholder="Enter title">
+            <!-- Controls Above the Grid -->
+            <div class="grid-top-controls">
+                <button onclick="handleNew()">New</button>
+                <button onclick="handleLoad()">Load...</button>
+                <div class="input-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" placeholder="Enter title">
+                </div>
+                <div class="input-group">
+                    <label for="author">Author:</label>
+                    <select id="author">
+                        <option value="Author 1">Author 1</option>
+                        <option value="Author 2">Author 2</option>
+                        <option value="Author 3">Author 3</option>
+                    </select>
+                </div>
+                <!-- Resize Grid Selector -->
+                <div class="input-group">
+                    <label for="size">Size:</label>
+                    <select id="size" onchange="createGrid(this.value)">
+                        <option value="3">3x3</option>
+                        <option value="4">4x4</option>
+                        <option value="5">5x5</option>
+                        <option value="6">6x6</option>
+                        <option value="7">7x7</option>
+                        <option value="8">8x8</option>
+                        <option value="9">9x9</option>
+                        <option value="10">10x10</option>
+                    </select>
+                </div>
             </div>
-            <div class="input-group">
-              <label for="author">Author:</label>
-              <select id="author">
-                <option value="Author 1">Author 1</option>
-                <option value="Author 2">Author 2</option>
-                <option value="Author 3">Author 3</option>
-              </select>
+
+            <!-- Grid -->
+            <div id="grid" class="grid"></div>
+
+            <!-- Controls Below the Grid -->
+            <div class="grid-bottom-controls">
+                <button onclick="handleSave()">Save</button>
+                <button onclick="handleSolve()">Solve</button>
+                <button onclick="handlePublish()">Publish</button>
             </div>
-            <!-- Resize Grid Buttons -->
-            <div class="resize-controls">
-              <button onclick="createGrid(3)">3x3 Grid</button>
-              <button onclick="createGrid(5)">5x5 Grid</button>
-              <button onclick="createGrid(10)">10x10 Grid</button>
-            </div>
-          </div>
-    
-          <!-- Grid -->
-          <div id="grid" class="grid"></div>
-    
-          <!-- Controls Below the Grid -->
-          <div class="grid-bottom-controls">
-            <button onclick="handleSave()">Save</button>
-            <button onclick="handleSolve()">Solve</button>
-            <button onclick="handlePublic()">Public</button>
-          </div>
         </div>
-    
+
         <!-- Lists Section -->
         <div class="lists-section">
-          <div class="word-list" id="listRequired">
-            <h2>Required Words</h2>
-            <p class="word-count">Words: <span id="countRequired">3</span></p>
-            <ul>
-              <li><label><input type="checkbox"> Word 1</label></li>
-              <li><label><input type="checkbox"> Word 2</label></li>
-              <li><label><input type="checkbox"> Word 3</label></li>
-            </ul>
-            <div class="list-controls">
-              <button onclick="moveSelected('listRequired', 'listBonus')">Bonus Word</button>
-              <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded Word</button>
+            <div class="word-list" id="listRequired">
+                <h2>Required Words</h2>
+                <p class="word-count">Words: <span id="countRequired">3</span></p>
+                <ul>
+                    <li><label><input type="checkbox"> Word 1</label></li>
+                    <li><label><input type="checkbox"> Word 2</label></li>
+                    <li><label><input type="checkbox"> Word 3</label></li>
+                </ul>
+                <div class="list-controls">
+                    <button onclick="moveSelected('listRequired', 'listBonus')">Bonus Word</button>
+                    <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded Word</button>
+                </div>
             </div>
-          </div>
-          <div class="word-list" id="listBonus">
-            <h2>Bonus Words</h2>
-            <p class="word-count">Words: <span id="countBonus">3</span></p>
-            <ul>
-              <li><label><input type="checkbox"> Word 4</label></li>
-              <li><label><input type="checkbox"> Word 5</label></li>
-              <li><label><input type="checkbox"> Word 6</label></li>
-            </ul>
-            <div class="list-controls">
-              <button onclick="moveSelected('listBonus', 'listRequired')">Move to List 1</button>
-              <button onclick="moveSelected('listBonus', 'listExcluded')">Move to List 3</button>
+            <div class="word-list" id="listBonus">
+                <h2>Bonus Words</h2>
+                <p class="word-count">Words: <span id="countBonus">3</span></p>
+                <ul>
+                    <li><label><input type="checkbox"> Word 4</label></li>
+                    <li><label><input type="checkbox"> Word 5</label></li>
+                    <li><label><input type="checkbox"> Word 6</label></li>
+                </ul>
+                <div class="list-controls">
+                    <button onclick="moveSelected('listBonus', 'listRequired')">Required Word</button>
+                    <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded Word</button>
+                </div>
             </div>
-          </div>
-          <div class="word-list" id="listExcluded">
-            <h2>Excluded Words</h2>
-            <p class="word-count">Words: <span id="countExcluded">3</span></p>
-            <ul>
-              <li><label><input type="checkbox"> Word 7</label></li>
-              <li><label><input type="checkbox"> Word 8</label></li>
-              <li><label><input type="checkbox"> Word 9</label></li>
-            </ul>
-            <div class="list-controls">
-              <button onclick="moveSelected('listExcluded', 'listRequired')">Move to List 1</button>
-              <button onclick="moveSelected('listExcluded', 'listBonus')">Move to List 2</button>
+            <div class="word-list" id="listExcluded">
+                <h2>Excluded Words</h2>
+                <p class="word-count">Words: <span id="countExcluded">3</span></p>
+                <ul>
+                    <li><label><input type="checkbox"> Word 7</label></li>
+                    <li><label><input type="checkbox"> Word 8</label></li>
+                    <li><label><input type="checkbox"> Word 9</label></li>
+                </ul>
+                <div class="list-controls">
+                    <button onclick="moveSelected('listExcluded', 'listRequired')">Required Word</button>
+                    <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus Word</button>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
 
-      <script src="designer.js"></script>
-    </body>
+    <script src="designer.js"></script>
+</body>
 
 </html>

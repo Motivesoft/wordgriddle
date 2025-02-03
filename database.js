@@ -1,5 +1,9 @@
+// External requires
 const sqlite3 = require('sqlite3').verbose();
 const util = require('util');
+
+// Internal requires
+const { PUZZLE_STATUS_CONSTANTS } = require('./constants');
 
 // Toggle between in-memory and file-based database
 const databaseName = ':memory:';
@@ -75,11 +79,10 @@ function createPuzzleSupportTables() {
             )`);
 
     // Insert some hard-wired entries so we can have guaranteed IDs
-    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (0, "Unsaved/New" )`); // brand new, incomplete details on server
-    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (1, "Editable" )`); // still being worked on
-    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (2, "Locked" )`); // e.g. for beta testing, e.g. playable but results not stored
-    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (3, "Published" )`); // released to users, no longer editable
-    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (4, "Withdrawn" )`); // no longer available
+    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (${PUZZLE_STATUS_CONSTANTS.EDITABLE}, "Editable" )`); // still being worked on
+    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (${PUZZLE_STATUS_CONSTANTS.LOCKED}, "Locked" )`); // e.g. for beta testing, e.g. playable but results not stored
+    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (${PUZZLE_STATUS_CONSTANTS.PUBLISHED}, "Published" )`); // released to users, no longer editable
+    db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (${PUZZLE_STATUS_CONSTANTS.WITHDRAWN}, "Withdrawn" )`); // no longer available
 
     // Table that is used to create and store auto-generated puzzle labels, e.g. "wordgriddle #10 - 2025-12-25"
     db.run(`
@@ -101,7 +104,7 @@ function createPuzzleTables() {
                 alternateName TEXT DEFAULT '',
                 author INTEGER DEFAULT 0,
                 letters TEXT DEFAULT '',
-                status INTEGER DEFAULT 0,
+                status INTEGER DEFAULT 1,
                 created STRING NOT NULL,
                 updated STRING NOT NULL,
                 FOREIGN KEY (author) REFERENCES users(id),
