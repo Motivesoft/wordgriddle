@@ -34,7 +34,6 @@
                 </div>
             
                 <div class="input-group">
-                    <label for="title">Title:</label>
                     <input type="text" id="title" style="width: 300px;" placeholder="Enter title">
                 </div>
                 <div class="input-group">
@@ -66,40 +65,61 @@
             <div class="word-list" id="listRequired">
                 <h2>Required Words</h2>
                 <p class="word-count">Words: <span id="countRequired">3</span></p>
-                <ul>
-                    <li><label><input type="checkbox"> Word 1</label></li>
-                    <li><label><input type="checkbox"> Word 2</label></li>
-                    <li><label><input type="checkbox"> Word 3</label></li>
-                </ul>
+                    <ul id="wordListContainer">
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                        <li><label><input type="checkbox"> Word 1</label></li>
+                        <li><label><input type="checkbox"> Word 2</label></li>
+                        <li><label><input type="checkbox"> Word 3</label></li>
+                    </ul>
                 <div class="list-controls">
-                    <button onclick="moveSelected('listRequired', 'listBonus')">Bonus Word</button>
-                    <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded Word</button>
+                    <button onclick="moveSelected('listRequired', 'listBonus')">Bonus</button>
+                    <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded</button>
                 </div>
             </div>
             <div class="word-list" id="listBonus">
                 <h2>Bonus Words</h2>
                 <p class="word-count">Words: <span id="countBonus">3</span></p>
-                <ul>
+                <ul id="wordListContainer">
                     <li><label><input type="checkbox"> Word 4</label></li>
                     <li><label><input type="checkbox"> Word 5</label></li>
                     <li><label><input type="checkbox"> Word 6</label></li>
                 </ul>
                 <div class="list-controls">
-                    <button onclick="moveSelected('listBonus', 'listRequired')">Required Word</button>
-                    <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded Word</button>
+                    <button onclick="moveSelected('listBonus', 'listRequired')">Required</button>
+                    <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded</button>
                 </div>
             </div>
             <div class="word-list" id="listExcluded">
                 <h2>Excluded Words</h2>
                 <p class="word-count">Words: <span id="countExcluded">3</span></p>
-                <ul>
+                <ul id="wordListContainer">
                     <li><label><input type="checkbox"> Word 7</label></li>
                     <li><label><input type="checkbox"> Word 8</label></li>
                     <li><label><input type="checkbox"> Word 9</label></li>
                 </ul>
                 <div class="list-controls">
-                    <button onclick="moveSelected('listExcluded', 'listRequired')">Required Word</button>
-                    <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus Word</button>
+                    <button onclick="moveSelected('listExcluded', 'listRequired')">Required</button>
+                    <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus</button>
                 </div>
             </div>
         </div>
