@@ -17,11 +17,10 @@ function createGrid(size) {
 
 // Function to update word counts
 function updateWordCounts() {
-  //const lists = ["listRequired", "listBonus", "listExcluded"];
   const lists = [
     { list: "listRequired", counter: "countRequired" },
     { list: "listBonus", counter: "countBonus" },
-    { list: "listExcluded", counter: "countBonus" }
+    { list: "listExcluded", counter: "countExcluded" }
   ];
   lists.forEach((item) => {
     const list = document.getElementById(item.list).querySelector("ul");
@@ -107,7 +106,8 @@ function handleAuthorChange(selectedAuthorId) {
 
 // Function to reset the grid and clear the title
 function handleNew() {
-  createGrid(3); // Reset to 3x3 grid
+  const initialSize = document.getElementById("size");
+  createGrid(initialSize.value);
   document.getElementById("title").value = ""; // Clear the title field
 }
 
@@ -169,4 +169,4 @@ function handlePublish() {
 // Initialize with a default grid
 fetchAuthors(); // Fetch and populate authors
 updateWordCounts(); // Set initial word counts
-createGrid(3);
+handleNew();
