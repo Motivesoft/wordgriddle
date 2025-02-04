@@ -2,7 +2,6 @@
 
 // Internal requires
 const { dbAll, dbGet } = require('./database');
-const { PUZZLE_STATUS_CONSTANTS } = require('./constants');
 
 const PUZZLE_NAME = "wordgriddle";
 
@@ -117,23 +116,6 @@ class PuzzleOperations {
         `,[puzzle.alternateName, puzzle.author, puzzle.letters, today.toJSON(), puzzle.id]);
     }
 
-    // Update the status of a puzzle between locked and editable
-    async changeLockStatus(id, lock) {
-        console.log(`Change status of #${id} in ${this.name} to ${lock ? "locked":"unlocked"}`);
-
-        // Get update date
-        const today = new Date();
-        const status = lock ? PUZZLE_STATUS_CONSTANTS.LOCKED : PUZZLE_STATUS_CONSTANTS.EDITABLE;
-
-        return await dbGet(`
-            UPDATE ${this.tableName} SET 
-                    status = ?,
-                    updated = ?
-                WHERE id = ?
-                RETURNING *
-        `,[status, today.toJSON(), id]);
-    }
-
     async changePuzzleStatus(id, status) {
         console.log(`Change status of #${id} in ${this.name}`);
 
@@ -161,11 +143,10 @@ class PuzzleOperations {
                     CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM ${this.tableName}), 0) + 1, ' - ', ?),
                     0,
                     ?,
-                    ?,
                     ?
                 )
                 RETURNING *
-        `,[today.toISOString().slice(0, 10), today.toJSON(), today.toJSON(), PUZZLE_STATUS_CONSTANTS.EDITABLE]);
+        `,[today.toISOString().slice(0, 10), today.toJSON(), today.toJSON()]);
     }
 }
 
