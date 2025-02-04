@@ -12,33 +12,32 @@
     <nav>
         <ul>
             <li><a href="/index.html">Home</a></li>
-            <li><a href="/admin/dictionary.html">Dictionary Words</a></li>
-            <li><a href="/admin/bonus.html">Bonus Words</a></li>
-            <li><a href="/admin/excluded.html">Excluded Words</a></li>
-            <li><a class="nav-current" href="/admin/designer.html">Puzzle Designer</a></li>
+            <li><a href="/admin/dictionary.html">Dictionary</a></li>
+            <li><a href="/admin/bonus.html">Bonus</a></li>
+            <li><a href="/admin/excluded.html">Excluded</a></li>
+            <li><a class="nav-current" href="/admin/designer.html">Designer</a></li>
         </ul>
     </nav>
 
-    <h1>Puzzle Designer</h1>
+    <!-- <h1>Puzzle Designer</h1> -->
 
     <div class="grid-container">
         <!-- Grid Section -->
         <div class="grid-section">
             <!-- Controls Above the Grid -->
             <div class="grid-top-controls">
-                <button onclick="handleNew()">New</button>
-                <button onclick="handleLoad()">Load...</button>
+                <div class="button-bar">
+                    <button class="button" onclick="handleNew()">New</button>
+                    <button class="button" onclick="handleLoad()">Load...</button>
+                    <button class="button" onclick="handleSave()">Save</button>
+                    <button class="button" onclick="handleSolve()">Solve</button>
+                </div>
+            
                 <div class="input-group">
                     <label for="title">Title:</label>
-                    <input type="text" id="title" placeholder="Enter title">
+                    <input type="text" id="title" style="width: 300px;" placeholder="Enter title">
                 </div>
                 <div class="input-group">
-                    <label for="author">Author:</label>
-                    <select id="author" onchange="handleAuthorChange(this.value)"></select>
-                </div>
-                <!-- Resize Grid Selector -->
-                <div class="input-group">
-                    <label for="size">Size:</label>
                     <select id="size" onchange="createGrid(this.value)">
                         <option value="3">3x3</option>
                         <option value="4">4x4</option>
@@ -49,6 +48,7 @@
                         <option value="9">9x9</option>
                         <option value="10">10x10</option>
                     </select>
+                    <select id="author" onchange="handleAuthorChange(this.value)"></select>
                 </div>
             </div>
 
@@ -56,11 +56,9 @@
             <div id="grid" class="grid"></div>
 
             <!-- Controls Below the Grid -->
-            <div class="grid-bottom-controls">
-                <button onclick="handleSave()">Save</button>
-                <button onclick="handleSolve()">Solve</button>
+            <!-- <div class="grid-bottom-controls">
                 <button onclick="handlePublish()">Publish</button>
-            </div>
+            </div> -->
         </div>
 
         <!-- Lists Section -->
