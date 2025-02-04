@@ -138,7 +138,7 @@ class PuzzleOperations {
         const today = new Date(); 
 
         return await dbGet(`
-            INSERT INTO ${this.tableName} (label, author, created, updated, status)
+            INSERT INTO ${this.tableName} (label, author, created, updated)
                 VALUES (
                     CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM ${this.tableName}), 0) + 1, ' - ', ?),
                     0,
