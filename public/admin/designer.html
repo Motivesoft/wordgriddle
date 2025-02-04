@@ -34,11 +34,7 @@
                 </div>
                 <div class="input-group">
                     <label for="author">Author:</label>
-                    <select id="author">
-                        <option value="Author 1">Author 1</option>
-                        <option value="Author 2">Author 2</option>
-                        <option value="Author 3">Author 3</option>
-                    </select>
+                    <select id="author" onchange="handleAuthorChange(this.value)"></select>
                 </div>
                 <!-- Resize Grid Selector -->
                 <div class="input-group">
