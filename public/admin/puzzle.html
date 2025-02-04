@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/style.css">
-    <title>Bonus Word List Manager</title>
+    <title>Puzzle Manager</title>
 </head>
 
 <body>
@@ -13,14 +13,14 @@
         <ul>
             <li><a href="/index.html">Home</a></li>
             <li><a href="/admin/designer.html">Designer</a></li>
-            <li><a href="/admin/puzzle.html">Puzzle</a></li>
+            <li><a class="nav-current" href="/admin/puzzle.html">Puzzle</a></li>
             <li><a href="/admin/dictionary.html">Dictionary</a></li>
-            <li><a class="nav-current" href="/admin/bonus.html">Bonus</a></li>
+            <li><a href="/admin/bonus.html">Bonus</a></li>
             <li><a href="/admin/excluded.html">Excluded</a></li>
         </ul>
     </nav>
 
-    <h1>Bonus Word List Manager</h1>
+    <h1>Puzzle Manager</h1>
 
     <div class="stack-container">
         <div class="button-stack">
@@ -31,7 +31,7 @@
         </div>
         <div class="button-stack">
             <div class="top-buttons">
-                <button onclick="openInsertWordsModal()">Insert</button>
+                <button onclick="openInsertWordsModal()">Publish</button>
                 <button onclick="performDelete()">Delete</button>
                 <script>
                     function performDelete() {
