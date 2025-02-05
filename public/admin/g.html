@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letter Grid Path</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-template-rows: repeat(5, 60px);
+            gap: 5px;
+        }
+
+        .cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .cell.active {
+            background-color: #aaffaa;
+            /* Highlight active cells */
+        }
+
+        .cell.visited {
+            background-color: #ffaaaa;
+            /* Highlight visited cells */
+        }
+
+        .line {
+            position: absolute;
+            height: 2px;
+            background-color: #000;
+            transform-origin: 0 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-container" id="grid">
+        <!-- 5x5 grid of letters -->
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    </div>
+
+    <script>
+        const grid = document.getElementById("grid");
+        const cells = document.querySelectorAll(".cell");
+        let isDrawing = false;
+        let path = [];
+        let lines = [];
+
+        // Add event listeners to cells
+        cells.forEach((cell) => {
+            cell.addEventListener("mousedown", startPath);
+            cell.addEventListener("mouseenter", addToPath);
+            cell.addEventListener("mouseup", endPath);
+            cell.addEventListener("touchstart", startPath);
+            cell.addEventListener("touchmove", addToPathTouch);
+            cell.addEventListener("touchend", endPath);
+        });
+
+        // Start drawing the path
+        function startPath(e) {
+            if (!isDrawing) {
+                isDrawing = true;
+                path = []; // Reset the path
+                lines.forEach((line) => line.remove()); // Clear existing lines
+                lines = [];
+                addToPath(e);
+            }
+        }
+
+        // Add a cell to the path
+        function addToPath(e) {
+            if (isDrawing) {
+                const cell = e.target;
+                if (!path.includes(cell) && isAdjacent(cell, path[path.length - 1])) {
+                    cell.classList.add("active");
+                    path.push(cell);
+
+                    // Draw a line between the last two cells
+                    if (path.length > 1) {
+                        const prevCell = path[path.length - 2];
+                        const currentCell = path[path.length - 1];
+                        drawLine(prevCell, currentCell);
+                    }
+                }
+            }
+        }
+
+        // Add a cell to the path (for touch events)
+        function addToPathTouch(e) {
+            if (isDrawing) {
+                // Get the touch position
+                const touch = e.touches[0];
+                const cell = document.elementFromPoint(touch.clientX, touch.clientY);
+
+                if (cell && cell.classList.contains("cell") && !path.includes(cell) && isAdjacent(cell, path[path.length - 1])) {
+                    cell.classList.add("active");
+                    path.push(cell);
+
+                    // Draw a line between the last two cells
+                    if (path.length > 1) {
+                        const prevCell = path[path.length - 2];
+                        const currentCell = path[path.length - 1];
+                        drawLine(prevCell, currentCell);
+                    }
+                }
+            }
+        }
+        // Stop drawing the path
+        function endPath() {
+            if (isDrawing) {
+                isDrawing = false;
+                path.forEach((cell) => cell.classList.add("visited"));
+                path.forEach((cell) => cell.classList.remove("active"));
+
+                // Prompt the user to enter letters
+                const input = prompt(`Enter ${path.length} letters for the path (one per cell, '.' for empty):`);
+
+                if (input) {
+                    if (input.length === path.length) {
+                        let valid = true;
+                        const letters = input.toUpperCase();
+                        for (let i = 0; i < path.length; i++) {
+                            const letter = letters[i];
+                            if (letter == '.') continue;
+                            if (letter >= 'A' && letter <= 'Z') continue;
+                            valid = false;
+                        }
+                        if (valid) {
+                            for (let i = 0; i < path.length; i++) {
+                                let letter = letters[i];
+                                if (letters[i] == '.') {
+                                    letter = '';
+                                    path[i].style.background = '#f0f0f0';
+                                    path[i].style.border = 'none';
+                                } else {
+                                    path[i].style.background = '#fff';
+                                    path[i].style.border = '1px solid #ccc';
+                                    path[i].textContent = letter;
+                                }
+                            }
+                        } else {
+                            alert("Invalid input. Please enter '.' for an empty cell, or letters.");
+                        }
+                    } else {
+                        alert("Invalid input. Please enter exactly " + path.length + " letters.");
+                    }
+                }
+
+                path.forEach((cell) => cell.classList.remove("visited"));
+                lines.forEach((line) => line.remove()); // Clear existing lines
+            }
+        }
+
+        function isAdjacent(cell1, cell2) {
+            if (cell1 === undefined || cell2 === undefined) {
+                return true;
+            }
+            const rect1 = cell1.getBoundingClientRect();
+            const rect2 = cell2.getBoundingClientRect();
+
+            const x1 = rect1.left + rect1.width / 2;
+            const y1 = rect1.top + rect1.height / 2;
+            const x2 = rect2.left + rect2.width / 2;
+            const y2 = rect2.top + rect2.height / 2;
+
+            // Compare centre distances to identify adjacent squares, which must be
+            // at most 1x cell centre distance away (including padding of, say, 5)
+            return Math.abs(x1 - x2) <= (rect1.width + 5) && Math.abs(y1 - y2) <= (rect1.height + 5);
+        }
+
+        // Draw a line between two cells
+        function drawLine(cell1, cell2) {
+            const rect1 = cell1.getBoundingClientRect();
+            const rect2 = cell2.getBoundingClientRect();
+
+            const x1 = rect1.left + rect1.width / 2;
+            const y1 = rect1.top + rect1.height / 2;
+            const x2 = rect2.left + rect2.width / 2;
+            const y2 = rect2.top + rect2.height / 2;
+
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+            const line = document.createElement("div");
+            line.className = "line";
+            line.style.width = `${length}px`;
+            line.style.transform = `rotate(${angle}deg)`;
+            line.style.left = `${x1}px`;
+            line.style.top = `${y1}px`;
+
+            document.body.appendChild(line);
+            lines.push(line);
+        }
+    </script>
+</body>
+
+</html>
