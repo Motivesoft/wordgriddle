@@ -293,11 +293,14 @@ button:active {
 .word-list ul {
   list-style-type: none;
   padding: 0;
+  background-color: #fff;
 }
 
 .word-list li {
   padding: 5px 0;
   border-bottom: 1px solid #ddd;
+  background-color: #fff;
+  border: none;
 }
 
 .word-list label {
