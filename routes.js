@@ -44,9 +44,9 @@ router.get('/admin/vacuum', (req, res) => adminOperations.vacuumEndpoint(req, re
 router.get('/admin/shutdown', (req, res) => adminOperations.shutdownEndpoint(req, res));
 
 // Puzzle design
-router.get('/designer/puzzles', (req, res) => editablePuzzleOperations.getPuzzlesEndpoint(req, res));
+router.get('/designer/puzzles', (req, res) => editablePuzzleOperations.getUnpublishedPuzzlesEndpoint(req, res));
 router.get('/designer/puzzle/:id', (req, res) => editablePuzzleOperations.getPuzzleEndpoint(req, res));
-router.post('/designer/update', (req, res) => editablePuzzleOperations.updatePuzzleEndpoint(req, res));
+router.post('/designer/save', (req, res) => editablePuzzleOperations.savePuzzleEndpoint(req, res));
 router.get('/designer/create', (req, res) => editablePuzzleOperations.createPuzzleEndpoint(req, res));
 
 module.exports = router;

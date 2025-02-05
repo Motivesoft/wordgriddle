@@ -82,16 +82,6 @@ function createPuzzleSupportTables() {
     db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (2, "Locked" )`); // e.g. for beta testing, e.g. playable but results not stored
     db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (3, "Published" )`); // released to users, no longer editable
     db.run(`INSERT OR IGNORE INTO puzzleStatus (id, name) VALUES (4, "Withdrawn" )`); // no longer available
-
-    // Table that is used to create and store auto-generated puzzle labels, e.g. "wordgriddle #10 - 2025-12-25"
-    db.run(`
-            CREATE TABLE IF NOT EXISTS puzzleLabels (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                label TEXT NOT NULL UNIQUE
-            )`);
-
-    // Make sure there is at least one entry so we don't need to worry at first use
-    db.run(`INSERT OR IGNORE INTO puzzleLabels (id, label) VALUES (0, "**Unused**" )`);
 }
 
 // Create tables for the puzzles themselves
@@ -99,8 +89,7 @@ function createPuzzleTables() {
     db.run(`
             CREATE TABLE IF NOT EXISTS editablePuzzles (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                label TEXT NOT NULL,
-                alternateName TEXT DEFAULT '',
+                title TEXT NOT NULL,
                 author INTEGER DEFAULT 0,
                 letters TEXT DEFAULT '',
                 status INTEGER DEFAULT 1,
@@ -117,7 +106,7 @@ function createPuzzleTables() {
                 title TEXT NOT NULL,
                 author INTEGER DEFAULT 0,
                 letters TEXT DEFAULT '',
-                status INTEGER DEFAULT 0,
+                status INTEGER DEFAULT 3,
                 created STRING NOT NULL,
                 FOREIGN KEY (origin) REFERENCES editablePuzzles(id),
                 FOREIGN KEY (author) REFERENCES users(id),

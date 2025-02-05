@@ -1,11 +1,11 @@
 meta {
-  name: update
+  name: save
   type: http
   seq: 5
 }
 
 post {
-  url: http://{{HOST}}/api/designer/update
+  url: http://{{HOST}}/api/designer/save
   body: json
   auth: none
 }
@@ -18,10 +18,9 @@ body:json {
   {
     "puzzle": {
       "id": 1,
-      "label": "wordgriddle #1 - 2025-02-03",
-      "alternateName": "First!",
+      "title": "wordgriddle #1 - 2025-02-03",
       "author": 1,
-      "letters": "ABCDE",
+      "letters": "ABIDE",
       "status": 0,
       "created": "2025-02-03T12:25:51.674Z",
       "updated": "2025-02-03T12:25:51.674Z"

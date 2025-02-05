@@ -1,3 +1,7 @@
+// Variables used during the design phase
+let currentPuzzle;
+let puzzleEdited;
+
 // Function to create the grid
 function createGrid(size) {
   const grid = document.getElementById("grid");
@@ -97,18 +101,36 @@ function populateAuthorComboBox(authors) {
   });
 }
 
-// Function to handle changes in the Author combobox
-function handleAuthorChange(selectedAuthorId) {
-  console.log("Selected Author ID:", selectedAuthorId);
-  // You can add additional logic here, such as saving the selected author ID
-  alert(`Author changed to ID: ${selectedAuthorId}`);
-}
-
 // Function to reset the grid and clear the title
-function handleNew() {
+async function handleNew() {
+  if (currentPuzzle !== undefined && puzzleEdited) {
+    // Prompt to save current and do so, or cancel and return here
+  }
+
   const initialSize = document.getElementById("size");
   createGrid(initialSize.value);
   document.getElementById("title").value = ""; // Clear the title field
+
+  try {
+    const response = await fetch("/api/designer/create", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create new puzzle");
+    }
+
+    const data = await response.json();
+    console.log("Data from Create API:", data.puzzle);
+
+    updateFromPuzzle( data.puzzle );
+  } catch (error) {
+    console.error("Error calling Create API:", error);
+    alert("Error calling Create API");
+  }
 }
 
 // Function to load data from a web API (Solve button)
@@ -137,15 +159,17 @@ async function handleSolve() {
 // Function to save data to a web API (Save button)
 async function handleSave() {
   const wordLists = getWordLists();
-  const title = document.getElementById("title").value;
+
+  currentPuzzle.title = document.getElementById("title").value;
+  currentPuzzle.author = document.getElementById("author").value;
 
   try {
-    const response = await fetch("https://api.example.com/save", {
+    const response = await fetch("/api/designer/save", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title, wordLists }),
+      body: JSON.stringify({puzzle: currentPuzzle}),
     });
 
     if (!response.ok) {
@@ -153,12 +177,20 @@ async function handleSave() {
     }
 
     const data = await response.json();
-    console.log("Data from Save API:", data);
-    alert("Save API response: " + JSON.stringify(data));
+    console.log("Data from Save API:", data.puzzle);
+
+    updateFromPuzzle( data.puzzle );
   } catch (error) {
     console.error("Error calling Save API:", error);
     alert("Error calling Save API");
   }
+}
+
+function updateFromPuzzle(puzzle) {
+  currentPuzzle = puzzle;
+
+  document.getElementById("title").value = puzzle.title || '';
+  document.getElementById("author").value = puzzle.author || 0;
 }
 
 // Function to handle the Publish button

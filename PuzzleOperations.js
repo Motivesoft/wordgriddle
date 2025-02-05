@@ -60,17 +60,17 @@ class PuzzleOperations {
         }
     }
 
-    async updatePuzzleEndpoint(req, res) {
-        const data = req.body; 
-        
+    async savePuzzleEndpoint(req, res) {
+        const data = req.body;
+
         if (data.puzzle.id === undefined) {
-            return res.status(400).json({ message: `Cannot update a puzzle without an ID` });
+            return res.status(400).json({ message: `Puzzle data missing an ID` });
         }
-        
-        console.log(`Update #${data.puzzle.id} in ${this.name}`);
+
+        console.log(`Save puzzle ${data.puzzle.id} in ${this.name}`);
 
         try {
-            const puzzle = await this.updatePuzzle(data.puzzle);
+            const puzzle = await this.savePuzzle(data.puzzle);
             res.status(200).json({ puzzle: puzzle });
         } catch (error) {
             console.error("Failed to save puzzle:", error.message);
@@ -85,7 +85,7 @@ class PuzzleOperations {
         console.debug(`List of all ${this.name}`);
 
         // Execute the query and transform the result into an array
-        return await dbAll(`SELECT * FROM ${this.tableName}`,[]);
+        return await dbAll(`SELECT * FROM ${this.tableName}`, []);
     }
 
     // Return a specific puzzle
@@ -95,25 +95,30 @@ class PuzzleOperations {
         return await dbGet(`
             SELECT * from ${this.tableName} 
                 WHERE id = ?
-        `,[id]);
+        `, [id]);
     }
 
-    // Update certain metadata items (alternateName, author, letters, maybe more in future)
-    async updatePuzzle(puzzle) {
-        console.log(`Update #${puzzle.id} in ${this.name}`);
+    // Update certain metadata items (title, author, letters, maybe more in future)
+    async savePuzzle(puzzle) {
+        console.log(`Save #${puzzle.id} in ${this.name}`);
+
+        if (puzzle === undefined || puzzle.id === undefined) {
+            throw new Error("Missing or unsaved puzzle data");
+        }
 
         // Get update date
         const today = new Date();
 
         return await dbGet(`
             UPDATE ${this.tableName} SET 
-                    alternateName = ?,
+                    title = ?,
                     author = ?,
                     letters = ?,
+                    status = ?,
                     updated = ?
                 WHERE id = ?
                 RETURNING *
-        `,[puzzle.alternateName, puzzle.author, puzzle.letters, today.toJSON(), puzzle.id]);
+        `, [puzzle.title, puzzle.author, puzzle.letters, puzzle.status, today.toJSON(), puzzle.id]);
     }
 
     async changePuzzleStatus(id, status) {
@@ -128,28 +133,34 @@ class PuzzleOperations {
                     updated = ?
                 WHERE id = ?
                 RETURNING *
-        `,[status, today.toJSON(), id]);
+        `, [status, today.toJSON(), id]);
     }
 
     async createPuzzle() {
         console.log(`Create new ${this.name}`);
 
         // Get creation/update date
-        const today = new Date(); 
+        const today = new Date();
 
-        // ID of -1 to mean 'unsaved'
-        // Label will be generated on first save
-        // Author 0 means 'unknown' or anonymous
-        return ({
-            id: -1, 
-            label: '', 
-            alternateName: '', 
-            author: 0, 
-            letters: '', 
-            status: 1, 
-            created: today.toJSON(),
-            updated: today.toJSON() 
-        });
+        return await dbGet(`
+            INSERT INTO ${this.tableName} (title, author, letters, status, created, updated) 
+                VALUES (
+                    CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM ${this.tableName}), 0) + 1, ' - ', ?),
+                    ?,
+                    ?,
+                    ?,
+                    ?,
+                    ?
+                )
+                RETURNING *
+        `, [
+            today.toISOString().slice(0, 10),   // Creation date in short form
+            0,                                  // Default author 
+            '',                                 // No letters 
+            1,                                  // Default status 
+            today.toJSON(),                     // Created 
+            today.toJSON()                      // Last updated
+        ]);
     }
 }
 
