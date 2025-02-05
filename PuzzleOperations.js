@@ -49,10 +49,11 @@ class PuzzleOperations {
     }
 
     async createPuzzleEndpoint(req, res) {
-        console.log(`Create new ${this.name}`);
+        const size = req.params.size;
+        console.log(`Create new ${this.name} of size ${size}x${size}`);
 
         try {
-            const puzzle = await this.createPuzzle();
+            const puzzle = await this.createPuzzle(size);
             res.status(200).json({ puzzle: puzzle });
         } catch (error) {
             console.error("Failed to create puzzle:", error.message);
@@ -62,16 +63,21 @@ class PuzzleOperations {
 
     async savePuzzleEndpoint(req, res) {
         const data = req.body;
+        const puzzle = data.puzzle;
 
-        if (data.puzzle.id === undefined) {
+        if (puzzle.id === undefined) {
             return res.status(400).json({ message: `Puzzle data missing an ID` });
         }
 
-        console.log(`Save puzzle ${data.puzzle.id} in ${this.name}`);
+        if ((puzzle.size * puzzle.size) != puzzle.letters.length) {
+            return res.status(400).json({ message: `Size does not match number of letters` });
+        }
+
+        console.log(`Save puzzle ${puzzle.id} in ${this.name}`);
 
         try {
-            const puzzle = await this.savePuzzle(data.puzzle);
-            res.status(200).json({ puzzle: puzzle });
+            const savedPuzzle = await this.savePuzzle(puzzle);
+            res.status(200).json({ puzzle: savedPuzzle });
         } catch (error) {
             console.error("Failed to save puzzle:", error.message);
             res.status(500).json({ message: 'An error occurred', error: error.message });
@@ -106,6 +112,10 @@ class PuzzleOperations {
             throw new Error("Missing or unsaved puzzle data");
         }
 
+        if ((puzzle.size * puzzle.size) != puzzle.letters.length) {
+            throw new Error("Size does not match number of letters");
+        }
+
         // Get update date
         const today = new Date();
 
@@ -113,12 +123,13 @@ class PuzzleOperations {
             UPDATE ${this.tableName} SET 
                     title = ?,
                     author = ?,
+                    size = ?,
                     letters = ?,
                     status = ?,
                     updated = ?
                 WHERE id = ?
                 RETURNING *
-        `, [puzzle.title, puzzle.author, puzzle.letters, puzzle.status, today.toJSON(), puzzle.id]);
+        `, [puzzle.title, puzzle.author, puzzle.size, puzzle.letters, puzzle.status, today.toJSON(), puzzle.id]);
     }
 
     async changePuzzleStatus(id, status) {
@@ -136,16 +147,17 @@ class PuzzleOperations {
         `, [status, today.toJSON(), id]);
     }
 
-    async createPuzzle() {
+    async createPuzzle(size) {
         console.log(`Create new ${this.name}`);
 
         // Get creation/update date
         const today = new Date();
 
         return await dbGet(`
-            INSERT INTO ${this.tableName} (title, author, letters, status, created, updated) 
+            INSERT INTO ${this.tableName} (title, author, size, letters, status, created, updated) 
                 VALUES (
                     CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM ${this.tableName}), 0) + 1, ' - ', ?),
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -156,7 +168,8 @@ class PuzzleOperations {
         `, [
             today.toISOString().slice(0, 10),   // Creation date in short form
             0,                                  // Default author 
-            '',                                 // No letters 
+            size,                               // Grid size (for any edge, remembering that these are square)
+            '-'.repeat(size*size),              // Letter grid, where '-' means unknown 
             1,                                  // Default status 
             today.toJSON(),                     // Created 
             today.toJSON()                      // Last updated

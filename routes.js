@@ -47,6 +47,6 @@ router.get('/admin/shutdown', (req, res) => adminOperations.shutdownEndpoint(req
 router.get('/designer/puzzles', (req, res) => editablePuzzleOperations.getUnpublishedPuzzlesEndpoint(req, res));
 router.get('/designer/puzzle/:id', (req, res) => editablePuzzleOperations.getPuzzleEndpoint(req, res));
 router.post('/designer/save', (req, res) => editablePuzzleOperations.savePuzzleEndpoint(req, res));
-router.get('/designer/create', (req, res) => editablePuzzleOperations.createPuzzleEndpoint(req, res));
+router.get('/designer/create/:size', (req, res) => editablePuzzleOperations.createPuzzleEndpoint(req, res));
 
 module.exports = router;

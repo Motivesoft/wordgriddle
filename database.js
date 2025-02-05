@@ -91,6 +91,7 @@ function createPuzzleTables() {
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 author INTEGER DEFAULT 0,
+                size INTEGER,
                 letters TEXT DEFAULT '',
                 status INTEGER DEFAULT 1,
                 created STRING NOT NULL,

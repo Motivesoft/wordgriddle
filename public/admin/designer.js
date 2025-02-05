@@ -17,6 +17,12 @@ function createGrid(size) {
     cell.classList.add("grid-cell");
     grid.appendChild(cell);
   }
+
+  // Reset the letter count
+  if (currentPuzzle) {
+    currentPuzzle.size = size;
+    currentPuzzle.letters = '-'.repeat(size*size);
+  }
 }
 
 // Function to update word counts
@@ -108,11 +114,10 @@ async function handleNew() {
   }
 
   const initialSize = document.getElementById("size");
-  createGrid(initialSize.value);
-  document.getElementById("title").value = ""; // Clear the title field
+  const size = initialSize.value;
 
   try {
-    const response = await fetch("/api/designer/create", {
+    const response = await fetch(`/api/designer/create/${size}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -126,6 +131,7 @@ async function handleNew() {
     const data = await response.json();
     console.log("Data from Create API:", data.puzzle);
 
+    createGrid(size);
     updateFromPuzzle( data.puzzle );
   } catch (error) {
     console.error("Error calling Create API:", error);
@@ -191,6 +197,27 @@ function updateFromPuzzle(puzzle) {
 
   document.getElementById("title").value = puzzle.title || '';
   document.getElementById("author").value = puzzle.author || 0;
+  document.getElementById("size").value = puzzle.size || 3;
+
+  populateGrid(puzzle);
+}
+
+function populateGrid(puzzle) {
+  const grid = document.getElementById("grid");
+
+  if (puzzle.letters === undefined || puzzle.length === 0) {
+    document.getElementById("grid").children.forEach((cell) => {
+      cell.textContent = '';
+    })
+  } else {
+    // Create grid cells
+    for (let i = 0; i < puzzle.letters.length; i++) {
+      const cell = grid.children[i];
+      if (puzzle.letters[i] !== '-') {
+        cell.textContent = puzzle.letters[i];
+      }
+    }
+  }
 }
 
 // Function to handle the Publish button
