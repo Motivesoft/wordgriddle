@@ -137,16 +137,19 @@ class PuzzleOperations {
         // Get creation/update date
         const today = new Date(); 
 
-        return await dbGet(`
-            INSERT INTO ${this.tableName} (label, author, created, updated)
-                VALUES (
-                    CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM ${this.tableName}), 0) + 1, ' - ', ?),
-                    0,
-                    ?,
-                    ?
-                )
-                RETURNING *
-        `,[today.toISOString().slice(0, 10), today.toJSON(), today.toJSON()]);
+        // ID of -1 to mean 'unsaved'
+        // Label will be generated on first save
+        // Author 0 means 'unknown' or anonymous
+        return ({
+            id: -1, 
+            label: '', 
+            alternateName: '', 
+            author: 0, 
+            letters: '', 
+            status: 1, 
+            created: today.toJSON(),
+            updated: today.toJSON() 
+        });
     }
 }
 
