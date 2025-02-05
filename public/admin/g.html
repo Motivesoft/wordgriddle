@@ -21,6 +21,8 @@
             grid-template-columns: repeat(5, 60px);
             grid-template-rows: repeat(5, 60px);
             gap: 5px;
+            touch-action: none;
+            user-select: none;
         }
 
         .cell {
@@ -175,14 +177,14 @@
                             for (let i = 0; i < path.length; i++) {
                                 let letter = letters[i];
                                 if (letters[i] == '.') {
-                                    letter = '';
+                                    letter = ' ';
                                     path[i].style.background = '#f0f0f0';
                                     path[i].style.border = 'none';
                                 } else {
                                     path[i].style.background = '#fff';
                                     path[i].style.border = '1px solid #ccc';
-                                    path[i].textContent = letter;
                                 }
+                                path[i].textContent = letter;
                             }
                         } else {
                             alert("Invalid input. Please enter '.' for an empty cell, or letters.");
@@ -194,6 +196,14 @@
 
                 path.forEach((cell) => cell.classList.remove("visited"));
                 lines.forEach((line) => line.remove()); // Clear existing lines
+
+                let gridletters = '';
+                cells.forEach((cell) => {
+                    gridletters += cell.textContent;
+                });
+                if (gridletters.length == cells.length) {
+                    alert(`Grid complete with : ${gridletters}`);
+                }
             }
         }
 
