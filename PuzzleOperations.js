@@ -6,6 +6,40 @@ const { dictionaryWordOperations, bonusWordOperations, excludedWordOperations } 
 
 const PUZZLE_NAME = "wordgriddle";
 
+// Inner class to help with dictionary full and partial lookups
+class DictionaryLookupHelper
+{
+    constructor(list) {
+        this.longestWordLength = 0;
+        this.dictionary = new Set();
+        this.prefixes = new Set();
+
+        list.forEach((word) => {
+            // Track all the words
+            this.dictionary.add(word);
+
+            // Track the longest word
+            if (word.length > this.longestWordLength) {
+                this.longestWordLength = word.length;
+            }
+
+            // Track all the word fragments
+            while (word.length) {
+                this.prefixes.add(word);
+                word = word.slice(0,word.length-1);
+            }
+        })
+    }
+
+    lookup(word) {
+        return this.dictionary.has(word);
+    }
+
+    lookupPrefix(letters) {
+        return this.prefixes.has(letters);
+    }
+}
+
 class PuzzleOperations {
     // Parameters:
     // - readable name for log statements etc
@@ -241,10 +275,15 @@ class PuzzleOperations {
     async findInGrid(grid) {
         const wordsFound = new Array();
 
+        // Create an object that will help us search the dictionary, but without passing the
+        // dictionary through the call stack
+        const allDictionaryWords = await dictionaryWordOperations.getWords();
+        const lookupHelper = new DictionaryLookupHelper(allDictionaryWords);
+
         // Iterate over the grid, letter by letter, and find words from each one
         for (var rowIndex = 0; rowIndex < grid.length; rowIndex++) {
             for (var columnIndex = 0; columnIndex < grid[rowIndex].length; columnIndex++) {
-                await this.findWordsFromPosition(grid, rowIndex, columnIndex, wordsFound, new Set(), "");
+                await this.findWordsFromPosition(grid, rowIndex, columnIndex, wordsFound, new Set(), "", lookupHelper);
             }
         }
 
@@ -297,11 +336,11 @@ class PuzzleOperations {
 
         return deDupArray;
     }
-
+    
     // Using grid(rowIndex,columnIndex), search for words
     // Call this recursively, building visited and currentWord as we go
     // Add found words to a set as we may find duplicates
-    async findWordsFromPosition(grid, row, col, wordsFound, visitedCoordinates, currentWord) {
+    async findWordsFromPosition(grid, row, col, wordsFound, visitedCoordinates, currentWord, lookupHelper) {
         // Bounds checking
         if (row < 0 || row >= grid.length || col < 0 || col >= grid[row].length) {
             return;
@@ -332,8 +371,7 @@ class PuzzleOperations {
 
         currentWord += currentLetter.toLowerCase();
 
-        // TODO       if (currentWord.length >= 4 && dictionary.has(currentWord)) {
-        if (currentWord.length >= 4 && await dictionaryWordOperations.validateWord(currentWord)) {
+        if (currentWord.length >= 4 && lookupHelper.lookup(currentWord)) {
             // Coords are wrapped (above), so don't need any other separator
             const path = Array.from(visitedCoordinates).join('');
 
@@ -343,19 +381,18 @@ class PuzzleOperations {
         }
 
         // Constrain the algorithm to avoid creating words that are too long
-        // TODO if (currentWord.length < longestWordLength && wordFragments.has(currentWord)) {
-        if (await dictionaryWordOperations.validateWordPrefix(currentWord)) {
+        if (lookupHelper.lookupPrefix(currentWord) && currentWord.length < lookupHelper.longestWordLength) {
             // Cross
-            await this.findWordsFromPosition(grid, row - 1, col, wordsFound, visitedCoordinates, currentWord);
-            await this.findWordsFromPosition(grid, row + 1, col, wordsFound, visitedCoordinates, currentWord);
-            await this.findWordsFromPosition(grid, row, col - 1, wordsFound, visitedCoordinates, currentWord);
-            await this.findWordsFromPosition(grid, row, col + 1, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row - 1, col, wordsFound, visitedCoordinates, currentWord, lookupHelper);
+            await this.findWordsFromPosition(grid, row + 1, col, wordsFound, visitedCoordinates, currentWord, lookupHelper);
+            await this.findWordsFromPosition(grid, row, col - 1, wordsFound, visitedCoordinates, currentWord, lookupHelper);
+            await this.findWordsFromPosition(grid, row, col + 1, wordsFound, visitedCoordinates, currentWord, lookupHelper);
 
             // Diagonal
-            await this.findWordsFromPosition(grid, row - 1, col - 1, wordsFound, visitedCoordinates, currentWord);
-            await this.findWordsFromPosition(grid, row - 1, col + 1, wordsFound, visitedCoordinates, currentWord);
-            await this.findWordsFromPosition(grid, row + 1, col - 1, wordsFound, visitedCoordinates, currentWord);
-            await this.findWordsFromPosition(grid, row + 1, col + 1, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row - 1, col - 1, wordsFound, visitedCoordinates, currentWord, lookupHelper);
+            await this.findWordsFromPosition(grid, row - 1, col + 1, wordsFound, visitedCoordinates, currentWord, lookupHelper);
+            await this.findWordsFromPosition(grid, row + 1, col - 1, wordsFound, visitedCoordinates, currentWord, lookupHelper);
+            await this.findWordsFromPosition(grid, row + 1, col + 1, wordsFound, visitedCoordinates, currentWord, lookupHelper);
         }
 
         visitedCoordinates.delete(coordinate);
