@@ -7,6 +7,12 @@ const path = require('path');
 const routes = require('./routes');
 const { db } = require('./database');
 
+// Disable logging
+if (process.env.NODE_ENV !== 'development') {
+    console.log = () => { };
+    console.debug = () => { };
+}
+
 // Doing this allows us to read version info etc.
 var packageInfo = require('./package.json');
 
@@ -47,7 +53,7 @@ process.on('exit', (code) => {
 // Function to close resources
 function closeResources() {
     console.log('Closing resources...');
-    
+
     db.close();
 }
 
@@ -65,7 +71,7 @@ function gracefulShutdown() {
     // If after 10 seconds, forcefully shut down
     setTimeout(() => {
         console.error('Forcing shutdown due to timeout.');
-        
+
         process.exit(1);
     }, 10000);
 }

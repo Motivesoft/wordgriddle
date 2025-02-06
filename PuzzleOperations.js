@@ -2,6 +2,7 @@
 
 // Internal requires
 const { dbAll, dbGet } = require('./database');
+const { dictionaryWordOperations } = require('./WordListOperations');
 
 const PUZZLE_NAME = "wordgriddle";
 
@@ -95,6 +96,19 @@ class PuzzleOperations {
         }
     }
 
+    async solvePuzzleEndpoint(req, res) {
+        try {
+            const letters = req.params.letters;
+            console.log(`Solve puzzle with '${letters}' from ${this.name}`);
+
+            const wordLists = await this.solvePuzzle(letters);
+            res.status(200).json({ wordLists });
+        } catch (error) {
+            console.error("Failed to get puzzle:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
+
     // Other methods
 
     // Return all puzzles in this table
@@ -177,11 +191,158 @@ class PuzzleOperations {
             today.toISOString().slice(0, 10),   // Creation date in short form
             author,                             // Default author 
             size,                               // Grid size (for any edge, remembering that these are square)
-            '-'.repeat(size*size),              // Letter grid, where '-' means unknown 
+            '-'.repeat(size * size),              // Letter grid, where '-' means unknown 
             1,                                  // Default status 
             today.toJSON(),                     // Created 
             today.toJSON()                      // Last updated
         ]);
+    }
+
+    // Assumes 'letters' is the correct length, and using '.' for empty squares
+    async solvePuzzle(letters) {
+        console.log(`Solve puzzle for ${letters}`);
+
+        // Make a 2D grid of the letters
+        let size = Math.sqrt(letters.length);
+        let index = 0;
+        let grid = [];
+        for (let i = 0; i < size; i++) {
+            let row = [];
+            for (let j = 0; j < size; j++) {
+                const letter = letters[index++];
+                row.push(letter);
+            }
+            grid.push(row);
+        }
+
+        const allWords = await this.findInGrid(grid);
+
+        // TODO Now apply the word lists
+
+        return {required: allWords, bonus: [], excluded: []};
+    }
+
+    async findInGrid(grid) {
+        const wordsFound = new Array();
+
+        // Iterate over the grid, letter by letter, and find words from each one
+        for (var rowIndex = 0; rowIndex < grid.length; rowIndex++) {
+            for (var columnIndex = 0; columnIndex < grid[rowIndex].length; columnIndex++) {
+                await this.findWordsFromPosition(grid, rowIndex, columnIndex, wordsFound, new Set(), "");
+            }
+        }
+
+        //Sort the found words array by length and alphabetical within that
+        const sorted = wordsFound.sort((a, b) => {
+            const itemA = a[0];
+            const itemB = b[0];
+            if (itemA.length === itemB.length) {
+                return itemA.localeCompare(itemB);
+            }
+            return itemA.length - itemB.length;
+        });
+
+        // Find all duplicated words (same word found by different path) and simplify down to one (randomly)
+        const deDupArray = new Array();
+        var index = 0;
+        while (index < wordsFound.length) {
+            const [word, path] = wordsFound[index];
+            var lookAhead = index;
+            while (lookAhead < wordsFound.length - 1) {
+                const [nextWord, nextPath] = wordsFound[lookAhead + 1];
+                if (word !== nextWord) {
+                    break;
+                }
+
+                lookAhead++;
+            }
+
+            if (lookAhead === index) {
+                // No duplicates - simply add it to the list
+                deDupArray.push([word, path]);
+            } else {
+                // Multiple ways to spell this word.
+                const matches = lookAhead - index + 1;
+
+                // Eliminate all but one of the ways
+                // Randomise the one we choose (e.g. 4 matches means get a random number between 0-3 and add it to index)
+                const elementToKeep = index + Math.floor(Math.random() * (matches));
+
+                // Add the chosen one to the list
+                deDupArray.push(wordsFound[elementToKeep]);
+
+                // Move past the matching words
+                index = lookAhead;
+            }
+
+            // Move on to the next word
+            index++;
+        }
+
+        return deDupArray;
+    }
+
+    // Using grid(rowIndex,columnIndex), search for words
+    // Call this recursively, building visited and currentWord as we go
+    // Add found words to a set as we may find duplicates
+    async findWordsFromPosition(grid, row, col, wordsFound, visitedCoordinates, currentWord) {
+        // Bounds checking
+        if (row < 0 || row >= grid.length || col < 0 || col >= grid[row].length) {
+            return;
+        }
+
+        // Create a string representation of row and column to act as a unique coordinate
+        // Wrap the values in a string that makes them easy to match later - e.g. so the web page
+        // can generate its own coordinate and look for it in a list associated with the puzzle in play
+        //const coordinate = `[${row}x${col}]`;
+        const index = (row * grid[row].length) + col;
+        const coordinate = `[${index}]`;
+
+        // Don't loop back over ourselves
+        if (visitedCoordinates.has(coordinate)) {
+            return;
+        }
+
+        // Remember we've been here
+        visitedCoordinates.add(coordinate);
+
+        // Now try the letter
+        const currentLetter = grid[row][col];
+
+        // Allow use of blanks or dots to signify missing letters
+        if (currentLetter == ' ' || currentLetter == '.') {
+            return;
+        }
+
+        currentWord += currentLetter.toLowerCase();
+
+        // TODO       if (currentWord.length >= 4 && dictionary.has(currentWord)) {
+        if (currentWord.length >= 4 && await dictionaryWordOperations.validateWord(currentWord)) {
+            // Coords are wrapped (above), so don't need any other separator
+            const path = Array.from(visitedCoordinates).join('');
+
+            // Store the word and the path taken to form it
+            // We will prune duplicate words (with different paths) later
+            wordsFound.push([currentWord, path]);
+        }
+
+        // Constrain the algorithm to avoid creating words that are too long
+        // TODO if (currentWord.length < longestWordLength && wordFragments.has(currentWord)) {
+        if (await dictionaryWordOperations.validateWordPrefix(currentWord)) {
+            // Cross
+            await this.findWordsFromPosition(grid, row - 1, col, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row + 1, col, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row, col - 1, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row, col + 1, wordsFound, visitedCoordinates, currentWord);
+
+            // Diagonal
+            await this.findWordsFromPosition(grid, row - 1, col - 1, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row - 1, col + 1, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row + 1, col - 1, wordsFound, visitedCoordinates, currentWord);
+            await this.findWordsFromPosition(grid, row + 1, col + 1, wordsFound, visitedCoordinates, currentWord);
+        }
+
+        visitedCoordinates.delete(coordinate);
     }
 }
 

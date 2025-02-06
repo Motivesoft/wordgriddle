@@ -134,7 +134,6 @@ function populatePuzzlesComboBox(puzzles) {
   const puzzlesSelect = document.getElementById("puzzles");
   puzzlesSelect.innerHTML = ""; // Clear existing options
 
-  console.log(`p: ${puzzles} (${puzzles.length || 0})`);
   // Add each puzzle as an option
   puzzles.forEach((puzzle) => {
     const option = document.createElement("option");
