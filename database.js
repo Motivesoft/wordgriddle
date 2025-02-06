@@ -92,7 +92,7 @@ function createPuzzleTables() {
                 title TEXT NOT NULL,
                 author INTEGER DEFAULT 0,
                 size INTEGER,
-                letters TEXT DEFAULT '',
+                letters TEXT CHECK(length(letters) = size*size),
                 status INTEGER DEFAULT 1,
                 created STRING NOT NULL,
                 updated STRING NOT NULL,

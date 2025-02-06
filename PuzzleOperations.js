@@ -1,7 +1,7 @@
 // External requires
 
 // Internal requires
-const { db, dbAll, dbGet } = require('./database');
+const { dbAll, dbGet } = require('./database');
 
 const PUZZLE_NAME = "wordgriddle";
 
@@ -77,19 +77,27 @@ class PuzzleOperations {
         const puzzle = await this.getPuzzle(id);
 
         if (puzzle === undefined) {
-            return res.status(400).json({ message: `Puzzle ID not recognised` });
-        }
-
-        if (data.letters === undefined || data.letters.length != (puzzle.size * puzzle.size) ) {
-            return res.status(400).json({ message: `Incorrect number of letters provided` });
+            console.log("skipping length check");
+            //return res.status(400).json({ message: `Puzzle ID not recognised` });
         }
 
         try {
             const savedPuzzle = await this.updatePuzzleLetters(id, data.letters);
+
+            if (savedPuzzle === undefined) {
+                return res.status(400).json({ message: `Puzzle ID not recognised` });
+            }
+
             res.status(200).json({ puzzle: savedPuzzle });
         } catch (error) {
-            console.error("Failed to save puzzle:", error.message);
-            res.status(500).json({ message: 'An error occurred', error: error.message });
+            console.error("Failed to update puzzle:", error.message);
+
+            // Error 19 is 'failed database constraint' - this is a user error (4xx), not a system one (5xx)
+            if (error.errno === 19) {
+                res.status(400).json({ message: `Length of 'letters' inconsistent with puzzle size` });
+            } else {
+                res.status(500).json({ message: 'An error occurred', error: error.message });
+            }
         }
     }
 
@@ -113,7 +121,12 @@ class PuzzleOperations {
         `, [id]);
     }
 
-    // Update the letters
+    // Update the letters for a puzzle
+    // There is a database constraint on the letters field to match sure it is of the right length
+    // and will fail this update if not. 
+    // It would be good to prevent this issue by checking the value beforehand but if an exception is
+    // thrown for this, it will have an 'errno' of 19 (constraint failed)
+    // If no rows is updated ('id' unknown), then the return from this call will be 'undefined'.  
     async updatePuzzleLetters(id, letters) {
         console.log(`Update the letters for #${id} in ${this.name}`);
 
