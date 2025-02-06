@@ -131,6 +131,7 @@ async function handleNew() {
     const data = await response.json();
     console.log("Data from Create API:", data.puzzle);
 
+    data.puzzle.author = document.getElementById("author").value;
     createGrid(size);
     updateFromPuzzle( data.puzzle );
   } catch (error) {

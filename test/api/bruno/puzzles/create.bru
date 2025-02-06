@@ -6,6 +6,17 @@ meta {
 
 get {
   url: http://{{HOST}}/api/designer/create
-  body: none
+  body: json
   auth: none
+}
+
+headers {
+  content-type: application/json
+}
+
+body:json {
+  {
+    "size": 4,
+    "author": 2
+  }
 }
