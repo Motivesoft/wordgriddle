@@ -39,6 +39,29 @@ function updateWordCounts() {
   });
 }
 
+function updateWordLists(lists) {
+  updateWordList("listRequired", lists.wordLists.required);
+  updateWordList("listBonus", lists.wordLists.bonus);
+  updateWordList("listExcluded", lists.wordLists.excluded);
+}
+
+function updateWordList(listId, wordListItems) {
+  // Rebuild the word list with the provided items
+  const list = document.getElementById(listId).querySelector("ul");
+  while (list.children.length) {
+    list.removeChild(list.children[0]);
+  }
+  wordListItems.forEach(([word,_]) => {
+    const wordLi = document.createElement("li");
+    const wordLabel = document.createElement("label");
+    
+    wordLi.appendChild(wordLabel);
+    wordLabel.innerHTML = `<input type="checkbox">${word}`;
+
+    list.appendChild(wordLi);
+  });
+}
+
 // Function to move selected words to another list
 function moveSelected(fromListId, toListId) {
   const fromList = document.getElementById(fromListId).querySelector("ul");
@@ -202,10 +225,11 @@ async function handleLoad(puzzleId) {
     alert("Error calling Create API");
   }
 }
+
 // Function to load data from a web API (Solve button)
 async function handleSolve() {
   try {
-    const response = await fetch("https://api.example.com/solve", {
+    const response = await fetch("/api/designer/solve/BEAT", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -217,8 +241,7 @@ async function handleSolve() {
     }
 
     const data = await response.json();
-
-    alert("Solve API response: " + JSON.stringify(data));
+    updateWordLists(data);
   } catch (error) {
     console.error("Error calling Solve API:", error);
     alert("Error calling Solve API");
