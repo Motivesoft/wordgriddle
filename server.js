@@ -8,10 +8,10 @@ const routes = require('./routes');
 const { db } = require('./database');
 
 // Disable logging
-if (process.env.NODE_ENV !== 'development') {
-    console.log = () => { };
-    console.debug = () => { };
-}
+// if (process.env.NODE_ENV !== 'development') {
+//     console.log = () => { };
+//     console.debug = () => { };
+// }
 
 // Doing this allows us to read version info etc.
 var packageInfo = require('./package.json');

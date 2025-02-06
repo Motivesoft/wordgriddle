@@ -2,7 +2,7 @@
 
 // Internal requires
 const { dbAll, dbGet } = require('./database');
-const { dictionaryWordOperations } = require('./WordListOperations');
+const { dictionaryWordOperations, bonusWordOperations, excludedWordOperations } = require('./WordListOperations');
 
 const PUZZLE_NAME = "wordgriddle";
 
@@ -217,9 +217,25 @@ class PuzzleOperations {
 
         const allWords = await this.findInGrid(grid);
 
-        // TODO Now apply the word lists
+        const allBonusWords = await bonusWordOperations.getWords();
+        const allExcludedWords = await excludedWordOperations.getWords();
 
-        return {required: allWords, bonus: [], excluded: []};
+        // Now sort the found words into required, bonus and excluded
+        let requiredWords = [];
+        let bonusWords = [];
+        let excludedWords = [];
+
+        allWords.forEach( ([word,path])=>{
+            if (allExcludedWords.includes(word)) {
+                excludedWords.push([word,path]);
+            } else if( allBonusWords.includes(word)) {
+                bonusWords.push([word,path]);
+            } else {
+                requiredWords.push([word,path]);
+            }
+        })
+
+        return {required: requiredWords, bonus: bonusWords, excluded: excludedWords};
     }
 
     async findInGrid(grid) {
