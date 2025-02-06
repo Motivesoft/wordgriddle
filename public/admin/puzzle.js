@@ -1,6 +1,6 @@
 // Fetch and display word list
 async function fetchWordLists() {
-    // showBusyIndicator();
+    showBusyIndicator('busy-indicator');
 
     //const requiredWords = {words: ["apple", "banana", "grape"], wordCount: 3};
     const requiredWords = {words: [
@@ -72,5 +72,5 @@ async function fetchWordLists() {
     // Display the number of words in the list
     const excludedWordCountDisplay = document.getElementById('excludedWordCountDisplay');
     excludedWordCountDisplay.innerHTML = `Word count: ${excludedWords.wordCount}`;
-    // hideBusyIndicator();
+    hideBusyIndicator('busy-indicator');
 }

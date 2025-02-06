@@ -29,16 +29,36 @@
             <!-- Controls Above the Grid -->
             <div class="grid-top-controls">
                 <div class="button-bar">
-                    <button class="button" onclick="handleNew()">New</button>
+                    <button class="button" onclick="openNewPuzzleModal()">New</button>
                     <button class="button" onclick="handleLoad()">Load...</button>
                     <button class="button" onclick="handleSave()">Save</button>
                     <button class="button" onclick="handleSolve()">Solve</button>
                 </div>
             
                 <div class="input-group">
-                    <input type="text" id="title" style="width: 300px;" placeholder="Enter title">
+                    <input type="text" id="title" style="width: 380px;" placeholder="Puzzle title" readonly>
                 </div>
-                <div class="input-group">
+            </div>
+
+            <!-- Grid -->
+            <div id="grid" class="grid"></div>
+
+            <!-- Controls Below the Grid -->
+            <div class="grid-bottom-controls">
+                <button onclick="handlePublish()">Random Letters</button>
+            </div>
+        </div>
+
+        <div id="newPuzzleModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeNewPuzzleModal()">&times;</span>
+                <h2>Select details for the new puzzle</h2>
+                <div class="form-group">
+                    <label for="author">Author:</label>
+                    <select id="author"></select>
+                </div>
+                <div class="form-group">
+                    <label for="size">Size:</label>
                     <select id="size" onchange="createGrid(this.value)">
                         <option value="3">3x3</option>
                         <option value="4">4x4</option>
@@ -49,19 +69,35 @@
                         <option value="9">9x9</option>
                         <option value="10">10x10</option>
                     </select>
-                    <select id="author"></select>
                 </div>
+                <div style="padding-top: 8px;">
+                    <button onclick="closeNewPuzzleModal()">Cancel</button>
+                    <button onclick="submitNewPuzzleModal()">Insert</button>
+                </div>
+                <script>
+                    function openNewPuzzleModal() {
+                        resetNewPuzzleModal();
+                        openModal("newPuzzleModal");
+                    }
+                    function submitNewPuzzleModal() {
+                        var author = document.getElementById("author").value;
+                        var size = document.getElementById("size").value;
+    
+                        handleNew();
+                        closeNewPuzzleModal();
+                    }
+                    function resetNewPuzzleModal() {
+                        document.getElementById("author").value = "0";
+                        document.getElementById("size").value = "3";
+                    }
+                    function closeNewPuzzleModal() {
+                        closeModal("newPuzzleModal");
+                        resetNewPuzzleModal();
+                    }
+                </script>
             </div>
-
-            <!-- Grid -->
-            <div id="grid" class="grid"></div>
-
-            <!-- Controls Below the Grid -->
-            <!-- <div class="grid-bottom-controls">
-                <button onclick="handlePublish()">Publish</button>
-            </div> -->
         </div>
-
+    
         <!-- Lists Section -->
         <div class="lists-section">
             <div class="word-list" id="listRequired">
@@ -128,6 +164,7 @@
     </div>
 
     <script src="designer.js"></script>
+    <script src="utils.js"></script>
 </body>
 
 </html>

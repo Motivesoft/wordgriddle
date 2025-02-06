@@ -229,4 +229,4 @@ function handlePublish() {
 // Initialize with a default grid
 fetchAuthors(); // Fetch and populate authors
 updateWordCounts(); // Set initial word counts
-handleNew();
+//handleNew();
