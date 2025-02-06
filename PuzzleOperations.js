@@ -48,11 +48,19 @@ class PuzzleOperations {
         }
     }
 
+    // Given a size and an author ID in the application/json request body, create a new puzzle
     async createPuzzleEndpoint(req, res) {
-        console.log(`Create new ${this.name}`);
+        const contentType = req.headers['content-type'];
+
+        const size = req.body.size;
+        const author = req.body.author;
+
+        if (size === undefined || author === undefined) {
+            return res.status(400).json({ message: `Missing arguments for creating a new puzzle` });
+        }
 
         try {
-            const puzzle = await this.createPuzzle();
+            const puzzle = await this.createPuzzle(size, author);
             res.status(200).json({ puzzle: puzzle });
         } catch (error) {
             console.error("Failed to create puzzle:", error.message);
@@ -60,21 +68,30 @@ class PuzzleOperations {
         }
     }
 
-    async updatePuzzleEndpoint(req, res) {
-        const data = req.body; 
-        
-        if (data.puzzle.id === undefined) {
-            return res.status(400).json({ message: `Cannot update a puzzle without an ID` });
-        }
-        
-        console.log(`Update #${data.puzzle.id} in ${this.name}`);
+    // Given the puzzle ID as a param, and a letters object as an application/json request body, update the letters field in a puzzle
+    async updatePuzzleLettersEndpoint(req, res) {
+        const id = req.params.id;
+        const data = req.body;
+
+        console.log(`Update letters for #${id} on ${this.name}`);
 
         try {
-            const puzzle = await this.updatePuzzle(data.puzzle);
-            res.status(200).json({ puzzle: puzzle });
+            const savedPuzzle = await this.updatePuzzleLetters(id, data.letters);
+
+            if (savedPuzzle === undefined) {
+                return res.status(400).json({ message: `Puzzle ID not recognised` });
+            }
+
+            res.status(200).json({ puzzle: savedPuzzle });
         } catch (error) {
-            console.error("Failed to save puzzle:", error.message);
-            res.status(500).json({ message: 'An error occurred', error: error.message });
+            console.error("Failed to update puzzle:", error.message);
+
+            // Error 19 is 'failed database constraint' - this is a user error (4xx), not a system one (5xx)
+            if (error.errno === 19) {
+                res.status(400).json({ message: `Length of 'letters' inconsistent with puzzle size` });
+            } else {
+                res.status(500).json({ message: 'An error occurred', error: error.message });
+            }
         }
     }
 
@@ -85,7 +102,7 @@ class PuzzleOperations {
         console.debug(`List of all ${this.name}`);
 
         // Execute the query and transform the result into an array
-        return await dbAll(`SELECT * FROM ${this.tableName}`,[]);
+        return await dbAll(`SELECT * FROM ${this.tableName}`, []);
     }
 
     // Return a specific puzzle
@@ -95,25 +112,32 @@ class PuzzleOperations {
         return await dbGet(`
             SELECT * from ${this.tableName} 
                 WHERE id = ?
-        `,[id]);
+        `, [id]);
     }
 
-    // Update certain metadata items (alternateName, author, letters, maybe more in future)
-    async updatePuzzle(puzzle) {
-        console.log(`Update #${puzzle.id} in ${this.name}`);
+    // Update the letters for a puzzle
+    // There is a database constraint on the letters field to match sure it is of the right length
+    // and will fail this update if not. 
+    // It would be good to prevent this issue by checking the value beforehand but if an exception is
+    // thrown for this, it will have an 'errno' of 19 (constraint failed)
+    // If no rows is updated ('id' unknown), then the return from this call will be 'undefined'.  
+    async updatePuzzleLetters(id, letters) {
+        console.log(`Update the letters for #${id} in ${this.name}`);
+
+        if (id === undefined || letters === undefined) {
+            throw new Error("Missing data");
+        }
 
         // Get update date
         const today = new Date();
 
         return await dbGet(`
             UPDATE ${this.tableName} SET 
-                    alternateName = ?,
-                    author = ?,
                     letters = ?,
                     updated = ?
                 WHERE id = ?
                 RETURNING *
-        `,[puzzle.alternateName, puzzle.author, puzzle.letters, today.toJSON(), puzzle.id]);
+        `, [letters, today.toJSON(), id]);
     }
 
     async changePuzzleStatus(id, status) {
@@ -128,25 +152,36 @@ class PuzzleOperations {
                     updated = ?
                 WHERE id = ?
                 RETURNING *
-        `,[status, today.toJSON(), id]);
+        `, [status, today.toJSON(), id]);
     }
 
-    async createPuzzle() {
+    async createPuzzle(size, author) {
         console.log(`Create new ${this.name}`);
 
         // Get creation/update date
-        const today = new Date(); 
+        const today = new Date();
 
         return await dbGet(`
-            INSERT INTO ${this.tableName} (label, author, created, updated)
+            INSERT INTO ${this.tableName} (title, author, size, letters, status, created, updated) 
                 VALUES (
                     CONCAT('${PUZZLE_NAME}', ' #', COALESCE((SELECT MAX(id) FROM ${this.tableName}), 0) + 1, ' - ', ?),
-                    0,
+                    ?,
+                    ?,
+                    ?,
+                    ?,
                     ?,
                     ?
                 )
                 RETURNING *
-        `,[today.toISOString().slice(0, 10), today.toJSON(), today.toJSON()]);
+        `, [
+            today.toISOString().slice(0, 10),   // Creation date in short form
+            author,                             // Default author 
+            size,                               // Grid size (for any edge, remembering that these are square)
+            '-'.repeat(size*size),              // Letter grid, where '-' means unknown 
+            1,                                  // Default status 
+            today.toJSON(),                     // Created 
+            today.toJSON()                      // Last updated
+        ]);
     }
 }
 

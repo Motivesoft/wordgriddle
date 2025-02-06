@@ -44,9 +44,10 @@ router.get('/admin/vacuum', (req, res) => adminOperations.vacuumEndpoint(req, re
 router.get('/admin/shutdown', (req, res) => adminOperations.shutdownEndpoint(req, res));
 
 // Puzzle design
+// TODO turn 'puzzles' into getUnpublishedPuzzles for designer.
 router.get('/designer/puzzles', (req, res) => editablePuzzleOperations.getPuzzlesEndpoint(req, res));
 router.get('/designer/puzzle/:id', (req, res) => editablePuzzleOperations.getPuzzleEndpoint(req, res));
-router.post('/designer/update', (req, res) => editablePuzzleOperations.updatePuzzleEndpoint(req, res));
-router.get('/designer/create', (req, res) => editablePuzzleOperations.createPuzzleEndpoint(req, res));
+router.post('/designer/update-letters/:id', (req, res) => editablePuzzleOperations.updatePuzzleLettersEndpoint(req, res));
+router.post('/designer/create', (req, res) => editablePuzzleOperations.createPuzzleEndpoint(req, res));
 
 module.exports = router;

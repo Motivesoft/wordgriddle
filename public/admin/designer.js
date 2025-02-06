@@ -1,3 +1,7 @@
+// Variables used during the design phase
+let currentPuzzle;
+let puzzleEdited;
+
 // Function to create the grid
 function createGrid(size) {
   const grid = document.getElementById("grid");
@@ -12,6 +16,12 @@ function createGrid(size) {
     const cell = document.createElement("div");
     cell.classList.add("grid-cell");
     grid.appendChild(cell);
+  }
+
+  // Reset the letter count
+  if (currentPuzzle) {
+    currentPuzzle.size = size;
+    currentPuzzle.letters = '-'.repeat(size*size);
   }
 }
 
@@ -83,6 +93,28 @@ async function fetchAuthors() {
   }
 }
 
+// Function to fetch puzzles from the API and populate the combobox
+async function fetchPuzzles() {
+  try {
+    const response = await fetch("/api/designer/puzzles", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch authors");
+    }
+
+    const data = await response.json();
+    populatePuzzlesComboBox(data.puzzles);
+  } catch (error) {
+    console.error("Error fetching puzzles:", error);
+    alert("Error fetching puzzles");
+  }
+}
+
 // Function to populate the Author combobox
 function populateAuthorComboBox(authors) {
   const authorSelect = document.getElementById("author");
@@ -97,20 +129,80 @@ function populateAuthorComboBox(authors) {
   });
 }
 
-// Function to handle changes in the Author combobox
-function handleAuthorChange(selectedAuthorId) {
-  console.log("Selected Author ID:", selectedAuthorId);
-  // You can add additional logic here, such as saving the selected author ID
-  alert(`Author changed to ID: ${selectedAuthorId}`);
+// Function to populate the Author combobox
+function populatePuzzlesComboBox(puzzles) {
+  const puzzlesSelect = document.getElementById("puzzles");
+  puzzlesSelect.innerHTML = ""; // Clear existing options
+
+  console.log(`p: ${puzzles} (${puzzles.length || 0})`);
+  // Add each puzzle as an option
+  puzzles.forEach((puzzle) => {
+    const option = document.createElement("option");
+    option.value = puzzle.id; // Use the puzzle ID as the value
+    option.textContent = puzzle.title; // Use the title as the display text
+    puzzlesSelect.appendChild(option);
+  });
 }
 
 // Function to reset the grid and clear the title
-function handleNew() {
-  const initialSize = document.getElementById("size");
-  createGrid(initialSize.value);
-  document.getElementById("title").value = ""; // Clear the title field
+async function handleNew(author, size) {
+  if (currentPuzzle !== undefined && puzzleEdited) {
+    // Prompt to save current and do so, or cancel and return here
+  }
+
+  try {
+    const response = await fetch(`/api/designer/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        author: author,
+        size: size
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create new puzzle");
+    }
+
+    const data = await response.json();
+
+    createGrid(size);
+    updateFromPuzzle( data.puzzle );
+  } catch (error) {
+    console.error("Error calling Create API:", error);
+    alert("Error calling Create API");
+  }
 }
 
+// Function to reset the grid and clear the title
+async function handleLoad(puzzleId) {
+  if (currentPuzzle !== undefined && puzzleEdited) {
+    // Prompt to save current and do so, or cancel and return here
+  }
+
+  try {
+    const response = await fetch(`/api/designer/puzzle/${puzzleId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to load puzzle");
+    }
+
+    const data = await response.json();
+
+    createGrid(data.puzzle.size);
+    updateFromPuzzle( data.puzzle );
+  } catch (error) {
+    console.error("Error calling Create API:", error);
+    alert("Error calling Create API");
+  }
+}
 // Function to load data from a web API (Solve button)
 async function handleSolve() {
   try {
@@ -126,7 +218,7 @@ async function handleSolve() {
     }
 
     const data = await response.json();
-    console.log("Data from Solve API:", data);
+
     alert("Solve API response: " + JSON.stringify(data));
   } catch (error) {
     console.error("Error calling Solve API:", error);
@@ -137,15 +229,21 @@ async function handleSolve() {
 // Function to save data to a web API (Save button)
 async function handleSave() {
   const wordLists = getWordLists();
-  const title = document.getElementById("title").value;
+
+  let letters = '';
+  const grid = document.getElementById("grid");
+  for (i = 0; i < grid.children.length; i++) {
+    const letter = grid.children[i].value || '-';
+    letters += letter;
+  }
 
   try {
-    const response = await fetch("https://api.example.com/save", {
+    const response = await fetch(`/api/designer/update-letters/${currentPuzzle.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ title, wordLists }),
+      body: JSON.stringify({letters: letters}),
     });
 
     if (!response.ok) {
@@ -153,11 +251,37 @@ async function handleSave() {
     }
 
     const data = await response.json();
-    console.log("Data from Save API:", data);
-    alert("Save API response: " + JSON.stringify(data));
+
+    updateFromPuzzle( data.puzzle );
   } catch (error) {
     console.error("Error calling Save API:", error);
     alert("Error calling Save API");
+  }
+}
+
+function updateFromPuzzle(puzzle) {
+  currentPuzzle = puzzle;
+
+  document.getElementById("title").value = puzzle.title || '';
+
+  populateGrid(puzzle);
+}
+
+function populateGrid(puzzle) {
+  const grid = document.getElementById("grid");
+
+  if (puzzle.letters === undefined || puzzle.length === 0) {
+    document.getElementById("grid").children.forEach((cell) => {
+      cell.value = '';
+    })
+  } else {
+    // Create grid cells
+    for (let i = 0; i < puzzle.letters.length; i++) {
+      const cell = grid.children[i];
+      if (puzzle.letters[i] !== '-') {
+        cell.value = puzzle.letters[i];
+      }
+    }
   }
 }
 
@@ -166,7 +290,4 @@ function handlePublish() {
   alert("Publish button clicked");
 }
 
-// Initialize with a default grid
-fetchAuthors(); // Fetch and populate authors
 updateWordCounts(); // Set initial word counts
-handleNew();

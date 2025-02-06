@@ -1,11 +1,11 @@
 meta {
-  name: create
+  name: save
   type: http
-  seq: 1
+  seq: 5
 }
 
 post {
-  url: http://{{HOST}}/api/designer/create
+  url: http://{{HOST}}/api/designer/update-letters/2
   body: json
   auth: none
 }
@@ -16,7 +16,6 @@ headers {
 
 body:json {
   {
-    "size": 4,
-    "author": 2
+      "letters": "ABIDESNOABIDESNO"
   }
 }
