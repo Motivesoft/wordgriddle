@@ -48,16 +48,16 @@ class PuzzleOperations {
         }
     }
 
+    // Given a size and an author ID in the application/json request body, create a new puzzle
     async createPuzzleEndpoint(req, res) {
         const contentType = req.headers['content-type'];
 
-        if (contentType !== 'application/json') {
-            return res.status(400).json({ message: `Missing arguments for creating a new puzzle` });
-        }
-
         const size = req.body.size;
         const author = req.body.author;
-        console.log(`Create new ${this.name} of size ${size}x${size}`);
+
+        if (size === undefined || author === undefined) {
+            return res.status(400).json({ message: `Missing arguments for creating a new puzzle` });
+        }
 
         try {
             const puzzle = await this.createPuzzle(size, author);
@@ -68,18 +68,12 @@ class PuzzleOperations {
         }
     }
 
+    // Given the puzzle ID as a param, and a letters object as an application/json request body, update the letters field in a puzzle
     async updatePuzzleLettersEndpoint(req, res) {
         const id = req.params.id;
         const data = req.body;
 
         console.log(`Update letters for #${id} on ${this.name}`);
-
-        const puzzle = await this.getPuzzle(id);
-
-        if (puzzle === undefined) {
-            console.log("skipping length check");
-            //return res.status(400).json({ message: `Puzzle ID not recognised` });
-        }
 
         try {
             const savedPuzzle = await this.updatePuzzleLetters(id, data.letters);

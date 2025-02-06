@@ -108,20 +108,21 @@ function populateAuthorComboBox(authors) {
 }
 
 // Function to reset the grid and clear the title
-async function handleNew() {
+async function handleNew(author, size) {
   if (currentPuzzle !== undefined && puzzleEdited) {
     // Prompt to save current and do so, or cancel and return here
   }
 
-  const initialSize = document.getElementById("size");
-  const size = initialSize.value;
-
   try {
-    const response = await fetch(`/api/designer/create/${size}`, {
-      method: "GET",
+    const response = await fetch(`/api/designer/create`, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        author: author,
+        size: size
+      })
     });
 
     if (!response.ok) {
@@ -131,7 +132,6 @@ async function handleNew() {
     const data = await response.json();
     console.log("Data from Create API:", data.puzzle);
 
-    data.puzzle.author = document.getElementById("author").value;
     createGrid(size);
     updateFromPuzzle( data.puzzle );
   } catch (error) {
@@ -167,16 +167,21 @@ async function handleSolve() {
 async function handleSave() {
   const wordLists = getWordLists();
 
-  currentPuzzle.title = document.getElementById("title").value;
-  currentPuzzle.author = document.getElementById("author").value;
+  let letters = '';
+  const grid = document.getElementById("grid");
+  for (i = 0; i < grid.children.length; i++) {
+    const letter = grid.children[i].value || '-';
+    letters += letter;
+  }
 
+console.log(`->>-${letters}-<<-`);
   try {
-    const response = await fetch("/api/designer/save", {
+    const response = await fetch(`/api/designer/update-letters/${currentPuzzle.id}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({puzzle: currentPuzzle}),
+      body: JSON.stringify({letters: letters}),
     });
 
     if (!response.ok) {
