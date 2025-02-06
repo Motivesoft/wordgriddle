@@ -93,6 +93,28 @@ async function fetchAuthors() {
   }
 }
 
+// Function to fetch puzzles from the API and populate the combobox
+async function fetchPuzzles() {
+  try {
+    const response = await fetch("/api/designer/puzzles", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch authors");
+    }
+
+    const data = await response.json();
+    populatePuzzlesComboBox(data.puzzles);
+  } catch (error) {
+    console.error("Error fetching puzzles:", error);
+    alert("Error fetching puzzles");
+  }
+}
+
 // Function to populate the Author combobox
 function populateAuthorComboBox(authors) {
   const authorSelect = document.getElementById("author");
@@ -104,6 +126,21 @@ function populateAuthorComboBox(authors) {
     option.value = author.id; // Use the author's ID as the value
     option.textContent = author.name; // Use the author's name as the display text
     authorSelect.appendChild(option);
+  });
+}
+
+// Function to populate the Author combobox
+function populatePuzzlesComboBox(puzzles) {
+  const puzzlesSelect = document.getElementById("puzzles");
+  puzzlesSelect.innerHTML = ""; // Clear existing options
+
+  console.log(`p: ${puzzles} (${puzzles.length || 0})`);
+  // Add each puzzle as an option
+  puzzles.forEach((puzzle) => {
+    const option = document.createElement("option");
+    option.value = puzzle.id; // Use the puzzle ID as the value
+    option.textContent = puzzle.title; // Use the title as the display text
+    puzzlesSelect.appendChild(option);
   });
 }
 
@@ -130,7 +167,6 @@ async function handleNew(author, size) {
     }
 
     const data = await response.json();
-    console.log("Data from Create API:", data.puzzle);
 
     createGrid(size);
     updateFromPuzzle( data.puzzle );
@@ -140,6 +176,33 @@ async function handleNew(author, size) {
   }
 }
 
+// Function to reset the grid and clear the title
+async function handleLoad(puzzleId) {
+  if (currentPuzzle !== undefined && puzzleEdited) {
+    // Prompt to save current and do so, or cancel and return here
+  }
+
+  try {
+    const response = await fetch(`/api/designer/puzzle/${puzzleId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to load puzzle");
+    }
+
+    const data = await response.json();
+
+    createGrid(data.puzzle.size);
+    updateFromPuzzle( data.puzzle );
+  } catch (error) {
+    console.error("Error calling Create API:", error);
+    alert("Error calling Create API");
+  }
+}
 // Function to load data from a web API (Solve button)
 async function handleSolve() {
   try {
@@ -155,7 +218,7 @@ async function handleSolve() {
     }
 
     const data = await response.json();
-    console.log("Data from Solve API:", data);
+
     alert("Solve API response: " + JSON.stringify(data));
   } catch (error) {
     console.error("Error calling Solve API:", error);
@@ -174,7 +237,6 @@ async function handleSave() {
     letters += letter;
   }
 
-console.log(`->>-${letters}-<<-`);
   try {
     const response = await fetch(`/api/designer/update-letters/${currentPuzzle.id}`, {
       method: "POST",
@@ -189,7 +251,6 @@ console.log(`->>-${letters}-<<-`);
     }
 
     const data = await response.json();
-    console.log("Data from Save API:", data.puzzle);
 
     updateFromPuzzle( data.puzzle );
   } catch (error) {
@@ -202,8 +263,6 @@ function updateFromPuzzle(puzzle) {
   currentPuzzle = puzzle;
 
   document.getElementById("title").value = puzzle.title || '';
-  document.getElementById("author").value = puzzle.author || 0;
-  document.getElementById("size").value = puzzle.size || 3;
 
   populateGrid(puzzle);
 }
@@ -213,14 +272,14 @@ function populateGrid(puzzle) {
 
   if (puzzle.letters === undefined || puzzle.length === 0) {
     document.getElementById("grid").children.forEach((cell) => {
-      cell.textContent = '';
+      cell.value = '';
     })
   } else {
     // Create grid cells
     for (let i = 0; i < puzzle.letters.length; i++) {
       const cell = grid.children[i];
       if (puzzle.letters[i] !== '-') {
-        cell.textContent = puzzle.letters[i];
+        cell.value = puzzle.letters[i];
       }
     }
   }
@@ -231,7 +290,4 @@ function handlePublish() {
   alert("Publish button clicked");
 }
 
-// Initialize with a default grid
-fetchAuthors(); // Fetch and populate authors
 updateWordCounts(); // Set initial word counts
-//handleNew();

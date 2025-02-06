@@ -30,7 +30,7 @@
             <div class="grid-top-controls">
                 <div class="button-bar">
                     <button class="button" onclick="openNewPuzzleModal()">New</button>
-                    <button class="button" onclick="handleLoad()">Load...</button>
+                    <button class="button" onclick="openLoadPuzzleModal()">Load...</button>
                     <button class="button" onclick="handleSave()">Save</button>
                     <button class="button" onclick="handleSolve()">Solve</button>
                 </div>
@@ -72,7 +72,7 @@
                 </div>
                 <div style="padding-top: 8px;">
                     <button onclick="closeNewPuzzleModal()">Cancel</button>
-                    <button onclick="submitNewPuzzleModal()">Insert</button>
+                    <button onclick="submitNewPuzzleModal()">Create</button>
                 </div>
                 <script>
                     function openNewPuzzleModal() {
@@ -87,12 +87,44 @@
                         closeNewPuzzleModal();
                     }
                     function resetNewPuzzleModal() {
+                        fetchAuthors();
                         document.getElementById("author").value = "0";
                         document.getElementById("size").value = "3";
                     }
                     function closeNewPuzzleModal() {
                         closeModal("newPuzzleModal");
-                        resetNewPuzzleModal();
+                    }
+                </script>
+            </div>
+        </div>
+
+        <div id="loadPuzzleModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeLoadPuzzleModal()">&times;</span>
+                <h2>Select the puzzle to load</h2>
+                <div class="form-group">
+                    <select id="puzzles"></select>
+                </div>
+                <div style="padding-top: 8px;">
+                    <button onclick="closeLoadPuzzleModal()">Cancel</button>
+                    <button onclick="submitLoadPuzzleModal()">Load</button>
+                </div>
+                <script>
+                    function openLoadPuzzleModal() {
+                        resetLoadPuzzleModal();
+                        openModal("loadPuzzleModal");
+                    }
+                    function submitLoadPuzzleModal() {
+                        var puzzleId = document.getElementById("puzzles").value;
+    
+                        handleLoad(puzzleId);
+                        closeLoadPuzzleModal();
+                    }
+                    function resetLoadPuzzleModal() {
+                        fetchPuzzles();
+                    }
+                    function closeLoadPuzzleModal() {
+                        closeModal("loadPuzzleModal");
                     }
                 </script>
             </div>
