@@ -39,6 +39,7 @@ router.post('/excluded/add', (req, res) => excludedWordOperations.addWordsEndpoi
 router.post('/excluded/remove', (req, res) => excludedWordOperations.removeWordsEndpoint(req, res));
 
 // System admin and management, including users
+router.get('/admin/user/:id', (req, res) => adminOperations.getUserEndpoint(req, res));
 router.get('/admin/users', (req, res) => adminOperations.getUsersEndpoint(req, res));
 router.get('/admin/vacuum', (req, res) => adminOperations.vacuumEndpoint(req, res));
 router.get('/admin/shutdown', (req, res) => adminOperations.shutdownEndpoint(req, res));
