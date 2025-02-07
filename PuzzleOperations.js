@@ -364,8 +364,8 @@ class PuzzleOperations {
         // Now try the letter
         const currentLetter = grid[row][col];
 
-        // Allow use of blanks or dots to signify missing letters
-        if (currentLetter == ' ' || currentLetter == '.') {
+        // Allow use of blanks, dashes or dots to signify missing letters
+        if ([' ', '.', '-'].includes(currentLetter)) {
             return;
         }
 
