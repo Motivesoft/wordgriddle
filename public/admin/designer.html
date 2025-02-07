@@ -136,30 +136,6 @@
                 <h2>Required</h2>
                 <p class="word-count">Words: <span id="countRequired">3</span></p>
                     <ul id="wordListContainer">
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
-                        <li><label><input type="checkbox"> Word 1</label></li>
-                        <li><label><input type="checkbox"> Word 2</label></li>
-                        <li><label><input type="checkbox"> Word 3</label></li>
                     </ul>
                 <div class="list-controls">
                     <button onclick="moveSelected('listRequired', 'listBonus')">Bonus</button>
@@ -170,26 +146,26 @@
                 <h2>Bonus</h2>
                 <p class="word-count">Words: <span id="countBonus">3</span></p>
                 <ul id="wordListContainer">
-                    <li><label><input type="checkbox"> Word 4</label></li>
-                    <li><label><input type="checkbox"> Word 5</label></li>
-                    <li><label><input type="checkbox"> Word 6</label></li>
                 </ul>
                 <div class="list-controls">
                     <button onclick="moveSelected('listBonus', 'listRequired')">Required</button>
                     <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded</button>
+                </div>
+                <div class="list-controls">
+                    <button onclick="">Save</button>
                 </div>
             </div>
             <div class="word-list" id="listExcluded">
                 <h2>Excluded</h2>
                 <p class="word-count">Words: <span id="countExcluded">3</span></p>
                 <ul id="wordListContainer">
-                    <li><label><input type="checkbox"> Word 7</label></li>
-                    <li><label><input type="checkbox"> Word 8</label></li>
-                    <li><label><input type="checkbox"> Word 9</label></li>
                 </ul>
                 <div class="list-controls">
                     <button onclick="moveSelected('listExcluded', 'listRequired')">Required</button>
                     <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus</button>
+                </div>
+                <div class="list-controls">
+                    <button onclick="">Save</button>
                 </div>
             </div>
         </div>
