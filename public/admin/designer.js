@@ -94,6 +94,60 @@ function getWordLists() {
   return wordLists;
 }
 
+// Save word list changes.
+// Try and ensure no duplication by removing (eg) bonus words from the excluded list and vice-versa
+async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
+  // TODO make this into a server-side transaction API
+  const wordLists = getWordLists();
+  try {
+    // Add words to list
+    console.log(`Calling /api/${wordType}/add with ${wordLists[wordsToAdd]}`);
+    const addResponse = await fetch(`/api/${wordType}/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({words: wordLists[wordsToAdd]}),
+    });
+
+    if (!addResponse.ok) {
+      throw new Error("Failed to save data");
+    }
+
+    // Remove words that are now in the other list
+    console.log(`Calling /api/${wordType}/remove with ${wordLists[wordsToRemove]}`);
+    let removeResponse = await fetch(`/api/${wordType}/remove`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({words: wordLists[wordsToRemove]}),
+    });
+
+    if (!removeResponse.ok) {
+      throw new Error("Failed to save data");
+    }
+
+    // Remove words that are now in the other list
+    console.log(`Calling /api/${wordType}/remove with ${wordLists['listRequired']}`);
+    removeResponse = await fetch(`/api/${wordType}/remove`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({words: wordLists['listRequired']}),
+    });
+
+    if (!removeResponse.ok) {
+      throw new Error("Failed to save data");
+    }
+  } catch (error) {
+    console.error("Error calling Save API:", error);
+    alert("Error calling Save API");
+  }
+
+}
+
 // Function to fetch authors from the API and populate the combobox
 async function fetchAuthors() {
   try {
