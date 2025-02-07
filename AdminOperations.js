@@ -1,10 +1,24 @@
+// Internal requires
 const { dbAll, dbRun } = require('./database');
+
+// Doing this allows us to read version info etc.
+var packageInfo = require('./package.json');
 
 class AdminOperations {
     constructor() {
     }
 
     // Endpoints
+
+    async getVersionInfoEndpoint(req, res) {
+        try {
+            const [name, version] = await this.getVersionInfo();
+            res.status(200).json({ name: name, version: version, label: `${name} ${version}` });
+        } catch (error) {
+            console.error("Failed getting version info:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
 
     // Run a database
     async vacuumEndpoint(req, res) {
@@ -34,6 +48,10 @@ class AdminOperations {
     }
 
     // Other methods
+
+    async getVersionInfo() {
+        return [packageInfo.name,packageInfo.version];
+    }
 
     async getUsers() {
         console.debug(`Getting all users`);
