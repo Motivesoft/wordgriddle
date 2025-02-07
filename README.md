@@ -46,14 +46,18 @@ Grid based word puzzle game
 
 # Instructions
 ## Deployment
-* Install node
+* Install node and npm
 * ```npm install```
 * ```npm install -g nodemon``` (deveoper system)
 * ```npm install -g pm2```     (production system)
 * ```pm2 start server.js```
+* ```pm2 stop server.js```
+* ```pm2 list```
+* Install dictionary, bonus and excluded word lists
+* Import puzzles as required
 
 ## Development
-* Install node
+* Install node and npm
 * ```npm install```
 * ```npm install -g nodemon``` (deveoper system)
 * ```npm version prerelease``` (or other value, incremement version info at key points)
