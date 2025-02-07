@@ -307,16 +307,18 @@ button:active {
 .word-list .word-count {
   font-size: 14px;
   color: #555;
+  margin-top: 20px;
 }
 
 .word-list ul {
   list-style-type: none;
-  padding: 0;
+  padding: 0px;
+  margin: 0px;
   background-color: #fff;
 }
 
 .word-list li {
-  padding: 5px 0;
+  padding: 4px 0px 0px 0px;
   border-bottom: 1px solid #ddd;
   background-color: #fff;
   border: none;
@@ -332,17 +334,17 @@ button:active {
 }
 
 .list-controls {
-  margin-top: 10px;
+  margin-top: 0px;
   display: flex;
-  justify-content: center;
+  justify-content: left;
 }
 
 .list-controls button {
   margin-right: 10px;
-  padding: 5px 10px;
+  padding: 5px;
   font-size: 14px;
   cursor: pointer;
-  min-width: 90px;
+  min-width: 80px;
 }
 
 /* Button bar */
