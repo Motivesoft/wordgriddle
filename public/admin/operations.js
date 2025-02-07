@@ -12,7 +12,7 @@ async function fetchWordList(category) {
     // Populate the word list panel with the words and a checkbox for each one
     const wordList = document.getElementById('wordList');
     wordList.innerHTML = words.words.map(word => 
-        selectable ? `<div><input type="checkbox" value="${word}">&nbsp;${word}</div>` : `<div>${word}</div>`
+        selectable ? `<div><label><input type="checkbox" value="${word}">${word}</label></div>` : `<div><label>${word}</label></div>`
     ).join('');
 
     // Display the number of words in the list
