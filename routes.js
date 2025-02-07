@@ -43,6 +43,8 @@ router.get('/admin/users', (req, res) => adminOperations.getUsersEndpoint(req, r
 router.get('/admin/vacuum', (req, res) => adminOperations.vacuumEndpoint(req, res));
 router.get('/admin/shutdown', (req, res) => adminOperations.shutdownEndpoint(req, res));
 
+router.get('/version', (req, res) => adminOperations.getVersionInfoEndpoint(req, res));
+
 // Puzzle design
 // TODO turn 'puzzles' into getUnpublishedPuzzles for designer.
 router.get('/designer/puzzles', (req, res) => editablePuzzleOperations.getPuzzlesEndpoint(req, res));
