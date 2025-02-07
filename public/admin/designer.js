@@ -39,10 +39,18 @@ function updateWordCounts() {
   });
 }
 
+function clearWordLists() {
+  updateWordList("listRequired", []);
+  updateWordList("listBonus", []);
+  updateWordList("listExcluded", []);
+  updateWordCounts();
+}
+
 function updateWordLists(lists) {
   updateWordList("listRequired", lists.wordLists.required);
   updateWordList("listBonus", lists.wordLists.bonus);
   updateWordList("listExcluded", lists.wordLists.excluded);
+  updateWordCounts();
 }
 
 function updateWordList(listId, wordListItems) {
@@ -246,6 +254,7 @@ async function handleNew(author, size) {
 
     createGrid(size);
     updateFromPuzzle( data.puzzle );
+    clearWordLists();
   } catch (error) {
     console.error("Error calling Create API:", error);
     alert("Error calling Create API");
@@ -274,6 +283,7 @@ async function handleLoad(puzzleId) {
 
     createGrid(data.puzzle.size);
     updateFromPuzzle( data.puzzle );
+    clearWordLists();
   } catch (error) {
     console.error("Error calling Create API:", error);
     alert("Error calling Create API");
