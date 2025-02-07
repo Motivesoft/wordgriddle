@@ -14,7 +14,10 @@ function createGrid(size) {
   // Create grid cells
   for (let i = 0; i < size * size; i++) {
     const cell = document.createElement("div");
+    const label = document.createElement("label");
     cell.classList.add("grid-cell");
+    label.textContent = '-';
+    cell.appendChild(label);
     grid.appendChild(cell);
   }
 
@@ -103,7 +106,7 @@ function getWordLists() {
 }
 
 // Save word list changes.
-// Try and ensure no duplication by removing (eg) bonus words from the excluded list and vice-versa
+// Maintain integrity by removing (eg) bonus and required words from the excluded list and vice-versa
 async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
   // TODO make this into a server-side transaction API
   const wordLists = getWordLists();
@@ -143,7 +146,6 @@ async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
     // Remove words that got moved to the required list
     list = wordLists['listRequired'];
     if (list.length) {
-      console.log(`Calling /api/${wordType}/remove with ${wordLists['listRequired']}`);
       const response = await fetch(`/api/${wordType}/remove`, {
         method: "POST",
         headers: {
@@ -297,10 +299,48 @@ async function handleLoad(puzzleId) {
   }
 }
 
+// Fill in any empty squares
+async function handleRandomFill() {
+  const grid = document.getElementById("grid");
+
+  // Fill in any blank grid cells
+  for (let i = 0; i < grid.children.length; i++) {
+    const cell = grid.children[i];
+    const label = cell.children[0];
+    if (label.textContent == '-') {
+      label.textContent = getRandomLetter();
+    }
+  }
+}
+
+// Get a (usable) random letter (exclude QXZ)
+function getRandomLetter() {
+  const alphabet = 'ABCDEFGHIJKLMNOPRSTUVYW';
+  const randomIndex = Math.floor(Math.random() * alphabet.length);
+  return alphabet[randomIndex];
+}
+
+function getGridLetters() {
+  const grid = document.getElementById("grid");
+
+  let letters = '';
+
+  // Fill in any blank grid cells
+  for (let i = 0; i < grid.children.length; i++) {
+    const cell = grid.children[i];
+    const label = cell.children[0];
+    letters += label.textContent;
+  }
+
+  return letters;
+}
+
 // Function to load data from a web API (Solve button)
 async function handleSolve() {
   try {
-    const response = await fetch("/api/designer/solve/BEAT", {
+    const letters = getGridLetters();
+
+    const response = await fetch(`/api/designer/solve/${letters}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -323,12 +363,7 @@ async function handleSolve() {
 async function handleSave() {
   const wordLists = getWordLists();
 
-  let letters = '';
-  const grid = document.getElementById("grid");
-  for (i = 0; i < grid.children.length; i++) {
-    const letter = grid.children[i].value || '-';
-    letters += letter;
-  }
+  const letters = getGridLetters();
 
   try {
     const response = await fetch(`/api/designer/update-letters/${currentPuzzle.id}`, {
@@ -363,18 +398,11 @@ function updateFromPuzzle(puzzle) {
 function populateGrid(puzzle) {
   const grid = document.getElementById("grid");
 
-  if (puzzle.letters === undefined || puzzle.length === 0) {
-    document.getElementById("grid").children.forEach((cell) => {
-      cell.value = '';
-    })
-  } else {
-    // Create grid cells
-    for (let i = 0; i < puzzle.letters.length; i++) {
-      const cell = grid.children[i];
-      if (puzzle.letters[i] !== '-') {
-        cell.value = puzzle.letters[i];
-      }
-    }
+  // Create grid cells
+  for (let i = 0; i < puzzle.letters.length; i++) {
+    const cell = grid.children[i];
+    const label = cell.children[0];
+    label.textContent = puzzle.letters[i];
   }
 }
 
