@@ -26,8 +26,9 @@ class WordListOperations {
             return res.status(400).json({ message: `Only ${CONTENT_TYPE_TEXT_PLAIN} and ${CONTENT_TYPE_APPLICATION_JSON} are supported` });
         }
 
+        // Info message only
         if (words.length === 0) {
-            return res.status(400).json({ message: 'No words were provided.' });
+            console.log("No words in provided data");
         }
 
         try {
@@ -54,10 +55,11 @@ class WordListOperations {
             return res.status(400).json({ message: `Only ${CONTENT_TYPE_TEXT_PLAIN} and ${CONTENT_TYPE_APPLICATION_JSON} are supported` });
         }
 
+        // Info message only
         if (words.length === 0) {
-            return res.status(400).json({ message: 'No words were provided.' });
+            console.log("No words in provided data");
         }
-
+        
         try {
             const count = await this.removeWords(words);
             res.status(200).json({ status: "complete", wordCount: words.length, processedCount: count });

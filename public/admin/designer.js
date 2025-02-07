@@ -109,45 +109,52 @@ async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
   const wordLists = getWordLists();
   try {
     // Add words to list
-    console.log(`Calling /api/${wordType}/add with ${wordLists[wordsToAdd]}`);
-    const addResponse = await fetch(`/api/${wordType}/add`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({words: wordLists[wordsToAdd]}),
-    });
-
-    if (!addResponse.ok) {
-      throw new Error("Failed to save data");
+    let list = wordLists[wordsToAdd];
+    if (list.length) {
+      const response = await fetch(`/api/${wordType}/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({words: list}),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to save data");
+      }
     }
 
     // Remove words that are now in the other list
-    console.log(`Calling /api/${wordType}/remove with ${wordLists[wordsToRemove]}`);
-    let removeResponse = await fetch(`/api/${wordType}/remove`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({words: wordLists[wordsToRemove]}),
-    });
-
-    if (!removeResponse.ok) {
-      throw new Error("Failed to save data");
+    list = wordLists[wordsToRemove];
+    if (list.length) {
+      const removeResponse = await fetch(`/api/${wordType}/remove`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({words: list}),
+      });
+  
+      if (!removeResponse.ok) {
+        throw new Error("Failed to save data");
+      }
     }
 
-    // Remove words that are now in the other list
-    console.log(`Calling /api/${wordType}/remove with ${wordLists['listRequired']}`);
-    removeResponse = await fetch(`/api/${wordType}/remove`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({words: wordLists['listRequired']}),
-    });
-
-    if (!removeResponse.ok) {
-      throw new Error("Failed to save data");
+    // Remove words that got moved to the required list
+    list = wordLists['listRequired'];
+    if (list.length) {
+      console.log(`Calling /api/${wordType}/remove with ${wordLists['listRequired']}`);
+      const response = await fetch(`/api/${wordType}/remove`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({words: wordLists['listRequired']}),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to save data");
+      }
     }
   } catch (error) {
     console.error("Error calling Save API:", error);
