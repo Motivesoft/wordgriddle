@@ -1,5 +1,5 @@
 // Internal requires
-const { dbAll, dbRun } = require('./database');
+const { dbAll, dbGet, dbRun } = require('./database');
 
 // Doing this allows us to read version info etc.
 var packageInfo = require('./package.json');
@@ -37,6 +37,17 @@ class AdminOperations {
         process.exit(1);
     }
 
+    async getUserEndpoint(req, res) {
+        const id = req.params.id;
+        try {
+            const user = await this.getUser(id);
+            res.status(200).json(user);
+        } catch (error) {
+            console.error("Failed to get user:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
+
     async getUsersEndpoint(req, res) {
         try {
             const users = await this.getUsers();
@@ -51,6 +62,12 @@ class AdminOperations {
 
     async getVersionInfo() {
         return [packageInfo.name,packageInfo.version];
+    }
+
+    async getUser(id) {
+        console.debug(`Getting user with ID: ${id}`);
+
+        return await dbGet(`SELECT id, name FROM users WHERE id = ? ORDER BY name ASC`,[id]);
     }
 
     async getUsers() {

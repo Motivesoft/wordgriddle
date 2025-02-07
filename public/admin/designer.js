@@ -166,6 +166,27 @@ async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
 }
 
 // Function to fetch authors from the API and populate the combobox
+async function getAuthor(id) {
+  try {
+    const response = await fetch(`/api/admin/user/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch author");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching authors:", error);
+    alert("Error fetching authors");
+  }
+}
+
+// Function to fetch authors from the API and populate the combobox
 async function fetchAuthors() {
   try {
     const response = await fetch("/api/admin/users", {
@@ -232,7 +253,7 @@ function populatePuzzlesComboBox(puzzles) {
   puzzles.forEach((puzzle) => {
     const option = document.createElement("option");
     option.value = puzzle.id; // Use the puzzle ID as the value
-    option.textContent = puzzle.title; // Use the title as the display text
+    option.textContent = `${puzzle.title} - ${puzzle.size}x${puzzle.size}`; // Use the title as the display text
     puzzlesSelect.appendChild(option);
   });
 }
@@ -387,10 +408,12 @@ async function handleSave() {
   }
 }
 
-function updateFromPuzzle(puzzle) {
+async function updateFromPuzzle(puzzle) {
   currentPuzzle = puzzle;
 
-  document.getElementById("title").value = puzzle.title || '';
+  const author = await getAuthor(puzzle.author);
+
+  document.getElementById("title").value = `${puzzle.title} by ${author.name || 'unknown'}`;
 
   populateGrid(puzzle);
 }
