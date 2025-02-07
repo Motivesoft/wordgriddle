@@ -20,8 +20,8 @@ Grid based word puzzle game
   * express
   * sqlite (initially, consider something more robust later)
   * passport.js (user management)
-  * nodemon (development assistance, restart server on change)
-
+  * nodemon -- installed globally (development assistance, restart server on change)
+  * pm2 -- installed globally (runs app in background as a service)
 ## Development repositories
 * [wordgriddle](https://github.com/Motivesoft/wordgriddle)
   * Intended to be the production repo
@@ -43,6 +43,20 @@ Grid based word puzzle game
       * Bonus and excluded lists need management capabilities
       * Maintenance (CRUD - create, read, update, delete)
       * Backup/restore to file
+
+# Instructions
+## Deployment
+* Install node
+* ```npm install```
+* ```npm install -g nodemon``` (deveoper system)
+* ```npm install -g pm2```     (production system)
+* ```pm2 start server.js```
+
+## Development
+* Install node
+* ```npm install```
+* ```npm install -g nodemon``` (deveoper system)
+* ```npm version prerelease``` (or other value, incremement version info at key points)
 
 # Development phases
 * Concepts / Prototypes
