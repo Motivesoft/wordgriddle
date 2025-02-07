@@ -5,8 +5,8 @@ const util = require('util');
 // Internal requires
 
 // Toggle between in-memory and file-based database
-const databaseName = ':memory:';
-// const databaseName = './wordgriddle.db';
+///const databaseName = ':memory:';
+const databaseName = './wordgriddle.db';
 
 const db = new sqlite3.Database(databaseName, (err) => {
     if (err) {

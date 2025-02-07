@@ -49,5 +49,6 @@ router.get('/designer/puzzles', (req, res) => editablePuzzleOperations.getPuzzle
 router.get('/designer/puzzle/:id', (req, res) => editablePuzzleOperations.getPuzzleEndpoint(req, res));
 router.post('/designer/update-letters/:id', (req, res) => editablePuzzleOperations.updatePuzzleLettersEndpoint(req, res));
 router.post('/designer/create', (req, res) => editablePuzzleOperations.createPuzzleEndpoint(req, res));
+router.get('/designer/solve/:letters', (req, res) => editablePuzzleOperations.solvePuzzleEndpoint(req, res));
 
 module.exports = router;
