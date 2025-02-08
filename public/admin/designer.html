@@ -17,13 +17,12 @@
             <li><a href="/admin/dictionary.html">Dictionary</a></li>
             <li><a href="/admin/bonus.html">Bonus</a></li>
             <li><a href="/admin/excluded.html">Excluded</a></li>
-            <li><a href="/admin/g.html">Prototype</a></li>
         </ul>
     </nav>
 
     <!-- <h1>Puzzle Designer</h1> -->
 
-    <div class="grid-container">
+    <div class="page-container">
         <!-- Grid Section -->
         <div class="grid-section">
             <!-- Controls Above the Grid -->
@@ -40,6 +39,9 @@
                 </div>
             </div>
 
+            <!-- Trail canvas -->
+            <canvas id="trailCanvas" width="100%" height="100%" style="background: transparent;"></canvas>
+        
             <!-- Grid -->
             <div id="grid" class="grid"></div>
 
@@ -174,6 +176,7 @@
         </div>
     </div>
 
+    <script src="designer-grid.js"></script>
     <script src="designer.js"></script>
     <script src="utils.js"></script>
 </body>
