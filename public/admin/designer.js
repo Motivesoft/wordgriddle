@@ -2,30 +2,11 @@
 let currentPuzzle;
 let puzzleEdited;
 
+const letterGrid = new LetterGrid();
+
 // Function to create the grid
 function createGrid(size) {
-  const grid = document.getElementById("grid");
-  grid.innerHTML = ""; // Clear existing grid
-
-  // Set grid dimensions
-  grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-  grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
-
-  // Create grid cells
-  for (let i = 0; i < size * size; i++) {
-    const cell = document.createElement("div");
-    const label = document.createElement("label");
-    cell.classList.add("grid-cell");
-    label.textContent = '-';
-    cell.appendChild(label);
-    grid.appendChild(cell);
-  }
-
-  // Reset the letter count
-  if (currentPuzzle) {
-    currentPuzzle.size = size;
-    currentPuzzle.letters = '-'.repeat(size*size);
-  }
+  letterGrid.open(size, '-'.repeat(size*size));
 }
 
 // Function to update word counts
@@ -335,38 +316,11 @@ async function handleLoad(puzzleId) {
 
 // Fill in any empty squares
 async function handleRandomFill() {
-  const grid = document.getElementById("grid");
-
-  // Fill in any blank grid cells
-  for (let i = 0; i < grid.children.length; i++) {
-    const cell = grid.children[i];
-    const label = cell.children[0];
-    if (label.textContent == '-') {
-      label.textContent = getRandomLetter();
-    }
-  }
-}
-
-// Get a (usable) random letter (exclude QXZ)
-function getRandomLetter() {
-  const alphabet = 'ABCDEFGHIJKLMNOPRSTUVYW';
-  const randomIndex = Math.floor(Math.random() * alphabet.length);
-  return alphabet[randomIndex];
+  letterGrid.fillRandom();
 }
 
 function getGridLetters() {
-  const grid = document.getElementById("grid");
-
-  let letters = '';
-
-  // Fill in any blank grid cells
-  for (let i = 0; i < grid.children.length; i++) {
-    const cell = grid.children[i];
-    const label = cell.children[0];
-    letters += label.textContent;
-  }
-
-  return letters;
+  return letterGrid.getLetters();
 }
 
 // Function to load data from a web API (Solve button)
@@ -432,14 +386,7 @@ async function updateFromPuzzle(puzzle) {
 }
 
 function populateGrid(puzzle) {
-  const grid = document.getElementById("grid");
-
-  // Create grid cells
-  for (let i = 0; i < puzzle.letters.length; i++) {
-    const cell = grid.children[i];
-    const label = cell.children[0];
-    label.textContent = puzzle.letters[i];
-  }
+  letterGrid.open(puzzle.size, puzzle.letters);
 }
 
 // Function to handle the Publish button

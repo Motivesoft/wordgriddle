@@ -208,7 +208,7 @@ button:active {
 
 /* Puzzle designer layout */
 
-.grid-container {
+.page-container {
   display: flex;
   height: 100vh;
 }
@@ -279,6 +279,8 @@ button:active {
   width: 400px;
   height: 400px;
   background-color: #fff;
+  touch-action: none;
+  user-select: none;
 }
 
 .grid-cell {
@@ -374,4 +376,93 @@ button:active {
 
 .button:active {
   background-color: #3e8e41;
+}
+
+/* Grid stuff */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 80px);
+  grid-template-rows: repeat(4, 80px);
+  font-size: calc(16px + 2vw);
+  gap: 20px;
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  touch-action: none;
+  user-select: none;
+}
+
+.grid-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background-color: #edeff1;
+  color: #1a1a1b;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 10%;
+  position: relative;
+}
+
+/* The user is currently clicking or dragging through this cell */
+.grid-item.selected {
+  background-color: #e9ba3a;
+}
+
+/* This cell is empty (e.g. as in a waffle grid)*/
+.grid-item.hidden {
+  background-color: #ffffff;
+  cursor: default;
+}
+
+/* There are no more scoring words using this letter */
+.grid-item.zerozero {
+  background-color: #cccccc;
+  color: #aaaaaa;
+}
+
+/* All words have been found (does not include bonus, just main words) */
+.grid-item.completed {
+  background-color: #e0e0e0;
+  color: #b82828;
+}
+
+.grid-item::before,
+.grid-item::after {
+  position: absolute;
+  bottom: 2px;
+  font-size: 15px;
+}
+
+.grid-item::before {
+  content: attr(red-counter);
+  left: 2px;
+  color: #e03030;
+}
+
+.grid-item::after {
+  content: attr(grey-counter);
+  right: 2px;
+  color: #666;
+}
+
+#trail {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#canvasContainer {
+  position: relative;
+}
+
+canvas {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  pointer-events: none;
 }
