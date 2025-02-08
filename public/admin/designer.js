@@ -84,6 +84,8 @@ function moveSelected(fromListId, toListId) {
   checkedItems.forEach((checkbox) => {
     const listItem = checkbox.closest("li"); // Get the parent <li> element
     toList.appendChild(listItem); // Move to the target list
+
+    // TODO work out if we actually want/need to do this
     checkbox.checked = false; // Uncheck the checkbox
   });
 
@@ -103,6 +105,17 @@ function getWordLists() {
   });
 
   return wordLists;
+}
+
+async function clearWordListSelections() {
+  document.querySelectorAll('ul li input[type="checkbox"]').forEach(checkbox => {
+    checkbox.checked = false;
+  });
+}
+
+async function saveAllWordLists() {
+  await saveWordLists('bonus', 'listBonus', 'listExcluded');
+  await saveWordLists('excluded', 'listExcluded', 'listBonus');
 }
 
 // Save word list changes.
