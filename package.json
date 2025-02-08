@@ -1,13 +1,11 @@
 {
   "name": "wordgriddle",
-  "version": "0.4.2-build.10",
+  "version": "0.4.2-build.11",
   "description": "Grid based word puzzle",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ver": "npm version prerelease --preid=build",
-    "version": "npm version prerelease --preid=build && git add -A",
-    "postversion": "git push && git push --tags"
+    "ver": "npm version prerelease --preid=build"
   },
   "repository": {
     "type": "git",
