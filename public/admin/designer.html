@@ -22,7 +22,7 @@
 
     <!-- <h1>Puzzle Designer</h1> -->
 
-    <div class="page-container">
+    <div class="grid-container">
         <!-- Grid Section -->
         <div class="grid-section">
             <!-- Controls Above the Grid -->
@@ -105,7 +105,7 @@
                 <span class="close" onclick="closeLoadPuzzleModal()">&times;</span>
                 <h2>Select the puzzle to load</h2>
                 <div class="form-group">
-                    <select id="puzzles"></select>
+                    <select id="puzzles" style="min-width: 300px"></select>
                 </div>
                 <div style="padding-top: 8px;">
                     <button onclick="closeLoadPuzzleModal()">Cancel</button>
@@ -176,7 +176,6 @@
         </div>
     </div>
 
-    <script src="designer-grid.js"></script>
     <script src="designer.js"></script>
     <script src="utils.js"></script>
 </body>
