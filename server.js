@@ -6,6 +6,7 @@ const path = require('path');
 // Internal requires
 const routes = require('./routes');
 const { db } = require('./database');
+const { logClient } = require('./LoggerOperations');
 
 // Disable logging
 // if (process.env.NODE_ENV !== 'development') {
@@ -25,6 +26,19 @@ app.use(express.json());
 app.use(express.text());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
+
+// Endpoint to handle log data from the client
+app.post('/log', (req, res) => {
+    const logData = req.body;
+
+    try {
+        logClient(logData.type, logData.message);
+        res.status(200).json({status: 'Log received'});
+    } catch(error) {
+        return res.status(500).send('Failed to save log');
+    }
+});
+
 app.use('/api', routes);
 
 // Run the server

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/style.css">
     <title>wordgriddle - dictionary upload</title>
+    <script src="logger.js"></script>
 </head>
 
 <body>
@@ -38,8 +39,12 @@
                 }
 
                 const versionInfo = await response.json();
+
+                console.log(`Version info: ${versionInfo.label}`);
+                
                 document.getElementById("name").innerHTML = versionInfo.name;
                 document.getElementById("versionLabel").innerHTML = versionInfo.label;
+
             } catch (error) {
                 console.error("Error fetching version info:", error);
                 alert("Error fetching version info");
