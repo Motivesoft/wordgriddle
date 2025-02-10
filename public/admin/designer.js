@@ -192,7 +192,6 @@ function stopDragGesture() {
     const selectedWord = currentGrid.selectedLetters.map(item => item.letter).join('').toLowerCase();
 
     const submitCallback = (input) => {
-      alert("submit");
       if (input.length === currentGrid.trail.length) {
         const inputLetters = input.toLocaleUpperCase();
 
@@ -249,8 +248,6 @@ function stopDragGesture() {
       }
     };
     const closeCallback = () => {
-      alert("close");
-
       // Clear any selection decoractions
       clearTrail();
       document.querySelectorAll('.grid-item').forEach(item => {
