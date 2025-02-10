@@ -209,6 +209,25 @@ function stopDragGesture() {
           }
         }
 
+        // Iterate over the path and check whether we are about to change any letters and double-check
+        // with the user. This is to avoid accidentally breaking existing elements of the puzzle
+        // TODO make this an optional test
+        if (valid) {
+          for (let i = 0; i < currentGrid.trail.length; i++) {
+            const cell = currentGrid.trail[i];
+            const letter = inputLetters[i];
+
+            // Check for any (potentially accidental) attempts to change a square with a valid value
+            // (letter or space) to something else
+            if (cell.dataset.letter !== letter && cell.dataset.letter != '-') {
+              valid = confirm(`This will alter one or more letters in the grid. Continue?`);
+
+              // Only ask once
+              break;
+            }
+          }
+        }
+
         if (valid) {
           for (let i = 0; i < currentGrid.trail.length; i++) {
             const cell = currentGrid.trail[i];
@@ -635,11 +654,11 @@ function attachEventListeners() {
   grid.addEventListener('mousedown', handleMouseStart);
   grid.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', handleMouseEnd);
-  
+
   grid.addEventListener('touchstart', handleTouchStart);
   grid.addEventListener('touchmove', handleTouchMove);
   document.addEventListener('touchend', handleTouchEnd);
-  
+
   // Make sure our canvas for drawing selection lines is always the right size
   window.addEventListener('resize', handleResize);
 }
