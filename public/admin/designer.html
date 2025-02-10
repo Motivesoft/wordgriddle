@@ -132,6 +132,43 @@
                 </script>
             </div>
         </div>
+
+        <div id="letterEntryModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeLetterEntryModal()">&times;</span>
+                <h2>Enter the letters to place into the grid</h2>
+                <div class="form-group">
+                    <input type="text" id="letters" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </div>
+                <div style="padding-top: 8px;">
+                    <button onclick="closeLetterEntryModal()">Cancel</button>
+                    <button onclick="submitLetterEntryModal()">Load</button>
+                </div>
+                <script>
+                    let submitEntryCallback;
+                    let closeEntryCallback;
+                    function openLetterEntryModal(submitCallback, closeCallback) {
+                        submitEntryCallback = submitCallback;
+                        closeEntryCallback = closeCallback;
+
+                        document.getElementById("letters").value = '';
+                        openModal("letterEntryModal");
+                    }
+                    function submitLetterEntryModal() {
+                        var letters = document.getElementById("letters").value;
+                        
+                        // Reply with the entered text
+                        submitEntryCallback(letters);
+                        
+                        closeLetterEntryModal();
+                    }
+                    function closeLetterEntryModal() {
+                        closeEntryCallback();
+                        closeModal("letterEntryModal");
+                    }
+                </script>
+            </div>
+        </div>
     
         <!-- Lists Section -->
         <div class="lists-section">

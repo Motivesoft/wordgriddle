@@ -191,8 +191,8 @@ function stopDragGesture() {
     // TODO use this to warn if the user is about to change a letter
     const selectedWord = currentGrid.selectedLetters.map(item => item.letter).join('').toLowerCase();
 
-    const input = prompt(`Enter ${currentGrid.trail.length} letters for the path ('.' to create a hole, '-' to clear a cell):`);
-    if (input) {
+    const submitCallback = (input) => {
+      alert("submit");
       if (input.length === currentGrid.trail.length) {
         const inputLetters = input.toLocaleUpperCase();
 
@@ -247,13 +247,17 @@ function stopDragGesture() {
       } else {
         alert(`Input not of correct length ${input} (${input.length}) ${currentGrid.trail.length}`);
       }
-    }
+    };
+    const closeCallback = () => {
+      alert("close");
 
-    // Clear any selection decoractions
-    clearTrail();
-    document.querySelectorAll('.grid-item').forEach(item => {
-      item.classList.remove('selected');
-    });
+      // Clear any selection decoractions
+      clearTrail();
+      document.querySelectorAll('.grid-item').forEach(item => {
+        item.classList.remove('selected');
+      });
+    };
+    openLetterEntryModal(submitCallback, closeCallback);
   }
 }
 
