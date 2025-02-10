@@ -633,11 +633,11 @@ function attachEventListeners() {
   grid.addEventListener('mousedown', handleMouseStart);
   grid.addEventListener('mousemove', handleMouseMove);
   document.addEventListener('mouseup', handleMouseEnd);
-
+  
   grid.addEventListener('touchstart', handleTouchStart);
   grid.addEventListener('touchmove', handleTouchMove);
   document.addEventListener('touchend', handleTouchEnd);
-
+  
   // Make sure our canvas for drawing selection lines is always the right size
   window.addEventListener('resize', handleResize);
 }
@@ -751,14 +751,10 @@ function handleMouseEnd(e) {
 // Touch handlers
 
 function handleTouchStart(e) {
-  e.preventDefault();
-
   startDragGesture(e);
 }
 
 function handleTouchMove(e) {
-  e.preventDefault();
-
   // Work out where we have dragged to and process it
   const touch = e.touches[0];
   const element = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -769,8 +765,6 @@ function handleTouchMove(e) {
 }
 
 function handleTouchEnd(e) {
-  e.preventDefault();
-
   stopDragGesture();
 }
 
