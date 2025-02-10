@@ -44,7 +44,7 @@ function initializeGrid() {
   grid.style.gridTemplateRows = `repeat(${currentGrid.size}, 1fr)`;
 
   currentGrid.letters.forEach((letter, index) => {
-    // '.' and '-' are meaningful in terms of puzzle design, but are both hidden characters
+    // '.' and '-' are meaningful in terms of puzzle design, but don't show as letters in the grid
     let displayLetter = letter;
     if (letter === '.' || letter === '-') {
       displayLetter = ' ';
@@ -76,7 +76,7 @@ function initializeGrid() {
 function startDragGesture(e) {
   // React to a click or touch, unless on a 'hidden' square
   const cell = e.target;
-  if (cell.classList.contains('grid-item') && !cell.classList.contains('hidden')) {
+  if (cell.classList.contains('grid-item')) {
     currentGrid.isDrawing = true;
     currentGrid.selectedLetters = [{
       letter: cell.dataset.letter,
@@ -226,7 +226,7 @@ function stopDragGesture() {
           }
         }
       } else {
-        alert(`Input not of correct length`);
+        alert(`Input not of correct length ${input} (${input.length}) ${currentGrid.trail.length}`);
       }
     }
 
