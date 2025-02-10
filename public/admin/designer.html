@@ -78,8 +78,8 @@
                     <button onclick="submitNewPuzzleModal()">Create</button>
                 </div>
                 <script>
-                    function openNewPuzzleModal() {
-                        resetNewPuzzleModal();
+                    async function openNewPuzzleModal() {
+                        await resetNewPuzzleModal();
                         openModal("newPuzzleModal");
                     }
                     function submitNewPuzzleModal() {
@@ -89,10 +89,10 @@
                         handleNew(author, size);
                         closeNewPuzzleModal();
                     }
-                    function resetNewPuzzleModal() {
-                        fetchAuthors();
-                        document.getElementById("author").value = "0";
-                        document.getElementById("size").value = "3";
+                    async function resetNewPuzzleModal() {
+                        await fetchAuthors();
+                        document.getElementById("author").value = currentGrid.author;
+                        document.getElementById("size").value = currentGrid.size;
                     }
                     function closeNewPuzzleModal() {
                         closeModal("newPuzzleModal");

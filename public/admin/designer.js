@@ -1,8 +1,9 @@
 //Grid status
 const currentGrid = {
-  // Grid state
+  // Grid state - initialised to defaults
   puzzleId: -1,
-  size: 0,
+  author: 0,
+  size: 3,
   letters: [],
 
   // Interactive stuff
@@ -17,6 +18,7 @@ function createGrid(puzzle) {
   console.debug(`createGrid ${puzzle.size}x${puzzle.size} puzzle with ID: ${puzzle.id}`);
 
   currentGrid.puzzleId = puzzle.id;
+  currentGrid.author = puzzle.author;
 
   // Store letters list
   currentGrid.letters = Array.from(puzzle.letters);
