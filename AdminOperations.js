@@ -39,6 +39,9 @@ class AdminOperations {
 
     async getUserEndpoint(req, res) {
         const id = req.params.id;
+        
+        console.log(`Get user endpoint: ${id}`);
+
         try {
             const user = await this.getUser(id);
             res.status(200).json(user);
