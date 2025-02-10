@@ -155,7 +155,7 @@
                         openModal("letterEntryModal");
                     }
                     function submitLetterEntryModal() {
-                        var letters = document.getElementById("letters").value;
+                        var letters = document.getElementById("letters").value.trim();
                         
                         // Reply with the entered text
                         submitEntryCallback(letters);
