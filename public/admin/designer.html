@@ -74,8 +74,8 @@
                     </select>
                 </div>
                 <div style="padding-top: 8px;">
-                    <button onclick="closeNewPuzzleModal()">Cancel</button>
-                    <button onclick="submitNewPuzzleModal()">Create</button>
+                    <button type="submit" onclick="submitNewPuzzleModal()">Create</button>
+                    <button type="button" onclick="closeNewPuzzleModal()">Cancel</button>
                 </div>
                 <script>
                     async function openNewPuzzleModal() {
@@ -109,8 +109,8 @@
                     <select id="puzzles" style="min-width: 300px"></select>
                 </div>
                 <div style="padding-top: 8px;">
-                    <button onclick="closeLoadPuzzleModal()">Cancel</button>
-                    <button onclick="submitLoadPuzzleModal()">Load</button>
+                    <button type="submit" onclick="submitLoadPuzzleModal()">Load</button>
+                    <button type="button" onclick="closeLoadPuzzleModal()">Cancel</button>
                 </div>
                 <script>
                     function openLoadPuzzleModal() {
@@ -141,8 +141,8 @@
                     <input type="text" id="letters" autocorrect="off" autocapitalize="off" spellcheck="false">
                 </div>
                 <div style="padding-top: 8px;">
-                    <button onclick="closeLetterEntryModal()">Cancel</button>
-                    <button onclick="submitLetterEntryModal()">Load</button>
+                    <button type="submit" onclick="submitLetterEntryModal()">Load</button>
+                    <button type="button" onclick="closeLetterEntryModal()">Cancel</button>
                 </div>
                 <script>
                     let submitEntryCallback;
@@ -162,7 +162,6 @@
                         
                         // Reply with the entered text
                         submitEntryCallback(letters);
-                        
                         closeLetterEntryModal();
                     }
                     function closeLetterEntryModal() {

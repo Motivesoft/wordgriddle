@@ -63,13 +63,13 @@
             <h2>Enter new words, one per line</h2>
             <textarea id="multilineInput" rows="10" cols="40"></textarea>
             <div style="padding-top: 8px;">
-                <button onclick="closeInsertWordsModal()">Cancel</button>
-                <button onclick="submitInsertWordsModal()">Insert</button>
+                <button type="submit" onclick="submitInsertWordsModal()">Insert</button>
+                <button type="button" onclick="closeInsertWordsModal()">Cancel</button>
             </div>
             <script>
                 function openInsertWordsModal() {
-                    resetInsertWordsModal();
                     openModal("insertWordsModal");
+                    resetInsertWordsModal();
                 }
                 function submitInsertWordsModal() {
                     var text = document.getElementById("multilineInput").value;
@@ -85,10 +85,10 @@
                 }
                 function resetInsertWordsModal() {
                     document.getElementById("multilineInput").value = "";
+                    document.getElementById("multilineInput").focus()   ;
                 }
                 function closeInsertWordsModal() {
                     closeModal("insertWordsModal");
-                    resetInsertWordsModal();
                 }
             </script>
         </div>
