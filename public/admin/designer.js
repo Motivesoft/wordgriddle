@@ -188,12 +188,9 @@ function stopDragGesture() {
   if (currentGrid.isDrawing) {
     currentGrid.isDrawing = false;
 
-    // TODO use this to warn if the user is about to change a letter
-    const selectedWord = currentGrid.selectedLetters.map(item => item.letter).join('').toLowerCase();
-
     const submitCallback = (input) => {
       if (input.length === currentGrid.trail.length) {
-        const inputLetters = input.toLocaleUpperCase();
+        const inputLetters = input.toUpperCase();
 
         let valid = true;
         for (let i = 0; i < inputLetters.length; i++) {
@@ -212,13 +209,15 @@ function stopDragGesture() {
         // with the user. This is to avoid accidentally breaking existing elements of the puzzle
         // TODO make this an optional test
         if (valid) {
-          for (let i = 0; i < currentGrid.trail.length; i++) {
-            const cell = currentGrid.trail[i];
-            const letter = inputLetters[i];
+          const selectedWord = currentGrid.selectedLetters.map(item => item.letter).join('').toUpperCase();
+
+          for (let i = 0; i < selectedWord.length; i++) {
+            const selectedLetter = selectedWord[i];
+            const inputLetter = inputLetters[i];
 
             // Check for any (potentially accidental) attempts to change a square with a valid value
             // (letter or space) to something else
-            if (cell.dataset.letter !== letter && cell.dataset.letter != '-') {
+            if (selectedLetter !== inputLetter && selectedLetter != '-') {
               valid = confirm(`This will alter one or more letters in the grid. Continue?`);
 
               // Only ask once
