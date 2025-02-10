@@ -1,407 +1,253 @@
-// Variables used during the design phase
-let currentPuzzle;
-let puzzleEdited;
-
-let letterGrid;
-
-class LetterGrid {
-  constructor() {
-      this.grid = document.getElementById('grid');
-
-      this.attachEventListeners();
-  }
-
-  // Pass in the letters string
-  open(size, letters) {
-      // Store letters list
-      this.letters = Array.from(letters);
-      this.gridSize = size;
-
-      this.isDrawing = false;
-      this.selectedLetters = [];
-      this.trail = [];
-      this.lastCell = null;
-
-      // Grids are square by design and so the length of each size is the square root of the number of letters
-      this.grid.innerHTML = ""; // Clear existing grid
-
-      // Set grid dimensions
-      this.grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-      this.grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
-
-      // Create grid cells
-      for (let i = 0; i < size * size; i++) {
-          const cell = document.createElement("div");
-          const label = document.createElement("label");
-          cell.classList.add("grid-cell");
-          label.textContent = '-';
-          cell.appendChild(label);
-          grid.appendChild(cell);
-      }
-
-      this.initializeGrid();
-  }
-
-  initializeGrid() {
-      this.grid.innerHTML = '';
-      this.letters.forEach((letter, index) => {
-          let displayLetter = letter;
-          if (letter === '.' || letter === '-') {
-              displayLetter = ' ';
-          }
-          const cell = document.createElement('div');
-          cell.className = 'grid-item';
-          cell.textContent = displayLetter;
-          cell.dataset.letter = letter;
-          cell.dataset.index = index;
-          cell.dataset.coord = `[${index}]`;
-
-          // Style the unusable parts of the grid so they look and interact as we need them to
-          if (letter === '.') {
-              cell.classList.add('hidden');
-          }
-
-          // Add the cell to the grid
-          this.grid.appendChild(cell);
-      });
-
-      // Make sure our canvas for drawing selection lines is always the right size
-      window.addEventListener('resize', this.resizeCanvas);
-      this.resizeCanvas();
-  }
-
-  resizeCanvas() {
-      // Make sure the canvas stays resized to the grid
-      const grid = document.getElementById('grid');
-      const canvas = document.getElementById('trailCanvas');
-
-      canvas.style.left = `${grid.offsetLeft}px`;
-      canvas.style.top = `${grid.offsetTop}px`;
-      canvas.width = grid.offsetWidth;
-      canvas.height = grid.offsetHeight;
-
-      // TODO do we need to redraw any active trail here?
-  }
-
-  attachEventListeners() {
-      this.grid.addEventListener('mousedown', this.handleMouseStart.bind(this));
-      this.grid.addEventListener('mousemove', this.handleMouseMove.bind(this));
-      document.addEventListener('mouseup', this.handleMouseEnd.bind(this));
-
-      this.grid.addEventListener('touchstart', this.handleTouchStart.bind(this));
-      this.grid.addEventListener('touchmove', this.handleTouchMove.bind(this));
-      document.addEventListener('touchend', this.handleTouchEnd.bind(this));
-  }
-
-  // Mouse handlers
-
-  handleMouseStart(e) {
-      this.startDrawing(e);
-  }
-
-  handleMouseMove(e) {
-      // Extract the mouse target and process it
-      // Pass in the individual elements rather than the event as 'draw()'
-      // needs to service mouse and touch events and has a signature to suit
-      this.draw(e.target, e.clientX, e.clientY);
-  }
-
-  handleMouseEnd(e) {
-      this.stopDrawing();
-  }
-
-  // Touch handlers
-
-  handleTouchStart(e) {
-      e.preventDefault();
-
-      this.startDrawing(e);
-  }
-
-  handleTouchMove(e) {
-      e.preventDefault();
-
-      // Work out where we have dragged to and process it
-      const touch = e.touches[0];
-      const element = document.elementFromPoint(touch.clientX, touch.clientY);
-
-      if (element) {
-          this.draw(element, touch.clientX, touch.clientY);
-      }
-  }
-
-  handleTouchEnd(e) {
-      e.preventDefault();
-
-      this.stopDrawing();
-  }
-
-  // Dragging and drawing methods
-
-  // Start a new drag operation
-  startDrawing(e) {
-      // React to a click or touch, unless on a 'hidden' square
-      const cell = e.target;
-      if (cell.classList.contains('grid-item') && !cell.classList.contains('hidden')) {
-          this.isDrawing = true;
-          this.selectedLetters = [{
-              letter: cell.dataset.letter,
-              index: parseInt(cell.dataset.index)
-          }];
-
-          // Mark the cell as selected
-          cell.classList.add('selected');
-
-          // Record the movement
-          this.trail.push(cell);
-
-          // Draw the start of a new trail
-          this.drawBlob(cell);
-
-          // Remember where we are for backtracking
-          this.lastCell = cell;
-      }
-  }
-
-  // Continue a drag operation
-  // This takes a target HTML element and mouse/touch x,y coordinates 
-  draw(cell, clientX, clientY) {
-      // Drop out if we're not currently in a drag operation
-      if (!this.isDrawing) {
-          return;
-      }
-
-      // If we're on a cell in the grid and have moved from the previous cell, treat this as a drag gesture
-      // unless the cell contains a space, intended to mean a gap in the layout that the user may not select
-      if (cell.classList.contains('grid-item') && cell !== this.lastCell && cell.dataset.letter !== ' ') {
-          // Reject points too close to the edge sto avoid false positives
-          const cellRect = cell.getBoundingClientRect();
-          const cellCentreX = cellRect.left + (cellRect.width / 2);
-          const cellCentreY = cellRect.top + (cellRect.height / 2);
-          const xDistanceToCentre = Math.abs(cellCentreX - clientX);
-          const yDistanceToCentre = Math.abs(cellCentreY - clientY);
-
-          // If we are within this distance of the centre, accept that we are selecting this cell
-          // Another way to put this is to use the middle 70% as the target area 
-          const proximityMeasure = 0.35;
-          if (xDistanceToCentre > cellRect.width * proximityMeasure || yDistanceToCentre > cellRect.height * proximityMeasure) {
-              return;
-          }
-
-          // Where are we?
-          const cellIndex = parseInt(cell.dataset.index);
-          const cellCol = cellIndex % this.gridSize;
-          const cellRow = (cellIndex - cellCol) / this.gridSize;
-
-          // Where have we come from?
-          const prevIndex = this.selectedLetters[this.selectedLetters.length - 1].index;
-          const prevCol = prevIndex % this.gridSize;
-          const prevRow = (prevIndex - prevCol) / this.gridSize;
-
-          // What will help us work out if this is a valid move - valid being -1 and 1 respectively
-          const lastSelectedIndex = this.selectedLetters.findIndex(item => item.index === cellIndex);
-          const distance = Math.max(Math.abs(cellCol - prevCol), Math.abs(cellRow - prevRow));
-
-          // lastSelectedIndex = -1 iff cell is not part of the current selection
-          // distance = 1 if the origin and new cell are adjacent
-
-          // if a valid move, select the square
-          if (lastSelectedIndex === -1 && distance === 1) {
-              // Add new cell to selection
-              this.selectedLetters.push({
-                  letter: cell.dataset.letter,
-                  index: cellIndex
-              });
-
-              // Mark the cell as selected
-              cell.classList.add('selected');
-
-              // Record the movement
-              this.trail.push(cell);
-
-              // Draw the movement
-              this.drawLine(this.lastCell, cell);
-
-              // Remember this step for backtracking
-              this.lastCell = cell;
-          } else if (lastSelectedIndex !== -1) {
-              // Encountered an already selected cell. Is this a step backwards
-              if (cellIndex === this.selectedLetters[this.selectedLetters.length - 2]?.index) {
-                  // Pop the last selected letter and deselect its cell
-
-                  const prevIndex = this.selectedLetters[this.selectedLetters.length - 1].index;
-                  const prevCell = this.grid.childNodes[prevIndex];
-                  prevCell.classList.remove('selected');
-
-                  // Remove the step - will need to redraw
-                  this.trail.pop();
-                  this.redrawTrail();
-
-                  // Remove the last letter
-                  this.selectedLetters.pop();
-
-                  // Reset where we are for further backtracking
-                  this.lastCell = cell;
-              }
-          }
-      }
-  }
-
-  // Stop a drag operation and process the outcome
-  stopDrawing() {
-      if (this.isDrawing) {
-          this.isDrawing = false;
-
-          const selectedWord = this.selectedLetters.map(item => item.letter).join('').toLowerCase();
-
-          const input = prompt(`Enter ${this.trail.length} letters for the path ('.' to create a hole, '-' to clear a cell):`);
-          if (input) {
-              if (input.length === this.trail.length) {
-                  const inputLetters = input.toLocaleUpperCase();
-
-                  let valid = true;
-                  for (let i = 0; i < inputLetters.length; i++) {
-                      const letter = inputLetters[i];
-                      if (letter < 'A' || letter > 'Z') {
-                          if (letter !== '.' && letter !== '-') {
-                              alert("Input invalid. Must be letters, '.' or '-'");
-                              
-                              valid = false;
-                              break;
-                          }
-                      }
-                  }
-
-                  if (valid) {
-                      for (let i = 0; i < this.trail.length; i++) {
-                          const cell = this.trail[i];
-                          const letter = inputLetters[i];
-                          cell.dataset.letter = letter;
-                          cell.textContent = letter === '.' || letter === '-' ? ' ' : letter;
-  
-                          if (letter === '.') {
-                              cell.classList.add('hidden');
-                          } else {
-                              cell.classList.remove('hidden');
-                          }
-  
-                          this.letters[cell.dataset.index] = letter;
-                      }
-                  }
-              } else {
-                  alert(`Input not of correct length`);
-              }
-          }
-
-          // Clear any selection decoractions
-          this.clearTrail();
-          document.querySelectorAll('.grid-item').forEach(item => {
-              item.classList.remove('selected');
-          });
-      }
-  }
-
-  // Draw a line between cells to indicate the selection
-  drawLine(from, to) {
-      const grid = document.getElementById('grid');
-      const canvas = document.getElementById('trailCanvas');
-      const ctx = canvas.getContext('2d');
-
-      ctx.strokeStyle = 'rgba(111, 176, 92, 0.4)'; // Green with some transparency
-      ctx.lineWidth = 15;
-      ctx.lineCap = 'round'; // Rounded line ends
-
-      ctx.beginPath();
-
-      const fromXCentre = (from.offsetLeft - grid.offsetLeft) + from.offsetWidth / 2;
-      const fromYCentre = (from.offsetTop - grid.offsetTop) + from.offsetHeight / 2;
-
-      const toXCentre = (to.offsetLeft - grid.offsetLeft) + to.offsetWidth / 2;
-      const toYCentre = (to.offsetTop - grid.offsetTop) + to.offsetHeight / 2;
-
-      ctx.moveTo(fromXCentre, fromYCentre);
-      ctx.lineTo(toXCentre, toYCentre);
-      ctx.stroke();
-  }
-
-  // Draw a blob on the first cell of a selection
-  drawBlob(cell) {
-      const grid = document.getElementById('grid');
-      const canvas = document.getElementById('trailCanvas');
-      const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = 'rgba(111, 176, 92, 0.4)'; // Green with some transparency
-
-      // Begin a new path
-      ctx.beginPath();
-
-      // Draw a circle
-      const radius = 24;
-      const xCentre = (cell.offsetLeft - grid.offsetLeft) + cell.offsetWidth / 2;
-      const yCentre = (cell.offsetTop - grid.offsetTop) + cell.offsetHeight / 2;
-      ctx.arc(xCentre, yCentre, radius, 0, 2 * Math.PI);
-
-      // Fill the circle to create the blob
-      ctx.fill();
-  }
-
-  redrawTrail() {
-      const canvas = document.getElementById('trailCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Redraw the whole trail from the start
-      let cells = this.trail.length;
-      if (cells > 0) {
-          let from = this.trail[0];
-          this.drawBlob(from);
-
-          let index = 1;
-          while (index < cells) {
-              let to = this.trail[index++];
-              this.drawLine(from, to);
-
-              // Step forward
-              from = to;
-          }
-      }
-  }
-
-  // Done with the current drag, clean up the trails
-  clearTrail() {
-      const canvas = document.getElementById('trailCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      this.trail.length = 0;
-  }
-
-  // Get a (usable) random letter (exclude QXZ)
-  getRandomLetter() {
-      const alphabet = 'ABCDEFGHIJKLMNOPRSTUVYW';
-      const randomIndex = Math.floor(Math.random() * alphabet.length);
-      return alphabet[randomIndex];
-  }
-
-  fillRandom() {
-      for (let i = 0; i < this.letters.length; i++) {
-          if (this.letters[i] === '-') {
-              this.letters[i] = this.getRandomLetter();
-          }
-      }
-
-      this.initializeGrid();
-  }
-
-  getLetters() {
-      return this.letters.join('');
+//Grid status
+const currentGrid = {
+  // Grid state
+  puzzleId: -1,
+  size: 0,
+  letters: [],
+
+  // Interactive stuff
+  isDrawing: false,
+  selectedLetters: [],
+  trail: [],
+  lastCell: null,
+};
+
+// Start a new grid by assembling its metadata, initialising its state data and then creating the onscreen grid
+function createGrid(puzzle) {
+  console.debug(`createGrid ${puzzle.size}x${puzzle.size} puzzle with ID: ${puzzle.id}`);
+
+  currentGrid.puzzleId = puzzle.id;
+
+  // Store letters list
+  currentGrid.letters = Array.from(puzzle.letters);
+  currentGrid.size = puzzle.size;
+
+  currentGrid.isDrawing = false;
+  currentGrid.selectedLetters = [];
+  currentGrid.trail = [];
+  currentGrid.lastCell = null;
+
+  initializeGrid();
+}
+
+// Called to (re)build the grid
+function initializeGrid() {
+  console.debug(`initializeGrid`);
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  // Set grid dimensions
+  grid.style.gridTemplateColumns = `repeat(${currentGrid.size}, 1fr)`;
+  grid.style.gridTemplateRows = `repeat(${currentGrid.size}, 1fr)`;
+
+  currentGrid.letters.forEach((letter, index) => {
+    // '.' and '-' are meaningful in terms of puzzle design, but are both hidden characters
+    let displayLetter = letter;
+    if (letter === '.' || letter === '-') {
+      displayLetter = ' ';
+    }
+
+    const cell = document.createElement('div');
+    cell.className = 'grid-item';
+    cell.textContent = displayLetter;
+    cell.dataset.letter = letter;
+    cell.dataset.index = index;
+    cell.dataset.coord = `[${index}]`;
+
+    // Style the unusable parts of the grid so they look and interact as we need them to
+    if (letter === '.') {
+      cell.classList.add('hidden');
+    }
+
+    // Add the cell to the grid
+    grid.appendChild(cell);
+  });
+
+  // Make sure our canvas is sized to this newly created grid
+  handleResize();
+}
+
+// Dragging and drawing methods
+
+// Start a new drag operation
+function startDragGesture(e) {
+  // React to a click or touch, unless on a 'hidden' square
+  const cell = e.target;
+  if (cell.classList.contains('grid-item') && !cell.classList.contains('hidden')) {
+    currentGrid.isDrawing = true;
+    currentGrid.selectedLetters = [{
+      letter: cell.dataset.letter,
+      index: parseInt(cell.dataset.index)
+    }];
+
+    // Mark the cell as selected
+    cell.classList.add('selected');
+
+    // Record the movement
+    currentGrid.trail.push(cell);
+
+    // Draw the start of a new trail
+    drawBlob(cell);
+
+    // Remember where we are for backtracking
+    currentGrid.lastCell = cell;
   }
 }
 
-// Function to create the grid
-function createGrid(size) {
-  letterGrid = new LetterGrid();
-  letterGrid.open(size, '-'.repeat(size*size));
+// Continue a drag operation
+// This takes a target HTML element and mouse/touch x,y coordinates 
+function continueDragGesture(cell, clientX, clientY) {
+  // Drop out if we're not currently in a drag operation
+  if (!currentGrid.isDrawing) {
+    return;
+  }
+
+  // If we're on a cell in the grid and have moved from the previous cell, treat this as a drag gesture
+  // unless the cell contains a space, intended to mean a gap in the layout that the user may not select
+  if (cell.classList.contains('grid-item') && cell !== currentGrid.lastCell && cell.dataset.letter !== ' ') {
+    // Reject points too close to the edge sto avoid false positives
+    const cellRect = cell.getBoundingClientRect();
+    const cellCentreX = cellRect.left + (cellRect.width / 2);
+    const cellCentreY = cellRect.top + (cellRect.height / 2);
+    const xDistanceToCentre = Math.abs(cellCentreX - clientX);
+    const yDistanceToCentre = Math.abs(cellCentreY - clientY);
+
+    // If we are within this distance of the centre, accept that we are selecting this cell
+    // Another way to put this is to use the middle 70% as the target area 
+    const proximityMeasure = 0.35;
+    if (xDistanceToCentre > cellRect.width * proximityMeasure || yDistanceToCentre > cellRect.height * proximityMeasure) {
+      return;
+    }
+
+    // Where are we?
+    const cellIndex = parseInt(cell.dataset.index);
+    const cellCol = cellIndex % currentGrid.size;
+    const cellRow = (cellIndex - cellCol) / currentGrid.size;
+
+    // Where have we come from?
+    const prevIndex = currentGrid.selectedLetters[currentGrid.selectedLetters.length - 1].index;
+    const prevCol = prevIndex % currentGrid.size;
+    const prevRow = (prevIndex - prevCol) / currentGrid.size;
+
+    // What will help us work out if this is a valid move - valid being -1 and 1 respectively
+    const lastSelectedIndex = currentGrid.selectedLetters.findIndex(item => item.index === cellIndex);
+    const distance = Math.max(Math.abs(cellCol - prevCol), Math.abs(cellRow - prevRow));
+
+    // lastSelectedIndex = -1 iff cell is not part of the current selection
+    // distance = 1 if the origin and new cell are adjacent
+
+    // if a valid move, select the square
+    if (lastSelectedIndex === -1 && distance === 1) {
+      // Add new cell to selection
+      currentGrid.selectedLetters.push({
+        letter: cell.dataset.letter,
+        index: cellIndex
+      });
+
+      // Mark the cell as selected
+      cell.classList.add('selected');
+
+      // Record the movement
+      currentGrid.trail.push(cell);
+
+      // Draw the movement
+      drawLine(currentGrid.lastCell, cell);
+
+      // Remember this step for backtracking
+      currentGrid.lastCell = cell;
+    } else if (lastSelectedIndex !== -1) {
+      // Encountered an already selected cell. Is this a step backwards
+      if (cellIndex === currentGrid.selectedLetters[currentGrid.selectedLetters.length - 2]?.index) {
+        const grid = document.getElementById('grid');
+
+        // Pop the last selected letter and deselect its cell
+
+        const prevIndex = currentGrid.selectedLetters[currentGrid.selectedLetters.length - 1].index;
+        const prevCell = grid.childNodes[prevIndex];
+        prevCell.classList.remove('selected');
+
+        // Remove the step - will need to redraw
+        currentGrid.trail.pop();
+        redrawTrail();
+
+        // Remove the last letter
+        currentGrid.selectedLetters.pop();
+
+        // Reset where we are for further backtracking
+        currentGrid.lastCell = cell;
+      }
+    }
+  }
+}
+
+// Stop a drag operation and process the outcome
+function stopDragGesture() {
+  if (currentGrid.isDrawing) {
+    currentGrid.isDrawing = false;
+
+    // TODO use this to warn if the user is about to change a letter
+    const selectedWord = currentGrid.selectedLetters.map(item => item.letter).join('').toLowerCase();
+
+    const input = prompt(`Enter ${currentGrid.trail.length} letters for the path ('.' to create a hole, '-' to clear a cell):`);
+    if (input) {
+      if (input.length === currentGrid.trail.length) {
+        const inputLetters = input.toLocaleUpperCase();
+
+        let valid = true;
+        for (let i = 0; i < inputLetters.length; i++) {
+          const letter = inputLetters[i];
+          if (letter < 'A' || letter > 'Z') {
+            if (letter !== '.' && letter !== '-') {
+              alert("Input invalid. Must be letters, '.' or '-'");
+
+              valid = false;
+              break;
+            }
+          }
+        }
+
+        if (valid) {
+          for (let i = 0; i < currentGrid.trail.length; i++) {
+            const cell = currentGrid.trail[i];
+            const letter = inputLetters[i];
+            cell.dataset.letter = letter;
+            cell.textContent = letter === '.' || letter === '-' ? ' ' : letter;
+
+            if (letter === '.') {
+              cell.classList.add('hidden');
+            } else {
+              cell.classList.remove('hidden');
+            }
+
+            currentGrid.letters[cell.dataset.index] = letter;
+          }
+        }
+      } else {
+        alert(`Input not of correct length`);
+      }
+    }
+
+    // Clear any selection decoractions
+    clearTrail();
+    document.querySelectorAll('.grid-item').forEach(item => {
+      item.classList.remove('selected');
+    });
+  }
+}
+
+function fillRandom() {
+  for (let i = 0; i < currentGrid.letters.length; i++) {
+    if (currentGrid.letters[i] === '-') {
+      currentGrid.letters[i] = getRandomLetter();
+    }
+  }
+
+  initializeGrid();
+}
+
+function getLetters() {
+  return currentGrid.letters.join('');
 }
 
 // Function to update word counts
@@ -438,10 +284,10 @@ function updateWordList(listId, wordListItems) {
   while (list.children.length) {
     list.removeChild(list.children[0]);
   }
-  wordListItems.forEach(([word,_]) => {
+  wordListItems.forEach(([word, _]) => {
     const wordLi = document.createElement("li");
     const wordLabel = document.createElement("label");
-    
+
     wordLi.appendChild(wordLabel);
     wordLabel.innerHTML = `<input type="checkbox">${word}`;
 
@@ -508,9 +354,9 @@ async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({words: list}),
+        body: JSON.stringify({ words: list }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to save data");
       }
@@ -524,9 +370,9 @@ async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({words: list}),
+        body: JSON.stringify({ words: list }),
       });
-  
+
       if (!removeResponse.ok) {
         throw new Error("Failed to save data");
       }
@@ -540,9 +386,9 @@ async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({words: wordLists['listRequired']}),
+        body: JSON.stringify({ words: wordLists['listRequired'] }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to save data");
       }
@@ -649,9 +495,7 @@ function populatePuzzlesComboBox(puzzles) {
 
 // Function to reset the grid and clear the title
 async function handleNew(author, size) {
-  if (currentPuzzle !== undefined && puzzleEdited) {
-    // Prompt to save current and do so, or cancel and return here
-  }
+  console.debug(`Create new grid by ${author} of size ${size}`);
 
   try {
     const response = await fetch(`/api/designer/create`, {
@@ -671,8 +515,11 @@ async function handleNew(author, size) {
 
     const data = await response.json();
 
-    createGrid(size);
-    updateFromPuzzle( data.puzzle );
+    console.debug(`Creating new grid: ${data.puzzle.title}`);
+    currentGrid.puzzleId = puzzle.id;
+
+    createGrid(puzzle);
+    updateFromPuzzle(data.puzzle);
     clearWordLists();
   } catch (error) {
     console.error("Error calling Create API:", error);
@@ -682,10 +529,6 @@ async function handleNew(author, size) {
 
 // Function to reset the grid and clear the title
 async function handleLoad(puzzleId) {
-  if (currentPuzzle !== undefined && puzzleEdited) {
-    // Prompt to save current and do so, or cancel and return here
-  }
-
   try {
     const response = await fetch(`/api/designer/puzzle/${puzzleId}`, {
       method: "GET",
@@ -700,8 +543,8 @@ async function handleLoad(puzzleId) {
 
     const data = await response.json();
 
-    createGrid(data.puzzle.size);
-    updateFromPuzzle( data.puzzle );
+    createGrid();
+    updateFromPuzzle(data.puzzle);
     clearWordLists();
   } catch (error) {
     console.error("Error calling Puzzle API:", error);
@@ -711,11 +554,11 @@ async function handleLoad(puzzleId) {
 
 // Fill in any empty squares
 async function handleRandomFill() {
-  letterGrid.fillRandom();
+  fillRandom();
 }
 
 function getGridLetters() {
-  return letterGrid.getLetters();
+  return getLetters();
 }
 
 // Function to load data from a web API (Solve button)
@@ -749,21 +592,21 @@ async function handleSave() {
   const letters = getGridLetters();
 
   try {
-    const response = await fetch(`/api/designer/update-letters/${currentPuzzle.id}`, {
+    const response = await fetch(`/api/designer/update-letters/${currentGrid.puzzleId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({letters: letters}),
+      body: JSON.stringify({ letters: letters }),
     });
 
     if (!response.ok) {
       throw new Error("Failed to save data");
     }
 
+    // Only saving here, so no need to update anything
     const data = await response.json();
-
-    updateFromPuzzle( data.puzzle );
+    console.log(`Saved ${data.puzzle.title} successfully`);
   } catch (error) {
     console.error("Error calling Save API:", error);
     alert("Error calling Save API");
@@ -771,17 +614,9 @@ async function handleSave() {
 }
 
 async function updateFromPuzzle(puzzle) {
-  currentPuzzle = puzzle;
-
   const author = await getAuthor(puzzle.author);
 
   document.getElementById("title").value = `${puzzle.title} by ${author.name || 'unknown'}`;
-
-  populateGrid(puzzle);
-}
-
-function populateGrid(puzzle) {
-  letterGrid.open(puzzle.size, puzzle.letters);
 }
 
 // Function to handle the Publish button
@@ -789,4 +624,167 @@ function handlePublish() {
   alert("Publish button clicked");
 }
 
+// Event handler logic
+
+function attachEventListeners() {
+  const grid = document.getElementById('grid');
+  grid.addEventListener('mousedown', handleMouseStart);
+  grid.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseEnd);
+
+  grid.addEventListener('touchstart', handleTouchStart);
+  grid.addEventListener('touchmove', handleTouchMove);
+  document.addEventListener('touchend', handleTouchEnd);
+
+  // Make sure our canvas for drawing selection lines is always the right size
+  window.addEventListener('resize', handleResize);
+}
+
+// Letter utility functions
+
+// Get a (useful) random letter (exclude things like QXZ)
+function getRandomLetter() {
+  const alphabet = 'ABCDEFGHIJKLMNOPRSTUVYW';
+  const randomIndex = Math.floor(Math.random() * alphabet.length);
+  return alphabet[randomIndex];
+}
+
+// Trail management
+
+// Draw a line between cells to indicate the selection
+function drawLine(from, to) {
+  const grid = document.getElementById('grid');
+  const canvas = document.getElementById('trailCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // TODO use a var here. save as in drawBlob
+  ctx.strokeStyle = 'rgba(111, 176, 92, 0.4)'; // Green with some transparency
+  ctx.lineWidth = 15;
+  ctx.lineCap = 'round'; // Rounded line ends
+
+  ctx.beginPath();
+
+  const fromXCentre = (from.offsetLeft - grid.offsetLeft) + from.offsetWidth / 2;
+  const fromYCentre = (from.offsetTop - grid.offsetTop) + from.offsetHeight / 2;
+
+  const toXCentre = (to.offsetLeft - grid.offsetLeft) + to.offsetWidth / 2;
+  const toYCentre = (to.offsetTop - grid.offsetTop) + to.offsetHeight / 2;
+
+  ctx.moveTo(fromXCentre, fromYCentre);
+  ctx.lineTo(toXCentre, toYCentre);
+  ctx.stroke();
+}
+
+// Draw a blob on the first cell of a selection
+function drawBlob(cell) {
+  const grid = document.getElementById('grid');
+  const canvas = document.getElementById('trailCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // TODO use a var here
+  ctx.fillStyle = 'rgba(111, 176, 92, 0.4)'; // Green with some transparency
+
+  // Begin a new path
+  ctx.beginPath();
+
+  // Draw a circle
+  const radius = 24;
+  const xCentre = (cell.offsetLeft - grid.offsetLeft) + cell.offsetWidth / 2;
+  const yCentre = (cell.offsetTop - grid.offsetTop) + cell.offsetHeight / 2;
+  ctx.arc(xCentre, yCentre, radius, 0, 2 * Math.PI);
+
+  // Fill the circle to create the blob
+  ctx.fill();
+}
+
+function redrawTrail(trail) {
+  const canvas = document.getElementById('trailCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Redraw the whole trail from the start
+  let cells = trail.length;
+  if (cells > 0) {
+    let from = trail[0];
+    drawBlob(from);
+
+    let index = 1;
+    while (index < cells) {
+      let to = trail[index++];
+      drawLine(from, to);
+
+      // Step forward
+      from = to;
+    }
+  }
+}
+
+// Done with the current drag, clean up the trails
+function clearTrail(trail) {
+  const canvas = document.getElementById('trailCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Reset the trail
+  trail.length = 0;
+}
+
+// Mouse handlers
+
+function handleMouseStart(e) {
+  startDragGesture(e);
+}
+
+function handleMouseMove(e) {
+  // Extract the mouse target and process it
+  // Pass in the individual elements rather than the event as 'draw()'
+  // needs to service mouse and touch events and has a signature to suit
+  continueDragGesture(e.target, e.clientX, e.clientY);
+}
+
+function handleMouseEnd(e) {
+  stopDragGesture();
+}
+
+// Touch handlers
+
+function handleTouchStart(e) {
+  e.preventDefault();
+
+  startDragGesture(e);
+}
+
+function handleTouchMove(e) {
+  e.preventDefault();
+
+  // Work out where we have dragged to and process it
+  const touch = e.touches[0];
+  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+
+  if (element) {
+    continueDragGesture(element, touch.clientX, touch.clientY);
+  }
+}
+
+function handleTouchEnd(e) {
+  e.preventDefault();
+
+  stopDragGesture();
+}
+
+function handleResize() {
+  // Make sure the canvas stays resized to the grid
+  const grid = document.getElementById('grid');
+  const canvas = document.getElementById('trailCanvas');
+
+  canvas.style.left = `${grid.offsetLeft}px`;
+  canvas.style.top = `${grid.offsetTop}px`;
+  canvas.width = grid.offsetWidth;
+  canvas.height = grid.offsetHeight;
+
+  // TODO do we need to redraw any active trail here?
+}
+
+// Initialisation
 updateWordCounts(); // Set initial word counts
+attachEventListeners();
