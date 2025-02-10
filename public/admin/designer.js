@@ -515,12 +515,7 @@ async function handleNew(author, size) {
 
     const data = await response.json();
 
-    console.debug(`Creating new grid: ${data.puzzle.title}`);
-    currentGrid.puzzleId = puzzle.id;
-
-    createGrid(puzzle);
-    updateFromPuzzle(data.puzzle);
-    clearWordLists();
+    openPuzzle(data.puzzle);
   } catch (error) {
     console.error("Error calling Create API:", error);
     alert("Error calling Create API");
@@ -529,6 +524,7 @@ async function handleNew(author, size) {
 
 // Function to reset the grid and clear the title
 async function handleLoad(puzzleId) {
+  console.debug(`Load puzzle with ID: ${puzzleId}`);
   try {
     const response = await fetch(`/api/designer/puzzle/${puzzleId}`, {
       method: "GET",
@@ -543,13 +539,19 @@ async function handleLoad(puzzleId) {
 
     const data = await response.json();
 
-    createGrid();
-    updateFromPuzzle(data.puzzle);
-    clearWordLists();
+    openPuzzle(data.puzzle);
   } catch (error) {
     console.error("Error calling Puzzle API:", error);
     alert("Error calling Puzzle API");
   }
+}
+
+function openPuzzle(puzzle) {
+  console.debug(`Opening grid: ${puzzle.title}`);
+
+  createGrid(puzzle);
+  updateTitleDisplay(puzzle);
+  clearWordLists();
 }
 
 // Fill in any empty squares
@@ -613,7 +615,7 @@ async function handleSave() {
   }
 }
 
-async function updateFromPuzzle(puzzle) {
+async function updateTitleDisplay(puzzle) {
   const author = await getAuthor(puzzle.author);
 
   document.getElementById("title").value = `${puzzle.title} by ${author.name || 'unknown'}`;
@@ -697,20 +699,20 @@ function drawBlob(cell) {
   ctx.fill();
 }
 
-function redrawTrail(trail) {
+function redrawTrail() {
   const canvas = document.getElementById('trailCanvas');
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Redraw the whole trail from the start
-  let cells = trail.length;
+  let cells = currentGrid.trail.length;
   if (cells > 0) {
-    let from = trail[0];
+    let from = currentGrid.trail[0];
     drawBlob(from);
 
     let index = 1;
     while (index < cells) {
-      let to = trail[index++];
+      let to = currentGrid.trail[index++];
       drawLine(from, to);
 
       // Step forward
@@ -720,13 +722,13 @@ function redrawTrail(trail) {
 }
 
 // Done with the current drag, clean up the trails
-function clearTrail(trail) {
+function clearTrail() {
   const canvas = document.getElementById('trailCanvas');
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Reset the trail
-  trail.length = 0;
+  currentGrid.trail.length = 0;
 }
 
 // Mouse handlers
