@@ -151,8 +151,11 @@
                         submitEntryCallback = submitCallback;
                         closeEntryCallback = closeCallback;
 
-                        document.getElementById("letters").value = '';
                         openModal("letterEntryModal");
+                        
+                        // Clear the field and give it focus 
+                        document.getElementById("letters").value = '';
+                        document.getElementById("letters").focus();
                     }
                     function submitLetterEntryModal() {
                         var letters = document.getElementById("letters").value.trim();
