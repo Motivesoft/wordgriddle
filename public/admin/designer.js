@@ -384,8 +384,13 @@ async function clearWordListSelections() {
 }
 
 async function saveAllWordLists() {
-  await saveWordLists('bonus', 'listBonus', 'listExcluded');
-  await saveWordLists('excluded', 'listExcluded', 'listBonus');
+  let saved = await saveWordLists('bonus', 'listBonus', 'listExcluded');
+  saved &= await saveWordLists('excluded', 'listExcluded', 'listBonus');
+
+  // If save worked, clear the dirty state
+  if( saved ) {
+    setWordListChangeState(false);
+  }
 }
 
 // Save word list changes.
@@ -444,8 +449,11 @@ async function saveWordLists(wordType, wordsToAdd, wordsToRemove) {
   } catch (error) {
     console.error("Error calling Save API:", error);
     alert("Error calling Save API");
+    return false;
   }
 
+  // Success
+  return true;
 }
 
 // Function to fetch authors from the API and populate the combobox
@@ -643,8 +651,6 @@ async function handleSolve() {
 
 // Function to save data to a web API (Save button)
 async function handleSave() {
-  const wordLists = getWordLists();
-
   const letters = getGridLetters();
 
   try {

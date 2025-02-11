@@ -335,6 +335,11 @@ button:active {
   margin-right: 10px;
 }
 
+.word-list hr {
+  color: #cccccc;
+  margin: 0px -30px 0px -30px;
+}
+
 .list-controls {
   margin-top: 0px;
   display: flex;
@@ -344,7 +349,7 @@ button:active {
 .list-controls button {
   margin-right: 10px;
   padding: 5px;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
   min-width: 80px;
 }
