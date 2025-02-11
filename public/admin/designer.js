@@ -567,6 +567,12 @@ async function handleLoad(puzzleId) {
   }
 }
 
+async function handleRevert() {
+  if (currentGrid.puzzleId >= 0) {
+    handleLoad(currentGrid.puzzleId);
+  }
+}
+
 function openPuzzle(puzzle) {
   console.debug(`Opening grid: ${puzzle.title}`);
 
