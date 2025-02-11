@@ -254,7 +254,7 @@ function stopDragGesture() {
           }
         }
       } else {
-        alert(`Input not of correct length ${input} (${input.length}) ${currentGrid.trail.length}`);
+        alert(`Input '${input}' not of correct length (${input.length}, instead of ${currentGrid.trail.length})`);
       }
     };
 
@@ -266,7 +266,7 @@ function stopDragGesture() {
         item.classList.remove('selected');
       });
     };
-    openLetterEntryModal(submitCallback, closeCallback);
+    openLetterEntryModal(currentGrid.trail.length, submitCallback, closeCallback);
   }
 }
 
