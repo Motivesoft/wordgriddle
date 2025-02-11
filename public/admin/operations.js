@@ -102,7 +102,7 @@ async function fetchPuzzleList() {
 
 // Download puzzle list - as application/json (the default on the server)
 function downloadPuzzleList() {
-    fetch(`/api/designer/puzzles`)
+    fetch(`/api/designer/download`)
         .then(response => response.json())
         .then(data => {
             const jsonString = JSON.stringify(data, null, 2);
@@ -123,6 +123,8 @@ function downloadPuzzleList() {
             // Clean up
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+        }).catch((error) => {
+            alert("Error downloading puzzle list");
         });
 }
 

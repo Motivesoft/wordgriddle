@@ -1,7 +1,7 @@
 // External requires
 
 // Internal requires
-const { dbAll, dbGet } = require('./database');
+const { db, dbAll, dbGet } = require('./database');
 const { dictionaryWordOperations, bonusWordOperations, excludedWordOperations } = require('./WordListOperations');
 
 const PUZZLE_NAME = "wordgriddle";
@@ -52,6 +52,67 @@ class PuzzleOperations {
     }
 
     // Endpoints
+
+    // Download all puzzles as a JSON object - a backup operation
+    async downloadEndpoint(req, res) {
+        // This code, right now, is ostensibly the same as the getPuzzles endpoint but that might not
+        // always be the case as we get more into status management
+        try {
+            console.log(`Download puzzle list from ${this.name}`);
+
+            const puzzles = await this.getPuzzles();
+            res.status(200).json({ puzzleCount: puzzles.length, puzzles: puzzles });
+        } catch (error) {
+            console.error("Failed to get puzzle list:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
+
+    // Upload puzzles in JSON as a replacement to the current contents - a restore operation
+    async uploadEndpoint(req, res) {
+        // Allow text (default) or JSON upload
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).json({ message: 'No files were uploaded.' });
+        }
+
+        let uploadedFile = req.files.file;
+        console.debug(`Uploading ${this.name} words from: ${uploadedFile.name} (${uploadedFile.mimetype})`);
+
+        const fileData = uploadedFile.data;
+        if (fileData === undefined) {
+            return res.status(400).json({ message: 'No data was uploaded.' });
+        }
+
+        const data = fileData.toString('utf8');
+        if (data.length === 0) {
+            return res.status(400).json({ message: 'File does not appear to contain a word list.' });
+        }
+
+        const mimetype = uploadedFile.mimetype;
+        if (mimetype !== 'application/json') {
+            return res.status(400).json({ message: 'File does not appear to be of the correct format.' });
+        }
+
+        const parsedData = JSON.parse(data);
+        const puzzles = parsedData.puzzles;
+
+        if (puzzles.length !== parsedData.puzzleCount) {
+            // Report the difference, but continue anyway - effectively, we ignore the 'count' here
+            console.log(`Uploaded puzzle list does not have expected number of puzzles: ${puzzles.length} instead of ${parsedData.count}`);
+        }
+
+        if (puzzles === undefined || puzzles.length == 0) {
+            return res.status(400).json({ message: 'File does not appear to contain a list of puzzles.' });
+        }
+
+        try {
+            const count = await this.replacePuzzles(puzzles);
+            res.status(200).json({ status: "complete", puzzleCount: puzzles.length, processedCount: count });
+        } catch (error) {
+            console.error("Failed to upload puzzle list:", error.message);
+            res.status(500).json({ message: 'An error occurred', error: error.message });
+        }
+    }
 
     async getPuzzlesEndpoint(req, res) {
         try {
@@ -144,6 +205,65 @@ class PuzzleOperations {
     }
 
     // Other methods
+
+    // Replace the entire contents with the provided puzzles
+    async replacePuzzles(puzzles) {
+        if (puzzles === undefined) {
+            throw new Error("Missing input");
+        }
+
+        console.debug(`Replacing ${this.name} with ${puzzles.length} puzzles`);
+
+        // Whereas many of the other methods use promisified db methods, that doesn't really work here due
+        // to the serialized calls, so manually construct a single promise instead
+
+        return new Promise((resolve, reject) => {
+            db.serialize(() => {
+                db.run("BEGIN TRANSACTION");
+
+                // Delete existing data
+                db.run(`DELETE FROM ${this.tableName}`);
+
+                // Insert new data using a prepared statement for performance
+                const stmt = db.prepare(`INSERT OR IGNORE INTO ${this.tableName} 
+                        (id, title, author, size, letters, status, created, updated)
+                    VALUES 
+                        (?, ?, ?, ?, ?, ?, ?, ?)`);
+
+                let counter = 0;
+                for (const puzzle of puzzles) {
+                    stmt.run([puzzle.id, puzzle.title, puzzle.author, puzzle.size, puzzle.letters, puzzle.status, puzzle.created, puzzle.updated], (err) => {
+                        if (err) {
+                            console.error('Error inserting row:', err.message);
+                        } else {
+                            counter++;
+                        }
+                    });
+                }
+
+                // Finalise the transaction and commit - with explicit rollback in the event of an error
+                stmt.finalize();
+
+                db.run("COMMIT", (err) => {
+                    if (err) {
+                        console.error('Error committing transaction:', err.message);
+
+                        // If the commit fails, roll back
+                        db.run("ROLLBACK", (rollbackError) => {
+                            if (rollbackError) {
+                                console.error('Error rolling back transaction:', rollbackError.message);
+                            }
+
+                            reject(err);
+                        });
+                    } else {
+                        console.log('All inserts completed successfully');
+                        resolve(counter);
+                    }
+                });
+            });
+        });
+    }
 
     // Return all puzzles in this table
     async getPuzzles() {
