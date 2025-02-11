@@ -581,6 +581,7 @@ async function handleNew(author, size) {
 // Function to reset the grid and clear the title
 async function handleLoad(puzzleId) {
   console.debug(`Load puzzle with ID: ${puzzleId}`);
+
   try {
     const response = await fetch(`/api/designer/puzzle/${puzzleId}`, {
       method: "GET",
@@ -603,8 +604,10 @@ async function handleLoad(puzzleId) {
 }
 
 async function handleRevert() {
-  if (currentGrid.puzzleId >= 0) {
-    handleLoad(currentGrid.puzzleId);
+  if (hasUnsavedChanges()) {
+    if (confirm("This will undo any unsaved changes. Are you sure?")) {
+      handleLoad(currentGrid.puzzleId);
+    }
   }
 }
 
