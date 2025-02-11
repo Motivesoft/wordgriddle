@@ -271,16 +271,21 @@ function stopDragGesture() {
 }
 
 function fillRandom() {
+  let changed = false;
   for (let i = 0; i < currentGrid.letters.length; i++) {
     if (currentGrid.letters[i] === '-') {
       currentGrid.letters[i] = getRandomLetter();
 
-      // Mark puzzle as 'changed'
-      setGridChangeState(true);
+      changed = true;
     }
   }
+  
+  if (changed) {
+    // Mark puzzle as 'changed'
+    setGridChangeState(true);
 
-  initializeGrid();
+    initializeGrid();
+  }
 }
 
 function getLetters() {
