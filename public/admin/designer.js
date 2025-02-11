@@ -35,7 +35,7 @@ function createGrid(puzzle) {
 
   setGridChangeState(false);
   setWordListChangeState(false);
-  
+
   initializeGrid();
 }
 
@@ -279,7 +279,7 @@ function fillRandom() {
       changed = true;
     }
   }
-  
+
   if (changed) {
     // Mark puzzle as 'changed'
     setGridChangeState(true);
@@ -350,14 +350,14 @@ function moveSelected(fromListId, toListId) {
     checkedItems.forEach((checkbox) => {
       const listItem = checkbox.closest("li"); // Get the parent <li> element
       toList.appendChild(listItem); // Move to the target list
-  
+
       // TODO work out if we actually want/need to do this
       checkbox.checked = false; // Uncheck the checkbox
     });
-  
+
     // Update word counts
     updateWordCounts();
-  
+
     // Mark word lists as modified
     setWordListChangeState(true);
   }
@@ -388,7 +388,7 @@ async function saveAllWordLists() {
   saved &= await saveWordLists('excluded', 'listExcluded', 'listBonus');
 
   // If save worked, clear the dirty state
-  if( saved ) {
+  if (saved) {
     setWordListChangeState(false);
   }
 }
@@ -670,7 +670,7 @@ async function handleSave() {
     const data = await response.json();
 
     console.log(`Saved ${data.puzzle.title} successfully`);
-    
+
     // Mark as unchanged again
     setGridChangeState(false);
 
@@ -746,12 +746,17 @@ function attachEventListeners() {
   window.addEventListener('beforeunload', function (e) {
     // Check if there are unsaved changes
     if (hasUnsavedChanges()) {
-        // Cancel the event
-        e.preventDefault();
-        // Chrome requires returnValue to be set
-        e.returnValue = '';
+      // Cancel the event
+      e.preventDefault();
+      // Chrome requires returnValue to be set
+      e.returnValue = '';
     }
-});
+  });
+
+  // Clear the title on refresh
+  window.onload = function () {
+    document.getElementById('title').value = '';
+  };
 }
 
 // Letter utility functions
