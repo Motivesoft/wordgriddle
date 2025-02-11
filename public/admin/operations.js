@@ -80,3 +80,63 @@ function insertWords(category, wordList) {
         fetchWordList(category);
     });
 }
+
+// Puzzle operations
+
+// Fetch and display puzzle list
+async function fetchPuzzleList() {
+    showBusyIndicator('busy-indicator');
+
+    // Get the list of words
+    const response = await fetch(`/api/designer/puzzles`);
+    const puzzleData = await response.json();
+
+    // Populate the panel with the puzzles and a checkbox for each one
+    const puzzleList = document.getElementById('puzzleList');
+    puzzleList.innerHTML = puzzleData.puzzles.map(puzzle => 
+        `<div><label><input type="checkbox" value="${puzzle.id}">${puzzle.title}</label></div>`
+    ).join('');
+
+    hideBusyIndicator('busy-indicator');
+}
+
+// Download puzzle list - as application/json (the default on the server)
+function downloadPuzzleList() {
+    fetch(`/api/designer/puzzles`)
+        .then(response => response.json())
+        .then(data => {
+            const jsonString = JSON.stringify(data, null, 2);
+      
+            // Create a Blob with the JSON data
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            
+            // Create a temporary URL for the Blob
+            const url = URL.createObjectURL(blob);
+            
+            // Create a temporary anchor element and trigger the download
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'puzzle_list.json';
+            document.body.appendChild(a);
+            a.click();
+            
+            // Clean up
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+}
+
+// Upload word list - text/plain (the default on the server)
+function uploadPuzzleList() {
+    const file = document.getElementById('uploadFile').files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // TODO do we need something like this?
+    //      headers: {'Content-Type': 'application/json'},
+    fetch(`/api/designer/upload`, {
+        method: 'POST',
+        body: formData
+    }).then(() => fetchWordList(category));
+}
+
