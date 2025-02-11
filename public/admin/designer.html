@@ -141,7 +141,8 @@
         <div id="letterEntryModal" class="modal">
             <div class="modal-content">
                 <span class="close" onclick="closeLetterEntryModal()">&times;</span>
-                <h2>Enter the letters to place into the grid</h2>
+                <h2 id="letterEntryPrompt">Enter the letters to place into the grid</h2>
+                <p>Use '.' to create a space in the grid and '-' to clear the contents of a cell</p>
                 <div class="form-group">
                     <input type="text" id="letters" autocorrect="off" autocapitalize="off" spellcheck="false">
                 </div>
@@ -152,7 +153,12 @@
                 <script>
                     let submitEntryCallback;
                     let closeEntryCallback;
-                    function openLetterEntryModal(submitCallback, closeCallback) {
+                    function openLetterEntryModal(length, submitCallback, closeCallback) {
+                        if (length > 1) {
+                            document.getElementById("letterEntryPrompt").textContent = `Enter ${length} letters to place into the grid`;
+                        } else {
+                            document.getElementById("letterEntryPrompt").textContent = `Enter a letter to place into the grid`;
+                        }
                         submitEntryCallback = submitCallback;
                         closeEntryCallback = closeCallback;
 
