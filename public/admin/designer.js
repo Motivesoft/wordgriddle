@@ -581,6 +581,7 @@ async function handleNew(author, size) {
 // Function to reset the grid and clear the title
 async function handleLoad(puzzleId) {
   console.debug(`Load puzzle with ID: ${puzzleId}`);
+  
   try {
     const response = await fetch(`/api/designer/puzzle/${puzzleId}`, {
       method: "GET",

@@ -20,7 +20,7 @@
             <li><a href="/admin/excluded.html">Excluded</a></li>
         </ul>
     </nav>
-        
+
     <div class="grid-container">
         <!-- Grid Section -->
         <div class="grid-section">
@@ -32,8 +32,9 @@
                     <button class="button" onclick="handleSave()">Save</button>
                     <button class="button" onclick="handleSolve()">Solve</button>
                 </div>
-            
-                <div class="change-state" style="width: 380px; font-weight: bold; padding-bottom: 10px; text-align: center;">
+
+                <div class="change-state"
+                    style="width: 380px; font-weight: bold; padding-bottom: 10px; text-align: center;">
                     <label id="status-line">There are no unsaved changes</label>
                 </div>
 
@@ -44,7 +45,7 @@
 
             <!-- Trail canvas -->
             <canvas id="trailCanvas" width="100%" height="100%" style="background: transparent;"></canvas>
-        
+
             <!-- Grid -->
             <div id="grid" class="grid"></div>
 
@@ -82,13 +83,19 @@
                 </div>
                 <script>
                     async function openNewPuzzleModal() {
+                        if (hasUnsavedChanges()) {
+                            if (!confirm("This will lose any unsaved changes. Continue?")) {
+                                return;
+                            }
+                        }
+
                         await resetNewPuzzleModal();
                         openModal("newPuzzleModal");
                     }
                     function submitNewPuzzleModal() {
                         var author = document.getElementById("author").value;
                         var size = document.getElementById("size").value;
-    
+
                         handleNew(author, size);
                         closeNewPuzzleModal();
                     }
@@ -116,18 +123,24 @@
                     <button type="button" onclick="closeLoadPuzzleModal()">Cancel</button>
                 </div>
                 <script>
-                    function openLoadPuzzleModal() {
-                        resetLoadPuzzleModal();
+                    async function openLoadPuzzleModal() {
+                        if (hasUnsavedChanges()) {
+                            if (!confirm("This will lose any unsaved changes. Continue?")) {
+                                return;
+                            }
+                        }
+
+                        await resetLoadPuzzleModal();
                         openModal("loadPuzzleModal");
                     }
                     function submitLoadPuzzleModal() {
                         var puzzleId = document.getElementById("puzzles").value;
-    
+
                         handleLoad(puzzleId);
                         closeLoadPuzzleModal();
                     }
-                    function resetLoadPuzzleModal() {
-                        fetchPuzzles();
+                    async function resetLoadPuzzleModal() {
+                        await fetchPuzzles();
                     }
                     function closeLoadPuzzleModal() {
                         closeModal("loadPuzzleModal");
@@ -161,14 +174,14 @@
                         closeEntryCallback = closeCallback;
 
                         openModal("letterEntryModal");
-                        
+
                         // Clear the field and give it focus 
                         document.getElementById("letters").value = '';
                         document.getElementById("letters").focus();
                     }
                     function submitLetterEntryModal() {
                         var letters = document.getElementById("letters").value.trim();
-                        
+
                         // Reply with the entered text
                         submitEntryCallback(letters);
                         closeLetterEntryModal();
@@ -180,20 +193,20 @@
                 </script>
             </div>
         </div>
-    
+
         <!-- Lists Section -->
         <div class="lists-section">
             <div class="word-list" id="listRequired">
                 <h2>Required</h2>
                 <p class="word-count">Words: <span id="countRequired">3</span></p>
-                    <ul id="wordListContainer">
-                    </ul>
+                <ul id="wordListContainer">
+                </ul>
                 <div class="list-controls">
                     <button onclick="moveSelected('listRequired', 'listBonus')">Bonus</button>
                     <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded</button>
                 </div>
-                <hr/>
-                <div style="margin-top: 0px"; class="list-controls">
+                <hr />
+                <div style="margin-top: 0px" ; class="list-controls">
                     <button onclick="clearWordListSelections()" style="min-width: 120px;">Clear Selection</button>
                 </div>
             </div>
@@ -206,9 +219,10 @@
                     <button onclick="moveSelected('listBonus', 'listRequired')">Required</button>
                     <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded</button>
                 </div>
-                <hr/>
+                <hr />
                 <div style="margin-top: 0px;" class="list-controls">
-                    <button onclick="saveAllWordLists()" style="min-width: 120px; background-color: rgb(214, 112, 112);">Save All</button>
+                    <button onclick="saveAllWordLists()"
+                        style="min-width: 120px; background-color: rgb(214, 112, 112);">Save All</button>
                 </div>
             </div>
             <div class="word-list" id="listExcluded">
@@ -220,7 +234,7 @@
                     <button onclick="moveSelected('listExcluded', 'listRequired')">Required</button>
                     <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus</button>
                 </div>
-                <hr/>
+                <hr />
             </div>
         </div>
     </div>
