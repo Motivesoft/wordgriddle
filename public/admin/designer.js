@@ -11,6 +11,10 @@ const currentGrid = {
   selectedLetters: [],
   trail: [],
   lastCell: null,
+
+  // Dirty state
+  cellStateUnsaved: false,
+  wordListStateUnsaved: false,
 };
 
 // Start a new grid by assembling its metadata, initialising its state data and then creating the onscreen grid
@@ -29,6 +33,9 @@ function createGrid(puzzle) {
   currentGrid.trail = [];
   currentGrid.lastCell = null;
 
+  setGridChangeState(false);
+  setWordListChangeState(false);
+  
   initializeGrid();
 }
 
@@ -188,6 +195,7 @@ function stopDragGesture() {
   if (currentGrid.isDrawing) {
     currentGrid.isDrawing = false;
 
+    // Create a callback to handle the letters the user is about to provide to enter into the grid
     const submitCallback = (input) => {
       if (input.length === currentGrid.trail.length) {
         const inputLetters = input.toUpperCase();
@@ -240,14 +248,19 @@ function stopDragGesture() {
             }
 
             currentGrid.letters[cell.dataset.index] = letter;
+
+            // Mark the grid as 'changed'
+            setGridChangeState(true);
           }
         }
       } else {
         alert(`Input not of correct length ${input} (${input.length}) ${currentGrid.trail.length}`);
       }
     };
+
+    // Create a callback to tidy up after asking the user for a string of letters for the grid
     const closeCallback = () => {
-      // Clear any selection decoractions
+      // Clear any selection decorations
       clearTrail();
       document.querySelectorAll('.grid-item').forEach(item => {
         item.classList.remove('selected');
@@ -261,6 +274,9 @@ function fillRandom() {
   for (let i = 0; i < currentGrid.letters.length; i++) {
     if (currentGrid.letters[i] === '-') {
       currentGrid.letters[i] = getRandomLetter();
+
+      // Mark puzzle as 'changed'
+      setGridChangeState(true);
     }
   }
 
@@ -324,16 +340,22 @@ function moveSelected(fromListId, toListId) {
   // Get all checked items
   const checkedItems = fromList.querySelectorAll("input[type='checkbox']:checked");
 
-  checkedItems.forEach((checkbox) => {
-    const listItem = checkbox.closest("li"); // Get the parent <li> element
-    toList.appendChild(listItem); // Move to the target list
-
-    // TODO work out if we actually want/need to do this
-    checkbox.checked = false; // Uncheck the checkbox
-  });
-
-  // Update word counts
-  updateWordCounts();
+  // Make sure there are some before we go updating anything
+  if (checkedItems.length) {
+    checkedItems.forEach((checkbox) => {
+      const listItem = checkbox.closest("li"); // Get the parent <li> element
+      toList.appendChild(listItem); // Move to the target list
+  
+      // TODO work out if we actually want/need to do this
+      checkbox.checked = false; // Uncheck the checkbox
+    });
+  
+    // Update word counts
+    updateWordCounts();
+  
+    // Mark word lists as modified
+    setWordListChangeState(true);
+  }
 }
 
 // Function to get the contents of all word lists
@@ -635,7 +657,12 @@ async function handleSave() {
 
     // Only saving here, so no need to update anything
     const data = await response.json();
+
     console.log(`Saved ${data.puzzle.title} successfully`);
+    
+    // Mark as unchanged again
+    setGridChangeState(false);
+
   } catch (error) {
     console.error("Error calling Save API:", error);
     alert("Error calling Save API");
@@ -653,6 +680,42 @@ function handlePublish() {
   alert("Publish button clicked");
 }
 
+function setGridChangeState(changed) {
+  currentGrid.cellStateUnsaved = changed;
+
+  updateChangeStateDisplay();
+}
+
+function setWordListChangeState(changed) {
+  currentGrid.wordListStateUnsaved = changed;
+
+  updateChangeStateDisplay();
+}
+
+function hasUnsavedChanges() {
+  return currentGrid.cellStateUnsaved | currentGrid.wordListStateUnsaved;
+}
+
+function updateChangeStateDisplay() {
+  let message;
+  let color = "rgb(192, 32, 32)";
+
+  if (currentGrid.cellStateUnsaved && currentGrid.wordListStateUnsaved) {
+    message = `There are unsaved grid and word list changes`;
+  } else if (currentGrid.cellStateUnsaved) {
+    message = `There are unsaved grid changes`;
+  } else if (currentGrid.wordListStateUnsaved) {
+    message = `There are unsaved word list changes`;
+  } else {
+    message = `There are no unsaved changes`;
+    color = "rgb(32, 32, 32)";
+  }
+
+  const statusLine = document.getElementById('status-line');
+  statusLine.innerHTML = message;
+  statusLine.style.color = color;
+}
+
 // Event handler logic
 
 function attachEventListeners() {
@@ -667,6 +730,17 @@ function attachEventListeners() {
 
   // Make sure our canvas for drawing selection lines is always the right size
   window.addEventListener('resize', handleResize);
+
+  // Try and avoid the user losing unsaved edits
+  window.addEventListener('beforeunload', function (e) {
+    // Check if there are unsaved changes
+    if (hasUnsavedChanges()) {
+        // Cancel the event
+        e.preventDefault();
+        // Chrome requires returnValue to be set
+        e.returnValue = '';
+    }
+});
 }
 
 // Letter utility functions
