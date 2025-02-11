@@ -20,9 +20,7 @@
             <li><a href="/admin/excluded.html">Excluded</a></li>
         </ul>
     </nav>
-
-    <!-- <h1>Puzzle Designer</h1> -->
-
+        
     <div class="grid-container">
         <!-- Grid Section -->
         <div class="grid-section">
@@ -194,8 +192,9 @@
                     <button onclick="moveSelected('listRequired', 'listBonus')">Bonus</button>
                     <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded</button>
                 </div>
+                <hr/>
                 <div style="margin-top: 0px"; class="list-controls">
-                    <button onclick="clearWordListSelections()">Clear Selection</button>
+                    <button onclick="clearWordListSelections()" style="min-width: 120px;">Clear Selection</button>
                 </div>
             </div>
             <div class="word-list" id="listBonus">
@@ -207,8 +206,9 @@
                     <button onclick="moveSelected('listBonus', 'listRequired')">Required</button>
                     <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded</button>
                 </div>
-                <div style="margin-top: 0px"; class="list-controls">
-                    <button onclick="saveWordLists('bonus', 'listBonus', 'listExcluded')">Save</button>
+                <hr/>
+                <div style="margin-top: 0px;" class="list-controls">
+                    <button onclick="saveAllWordLists()" style="min-width: 120px; background-color: rgb(214, 112, 112);">Save All</button>
                 </div>
             </div>
             <div class="word-list" id="listExcluded">
@@ -220,9 +220,7 @@
                     <button onclick="moveSelected('listExcluded', 'listRequired')">Required</button>
                     <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus</button>
                 </div>
-                <div style="margin-top: 0px"; class="list-controls">
-                    <button onclick="saveWordLists('excluded', 'listExcluded', 'listBonus')">Save</button>
-                </div>
+                <hr/>
             </div>
         </div>
     </div>
