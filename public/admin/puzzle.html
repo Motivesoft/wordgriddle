@@ -24,73 +24,21 @@
 
     <div class="stack-container">
         <div class="button-stack">
-            <div id="wordListContainer">
-                <div id="wordList"></div>
+            <div id="wordListContainer" style="min-width: 300px;">
+                <div id="puzzleList"></div>
             </div>
-            <div id="wordCountDisplay"></div>
         </div>
         <div class="button-stack">
             <div class="top-buttons">
                 <button onclick="openInsertWordsModal()">Publish</button>
-                <button onclick="performDelete()">Delete</button>
-                <script>
-                    function performDelete() {
-                        const selectedWords = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
-                            .map(checkbox => checkbox.value);
-
-                        if (selectedWords.length === 0) {
-                            alert("Select at least one word to delete. Select words by checking the boxes next to them.");
-                            return;
-                        }
-
-                        deleteWords('bonus', selectedWords);
-                    }
-                </script>
             </div>
             <div class="spacer"></div>
             <div class="bottom-buttons">
                 <button onclick="document.getElementById('uploadFile').click()">Upload</button>
-                <input type="file" id="uploadFile" accept=".txt" onchange="uploadWordList('bonus')"
+                <input type="file" id="uploadFile" accept=".txt" onchange="uploadPuzzleList()"
                     style="display:none">
-                <button onclick="downloadWordList('bonus')">Download</button>
+                <button onclick="downloadPuzzleList()">Download</button>
             </div>
-        </div>
-    </div>
-
-    <div id="insertWordsModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeInsertWordsModal()">&times;</span>
-            <h2>Enter new words, one per line</h2>
-            <textarea id="multilineInput" rows="10" cols="40"></textarea>
-            <div style="padding-top: 8px;">
-                <button type="submit" onclick="submitInsertWordsModal()">Insert</button>
-                <button type="button" onclick="closeInsertWordsModal()">Cancel</button>
-            </div>
-            <script>
-                function openInsertWordsModal() {
-                    openModal("insertWordsModal");
-                    resetInsertWordsModal();
-                }
-                function submitInsertWordsModal() {
-                    var text = document.getElementById("multilineInput").value;
-                    const newWords = text.split('\n').filter(word => word.trim() !== '');
-
-                    if (newWords.length === 0) {
-                        alert("Provide at least one word to insert.");
-                        return;
-                    }
-
-                    insertWords('bonus', newWords);
-                    closeInsertWordsModal();
-                }
-                function resetInsertWordsModal() {
-                    document.getElementById("multilineInput").value = "";
-                    document.getElementById("multilineInput").focus()   ;
-                }
-                function closeInsertWordsModal() {
-                    closeModal("insertWordsModal");
-                }
-            </script>
         </div>
     </div>
 
@@ -102,7 +50,7 @@
     <script src="utils.js"></script>
     <script>
         // Initial load
-        fetchWordList('bonus');
+        fetchPuzzleList();
     </script>
 </body>
 
