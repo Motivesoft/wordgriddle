@@ -1,6 +1,6 @@
 {
   "name": "wordgriddle",
-  "version": "0.5.4-build.0",
+  "version": "0.6.0",
   "description": "Grid based word puzzle",
   "main": "server.js",
   "scripts": {
