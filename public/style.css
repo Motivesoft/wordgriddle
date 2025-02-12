@@ -368,19 +368,10 @@ button:not(:disabled):active {
   font-size: 16px;
   border: none;
   border-radius: 8px;
-  background-color: #4CAF50;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s;
   min-width: 80px;
-}
-
-.button:hover {
-  background-color: #45a049;
-}
-
-.button:active {
-  background-color: #3e8e41;
 }
 
 .button:disabled {
