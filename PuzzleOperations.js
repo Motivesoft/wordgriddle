@@ -478,16 +478,16 @@ class PuzzleOperations {
             return;
         }
 
-        // Remember we've been here
-        visitedCoordinates.add(coordinate);
-
-        // Now try the letter
+        // Get the letter we've just landed on
         const currentLetter = grid[row][col];
 
-        // Allow use of blanks, dashes or dots to signify missing letters
+        // Blank, dash or dot signifies missing letter - nothing to see here
         if ([' ', '.', '-'].includes(currentLetter)) {
             return;
         }
+
+        // Remember we've been here as part of the current word
+        visitedCoordinates.add(coordinate);
 
         currentWord += currentLetter.toLowerCase();
 
