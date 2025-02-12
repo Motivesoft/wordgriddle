@@ -38,6 +38,8 @@ function createGrid(puzzle) {
   setWordListChangeState(false);
 
   initializeGrid();
+
+  setButtonState();
 }
 
 // Called to (re)build the grid
@@ -776,9 +778,11 @@ function attachEventListeners() {
     }
   });
 
-  // Clear the title on refresh
+  // Clear the title and do other initialisation stuff on refresh
   window.onload = function () {
     document.getElementById('title').value = '';
+
+    setButtonState();
   };
 }
 
@@ -1019,3 +1023,13 @@ function handleResize() {
 // Initialisation
 updateWordCounts(); // Set initial word counts
 attachEventListeners();
+
+function setButtonState() {
+  const disabled = currentGrid.puzzleId === -1;
+
+  const elements = document.querySelectorAll('.puzzle-required');
+  for (const element of elements) {
+    console.log(`${element}.disabled set to ${disabled}`);
+    element.disabled = disabled;
+  }
+}

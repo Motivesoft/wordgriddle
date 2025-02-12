@@ -29,8 +29,8 @@
                 <div class="button-bar">
                     <button class="button" onclick="openNewPuzzleModal()">New</button>
                     <button class="button" onclick="openLoadPuzzleModal()">Load...</button>
-                    <button class="button" onclick="handleSave()">Save</button>
-                    <button class="button" onclick="handleSolve()">Solve</button>
+                    <button class="button puzzle-required" onclick="handleSave()">Save</button>
+                    <button class="button puzzle-required" onclick="handleSolve()">Solve</button>
                 </div>
 
                 <div class="change-state"
@@ -52,8 +52,8 @@
 
             <!-- Controls Below the Grid -->
             <div class="grid-bottom-controls">
-                <button onclick="handleRandomFill()">Random Fill</button>
-                <button onclick="handleRevert()">Revert</button>
+                <button class="button puzzle-required" onclick="handleRandomFill()">Random Fill</button>
+                <button class="button puzzle-required" onclick="handleRevert()">Revert</button>
             </div>
         </div>
 
