@@ -45,6 +45,7 @@
 
             <!-- Trail canvas -->
             <canvas id="trailCanvas" width="100%" height="100%" style="background: transparent;"></canvas>
+            <canvas id="overlayCanvas" width="100%" height="100%" style="background: transparent;"></canvas>
 
             <!-- Grid -->
             <div id="grid" class="grid"></div>
@@ -206,8 +207,9 @@
                     <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded</button>
                 </div>
                 <hr />
-                <div style="margin-top: 0px" ; class="list-controls">
-                    <button onclick="clearWordListSelections()" style="min-width: 120px;">Clear Selection</button>
+                <div style="margin-top: 0px;" class="list-controls">
+                    <input style="margin-top: 16px;" type="checkbox" id="showOverlays" onchange="updateOverlays()">
+                    <label style="margin-top: 16px;" for="showOverlays">Show Paths</label>
                 </div>
             </div>
             <div class="word-list" id="listBonus">
@@ -220,9 +222,8 @@
                     <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded</button>
                 </div>
                 <hr />
-                <div style="margin-top: 0px;" class="list-controls">
-                    <button onclick="saveAllWordLists()"
-                        style="min-width: 120px; background-color: rgb(214, 112, 112);">Save All</button>
+                <div style="margin-top: 0px" ; class="list-controls">
+                    <button onclick="clearWordListSelections()" style="min-width: 120px;">Clear Selection</button>
                 </div>
             </div>
             <div class="word-list" id="listExcluded">
@@ -235,6 +236,10 @@
                     <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus</button>
                 </div>
                 <hr />
+                <div style="margin-top: 0px;" class="list-controls">
+                    <button onclick="saveAllWordLists()"
+                        style="min-width: 120px; background-color: rgb(214, 112, 112);">Save All</button>
+                </div>
             </div>
         </div>
     </div>

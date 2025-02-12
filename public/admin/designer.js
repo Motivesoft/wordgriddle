@@ -10,6 +10,7 @@ const currentGrid = {
   isDrawing: false,
   selectedLetters: [],
   trail: [],
+  overlays: new Set(),
   lastCell: null,
 
   // Dirty state
@@ -45,6 +46,9 @@ function initializeGrid() {
 
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
+
+  currentGrid.trail = [];
+  currentGrid.overlays.clear();
 
   // Set grid dimensions
   grid.style.gridTemplateColumns = `repeat(${currentGrid.size}, 1fr)`;
@@ -382,6 +386,9 @@ async function clearWordListSelections() {
   document.querySelectorAll('ul li input[type="checkbox"]').forEach(checkbox => {
     checkbox.checked = false;
   });
+
+  currentGrid.overlays.clear();
+  updateOverlays();
 }
 
 async function saveAllWordLists() {
@@ -747,9 +754,12 @@ function attachEventListeners() {
     if (event.target.classList.contains('wordlist-checkbox')) {
       if (event.target.checked) {
         console.log(`Checkbox with value ${event.target.value} is checked.`);
+        currentGrid.overlays.add(event.target.value);
       } else {
         console.log(`Checkbox with value ${event.target.value} is unchecked.`);
+        currentGrid.overlays.delete(event.target.value);
       }
+      updateOverlays();
     }
   });
 
@@ -771,6 +781,95 @@ function attachEventListeners() {
   window.onload = function () {
     document.getElementById('title').value = '';
   };
+}
+
+// Overlays
+
+function updateOverlays() {
+  const colorList = [
+    'rgba(255, 182, 193, 0.4)', // Pastel Pink
+    'rgba(173, 216, 230, 0.4)', // Pastel Blue
+    'rgba(144, 238, 144, 0.4)', // Pastel Green
+    'rgba(255, 255, 224, 0.4)', // Pastel Yellow
+    'rgba(230, 230, 250, 0.4)', // Pastel Lavender
+    'rgba(255, 218, 185, 0.4)', // Pastel Peach
+    'rgba(230, 255, 230, 0.4)', // Pastel Mint
+    'rgba(240, 128, 128, 0.4)', // Pastel Coral
+    'rgba(135, 206, 235, 0.4)', // Pastel Sky Blue
+    'rgba(255, 255, 79, 0.4)'   // Pastel Lemon
+  ];
+
+  // Clear the canvas and redraw any stored overlays
+  const canvas = document.getElementById('overlayCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const showOverlays = document.getElementById("showOverlays");
+  if (!showOverlays.checked) {
+    // Overlays are turned off
+    return;
+  }
+
+  // Draw each overlay trail
+  let colorIndex = 0;
+  currentGrid.overlays.forEach((overlay) => {
+    // Pick the next color and increment the index for the next, looping round if necessary
+    const color = colorList[colorIndex++];
+    if (colorIndex == colorList.length ) {
+      colorIndex = 0;
+    }
+
+    // At this point, overlay is just a string path. Turn it into an array of cells
+    const pathIndices = overlay.match(/\[(\d+)\]/g);
+    const cells = pathIndices.map(pathIndex => grid.children[ parseInt(pathIndex.replace(/\[|\]/g, ''), 10)]);
+
+    let cellCount = cells.length;
+    if (cellCount > 0) {
+      let from = cells[0];
+      //drawBlob(from);
+      {
+        // Begin a new path
+        ctx.beginPath();
+        
+        ctx.fillStyle = color;
+
+        // Draw a circle
+        const radius = 12;
+        const xCentre = (from.offsetLeft - grid.offsetLeft) + from.offsetWidth / 2;
+        const yCentre = (from.offsetTop - grid.offsetTop) + from.offsetHeight / 2;
+        ctx.arc(xCentre, yCentre, radius, 0, 2 * Math.PI);
+      
+        // Fill the circle to create the blob
+        ctx.fill();
+      }
+  
+      let index = 1;
+      while (index < cellCount) {
+        let to = cells[index++];
+        //drawLine(from, to);
+        {
+          ctx.beginPath();
+        
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 8;
+          ctx.lineCap = 'round'; // Rounded line ends
+        
+          const fromXCentre = (from.offsetLeft - grid.offsetLeft) + from.offsetWidth / 2;
+          const fromYCentre = (from.offsetTop - grid.offsetTop) + from.offsetHeight / 2;
+        
+          const toXCentre = (to.offsetLeft - grid.offsetLeft) + to.offsetWidth / 2;
+          const toYCentre = (to.offsetTop - grid.offsetTop) + to.offsetHeight / 2;
+        
+          ctx.moveTo(fromXCentre, fromYCentre);
+          ctx.lineTo(toXCentre, toYCentre);
+          ctx.stroke();
+        }
+  
+        // Step forward
+        from = to;
+      }
+    }
+  });
 }
 
 // Letter utility functions
@@ -902,12 +1001,18 @@ function handleTouchEnd(e) {
 function handleResize() {
   // Make sure the canvas stays resized to the grid
   const grid = document.getElementById('grid');
-  const canvas = document.getElementById('trailCanvas');
+  
+  const trailCanvas = document.getElementById('trailCanvas');
+  trailCanvas.style.left = `${grid.offsetLeft}px`;
+  trailCanvas.style.top = `${grid.offsetTop}px`;
+  trailCanvas.width = grid.offsetWidth;
+  trailCanvas.height = grid.offsetHeight;
 
-  canvas.style.left = `${grid.offsetLeft}px`;
-  canvas.style.top = `${grid.offsetTop}px`;
-  canvas.width = grid.offsetWidth;
-  canvas.height = grid.offsetHeight;
+  const overlayCanvas = document.getElementById('overlayCanvas');
+  overlayCanvas.style.left = `${grid.offsetLeft}px`;
+  overlayCanvas.style.top = `${grid.offsetTop}px`;
+  overlayCanvas.width = grid.offsetWidth;
+  overlayCanvas.height = grid.offsetHeight;
 
   // TODO do we need to redraw any active trail here?
 }
