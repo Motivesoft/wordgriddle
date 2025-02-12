@@ -29,8 +29,8 @@
                 <div class="button-bar">
                     <button class="button" onclick="openNewPuzzleModal()">New</button>
                     <button class="button" onclick="openLoadPuzzleModal()">Load...</button>
-                    <button class="button" onclick="handleSave()">Save</button>
-                    <button class="button" onclick="handleSolve()">Solve</button>
+                    <button class="button puzzle-required" id="savePuzzleButton" onclick="handleSave()">Save</button>
+                    <button class="button puzzle-required" onclick="handleSolve()">Solve</button>
                 </div>
 
                 <div class="change-state"
@@ -52,8 +52,8 @@
 
             <!-- Controls Below the Grid -->
             <div class="grid-bottom-controls">
-                <button onclick="handleRandomFill()">Random Fill</button>
-                <button onclick="handleRevert()">Revert</button>
+                <button class="button puzzle-required" onclick="handleRandomFill()">Random Fill</button>
+                <button class="button puzzle-required" id="revertButton" onclick="handleRevert()">Revert</button>
             </div>
         </div>
 
@@ -203,8 +203,8 @@
                 <ul id="wordListContainer">
                 </ul>
                 <div class="list-controls">
-                    <button onclick="moveSelected('listRequired', 'listBonus')">Bonus</button>
-                    <button onclick="moveSelected('listRequired', 'listExcluded')">Excluded</button>
+                    <button class="button puzzle-required" onclick="moveSelected('listRequired', 'listBonus')">Bonus</button>
+                    <button class="button puzzle-required" onclick="moveSelected('listRequired', 'listExcluded')">Excluded</button>
                 </div>
                 <hr />
                 <div style="margin-top: 0px;" class="list-controls">
@@ -218,12 +218,12 @@
                 <ul id="wordListContainer">
                 </ul>
                 <div class="list-controls">
-                    <button onclick="moveSelected('listBonus', 'listRequired')">Required</button>
-                    <button onclick="moveSelected('listBonus', 'listExcluded')">Excluded</button>
+                    <button class="button puzzle-required" onclick="moveSelected('listBonus', 'listRequired')">Required</button>
+                    <button class="button puzzle-required" onclick="moveSelected('listBonus', 'listExcluded')">Excluded</button>
                 </div>
                 <hr />
                 <div style="margin-top: 0px" ; class="list-controls">
-                    <button onclick="clearWordListSelections()" style="min-width: 120px;">Clear Selection</button>
+                    <button onclick="clearWordListSelections()" class="button puzzle-required" style="min-width: 120px;">Clear Selection</button>
                 </div>
             </div>
             <div class="word-list" id="listExcluded">
@@ -232,13 +232,13 @@
                 <ul id="wordListContainer">
                 </ul>
                 <div class="list-controls">
-                    <button onclick="moveSelected('listExcluded', 'listRequired')">Required</button>
-                    <button onclick="moveSelected('listExcluded', 'listBonus')">Bonus</button>
+                    <button class="button puzzle-required" onclick="moveSelected('listExcluded', 'listRequired')">Required</button>
+                    <button class="button puzzle-required" onclick="moveSelected('listExcluded', 'listBonus')">Bonus</button>
                 </div>
                 <hr />
                 <div style="margin-top: 0px;" class="list-controls">
-                    <button onclick="saveAllWordLists()"
-                        style="min-width: 120px; background-color: rgb(214, 112, 112);">Save All</button>
+                    <button onclick="saveAllWordLists()" id="saveAllWordLists" class="button puzzle-required"
+                        style="min-width: 120px;">Save All</button>
                 </div>
             </div>
         </div>
