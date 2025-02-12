@@ -4,8 +4,9 @@
   "description": "Grid based word puzzle",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "ver": "npm version prerelease --preid=build && git push --tags"
+    "ver-prerelease": "npm version prerelease --preid=build && git push --tags",
+    "ver-patch": "npm version patch && git push --tags",
+    "ver-minor": "npm version minor && git push --tags"
   },
   "repository": {
     "type": "git",
