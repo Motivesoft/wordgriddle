@@ -651,6 +651,8 @@ function getGridLetters() {
 // Function to load data from a web API (Solve button)
 async function handleSolve() {
   try {
+    showBusyIndicator('busy-indicator');
+
     const letters = getGridLetters();
 
     const response = await fetch(`/api/designer/solve/${letters}`, {
@@ -669,6 +671,9 @@ async function handleSolve() {
   } catch (error) {
     console.error("Error calling Solve API:", error);
     alert("Error calling Solve API");
+  }
+  finally {
+    hideBusyIndicator('busy-indicator');
   }
 }
 
