@@ -9,11 +9,13 @@ const PUZZLE_NAME = "wordgriddle";
 // Inner class to help with dictionary full and partial lookups
 class DictionaryLookupHelper
 {
-    constructor(list) {
+    constructor() {
         this.longestWordLength = 0;
         this.dictionary = new Set();
         this.prefixes = new Set();
+    }
 
+    addWordList(list) {
         list.forEach((word) => {
             // Track all the words
             this.dictionary.add(word);
@@ -28,7 +30,7 @@ class DictionaryLookupHelper
                 this.prefixes.add(word);
                 word = word.slice(0,word.length-1);
             }
-        })
+        });
     }
 
     lookup(word) {
@@ -397,8 +399,14 @@ class PuzzleOperations {
 
         // Create an object that will help us search the dictionary, but without passing the
         // dictionary through the call stack
-        const allDictionaryWords = await dictionaryWordOperations.getWords();
-        const lookupHelper = new DictionaryLookupHelper(allDictionaryWords);
+        //
+        // As new excluded words can be 'created' at a faster rate than dictionaries can be created
+        // and as some dictionaries don't carry what we would think of as excluded words, make a 
+        // composite list of all the words we know about for this word search
+        const lookupHelper = new DictionaryLookupHelper();
+        lookupHelper.addWordList( await dictionaryWordOperations.getWords() );
+        lookupHelper.addWordList( await bonusWordOperations.getWords() );
+        lookupHelper.addWordList( await excludedWordOperations.getWords() );
 
         // Iterate over the grid, letter by letter, and find words from each one
         for (var rowIndex = 0; rowIndex < grid.length; rowIndex++) {
