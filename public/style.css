@@ -329,10 +329,12 @@ button:not(:disabled):active {
 .word-list label {
   display: flex;
   align-items: center;
+  margin-right: 15px;
+  user-select: none;
 }
 
 .word-list input[type="checkbox"] {
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .word-list hr {
@@ -410,6 +412,12 @@ button:not(:disabled):active {
 /* There are no more scoring words using this letter */
 .grid-item.zerozero {
   background-color: #cccccc;
+  color: #aaaaaa;
+}
+
+/* There are no more scoring words using this letter */
+.grid-item.zerozero-designer {
+  background-color: #200808;
   color: #aaaaaa;
 }
 
