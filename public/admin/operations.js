@@ -23,6 +23,7 @@ async function fetchWordList(category) {
 
 // Download word list - as text/plain (the default on the server)
 function downloadWordList(category) {
+    showBusyIndicator('busy-indicator');
     fetch(`/api/${category}/download`)
         .then(response => response.blob())
         .then(blob => {
@@ -34,11 +35,14 @@ function downloadWordList(category) {
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
+        }).finally(() => {
+            hideBusyIndicator('busy-indicator');
         });
 }
 
 // Upload word list - text/plain (the default on the server)
 function uploadWordList(category) {
+    showBusyIndicator('busy-indicator');
     const file = document.getElementById('uploadFile').files[0];
     const formData = new FormData();
     formData.append('file', file);
@@ -46,7 +50,10 @@ function uploadWordList(category) {
     fetch(`/api/${category}/upload`, {
         method: 'POST',
         body: formData
-    }).then(() => fetchWordList(category));
+    }).then(() => fetchWordList(category)
+    ).finally(() => {
+        hideBusyIndicator('busy-indicator');
+    });
 }
 
 // Delete selected words
