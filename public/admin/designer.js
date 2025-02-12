@@ -84,6 +84,46 @@ function initializeGrid() {
   handleResize();
 }
 
+// Calculate the red/grey numbers for each cell from the supplied required word list
+function updateRedGrey(requiredWordList) {
+  const grid = document.getElementById('grid');
+  for( let i = 0; i < grid.children.length; i++) {
+    const cell = grid.children[i];
+    cell.dataset.redCount = 0;
+    cell.dataset.greyCount = 0;
+  }
+
+  if (currentGrid.puzzleId < 0 || requiredWordList === undefined) {
+    // Safety measure
+    return;
+  }
+
+  // Take each required word's path entry and add up red/grey; where paths are in the form '[1][2]...'
+  requiredWordList.forEach(([word,path]) => {
+    const pathIndices = path.match(/\[(\d+)\]/g);
+    const cells = pathIndices.map(pathIndex => grid.children[parseInt(pathIndex.replace(/\[|\]/g, ''), 10)]);
+
+    cells[0].dataset.redCount++;
+
+    cells.forEach((cell) => {
+      cell.dataset.greyCount++;
+    });
+  });
+ 
+  for( let i = 0; i < grid.children.length; i++) {
+    const cell = grid.children[i];
+    
+    console.log(`Cell ${i}/${cell.dataset.index} '${cell.dataset.letter}' R:${cell.dataset.redCount} G:${cell.dataset.greyCount}`);
+
+    // Highlight any unused letters (grey count of zero)
+    if( cell.dataset.greyCount == 0 && cell.dataset.letter != '-' && cell.dataset.letter != '.') {
+      cell.classList.add('zerozero-designer');
+    } else {
+      cell.classList.remove('zerozero-designer');
+    }
+  }
+}
+
 function setPuzzleLoadedState() {
   const disabled = currentGrid.puzzleId === -1;
 
@@ -672,9 +712,10 @@ async function handleSolve() {
 
     const data = await response.json();
     updateWordLists(data);
+    updateRedGrey(data.wordLists.required);
 
-    if (data.wordCount === 0 ) {
-      alert( "No words found.");
+    if (data.wordCount === 0) {
+      alert("No words found.");
     }
   } catch (error) {
     console.error("Error calling Solve API:", error);
@@ -746,13 +787,13 @@ function hasUnsavedChanges() {
 function updateChangeStateDisplay() {
   // Update button states
   const wordListSaveButton = document.getElementById('saveAllWordLists');
-  wordListSaveButton.disabled = !currentGrid.wordListStateUnsaved;  
+  wordListSaveButton.disabled = !currentGrid.wordListStateUnsaved;
 
   const savePuzzleButton = document.getElementById('savePuzzleButton');
-  savePuzzleButton.disabled = !currentGrid.cellStateUnsaved;  
+  savePuzzleButton.disabled = !currentGrid.cellStateUnsaved;
 
   const revertButton = document.getElementById('revertButton');
-  revertButton.disabled = !(currentGrid.cellStateUnsaved || currentGrid.wordListStateUnsaved);  
+  revertButton.disabled = !(currentGrid.cellStateUnsaved || currentGrid.wordListStateUnsaved);
 
   // Update the display message
   let message;
@@ -770,7 +811,7 @@ function updateChangeStateDisplay() {
     } else {
       message = `There are no unsaved changes`;
     }
-    
+
     color = "rgb(32, 32, 32)";
   }
 
@@ -791,7 +832,7 @@ function attachEventListeners() {
   grid.addEventListener('touchmove', handleTouchMove);
   document.addEventListener('touchend', handleTouchEnd);
 
-  document.body.addEventListener('change', function(event) {
+  document.body.addEventListener('change', function (event) {
     // Track for word list selections and prepare to draw their path on the grid if so configured
     if (event.target.classList.contains('wordlist-checkbox')) {
       if (event.target.checked) {
@@ -858,13 +899,13 @@ function updateOverlays() {
   currentGrid.overlays.forEach((overlay) => {
     // Pick the next color and increment the index for the next, looping round if necessary
     const color = colorList[colorIndex++];
-    if (colorIndex == colorList.length ) {
+    if (colorIndex == colorList.length) {
       colorIndex = 0;
     }
 
     // At this point, overlay is just a string path. Turn it into an array of cells
     const pathIndices = overlay.match(/\[(\d+)\]/g);
-    const cells = pathIndices.map(pathIndex => grid.children[ parseInt(pathIndex.replace(/\[|\]/g, ''), 10)]);
+    const cells = pathIndices.map(pathIndex => grid.children[parseInt(pathIndex.replace(/\[|\]/g, ''), 10)]);
 
     let cellCount = cells.length;
     if (cellCount > 0) {
@@ -873,7 +914,7 @@ function updateOverlays() {
       {
         // Begin a new path
         ctx.beginPath();
-        
+
         ctx.fillStyle = color;
 
         // Draw a circle
@@ -881,33 +922,33 @@ function updateOverlays() {
         const xCentre = (from.offsetLeft - grid.offsetLeft) + from.offsetWidth / 2;
         const yCentre = (from.offsetTop - grid.offsetTop) + from.offsetHeight / 2;
         ctx.arc(xCentre, yCentre, radius, 0, 2 * Math.PI);
-      
+
         // Fill the circle to create the blob
         ctx.fill();
       }
-  
+
       let index = 1;
       while (index < cellCount) {
         let to = cells[index++];
         //drawLine(from, to);
         {
           ctx.beginPath();
-        
+
           ctx.strokeStyle = color;
           ctx.lineWidth = 8;
           ctx.lineCap = 'round'; // Rounded line ends
-        
+
           const fromXCentre = (from.offsetLeft - grid.offsetLeft) + from.offsetWidth / 2;
           const fromYCentre = (from.offsetTop - grid.offsetTop) + from.offsetHeight / 2;
-        
+
           const toXCentre = (to.offsetLeft - grid.offsetLeft) + to.offsetWidth / 2;
           const toYCentre = (to.offsetTop - grid.offsetTop) + to.offsetHeight / 2;
-        
+
           ctx.moveTo(fromXCentre, fromYCentre);
           ctx.lineTo(toXCentre, toYCentre);
           ctx.stroke();
         }
-  
+
         // Step forward
         from = to;
       }
@@ -1044,7 +1085,7 @@ function handleTouchEnd(e) {
 function handleResize() {
   // Make sure the canvas stays resized to the grid
   const grid = document.getElementById('grid');
-  
+
   const trailCanvas = document.getElementById('trailCanvas');
   trailCanvas.style.left = `${grid.offsetLeft}px`;
   trailCanvas.style.top = `${grid.offsetTop}px`;

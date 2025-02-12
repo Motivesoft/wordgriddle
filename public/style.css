@@ -413,6 +413,12 @@ button:not(:disabled):active {
   color: #aaaaaa;
 }
 
+/* There are no more scoring words using this letter */
+.grid-item.zerozero-designer {
+  background-color: #200808;
+  color: #aaaaaa;
+}
+
 /* All words have been found (does not include bonus, just main words) */
 .grid-item.completed {
   background-color: #e0e0e0;
