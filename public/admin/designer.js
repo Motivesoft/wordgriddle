@@ -757,7 +757,12 @@ function updateChangeStateDisplay() {
   } else if (currentGrid.wordListStateUnsaved) {
     message = `There are unsaved word list changes`;
   } else {
-    message = `There are no unsaved changes`;
+    if (currentGrid.puzzleId < 0) {
+      message = `Create or load a puzzle`;
+    } else {
+      message = `There are no unsaved changes`;
+    }
+    
     color = "rgb(32, 32, 32)";
   }
 
