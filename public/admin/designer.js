@@ -326,12 +326,13 @@ function updateWordList(listId, wordListItems) {
   while (list.children.length) {
     list.removeChild(list.children[0]);
   }
-  wordListItems.forEach(([word, _]) => {
+
+  wordListItems.forEach(([word, path]) => {
     const wordLi = document.createElement("li");
     const wordLabel = document.createElement("label");
 
     wordLi.appendChild(wordLabel);
-    wordLabel.innerHTML = `<input type="checkbox">${word}`;
+    wordLabel.innerHTML = `<input type="checkbox" class="wordlist-checkbox" value="${path}">${word}`;
 
     list.appendChild(wordLi);
   });
@@ -741,6 +742,16 @@ function attachEventListeners() {
   grid.addEventListener('touchstart', handleTouchStart);
   grid.addEventListener('touchmove', handleTouchMove);
   document.addEventListener('touchend', handleTouchEnd);
+
+  document.body.addEventListener('change', function(event) {
+    if (event.target.classList.contains('wordlist-checkbox')) {
+      if (event.target.checked) {
+        console.log(`Checkbox with value ${event.target.value} is checked.`);
+      } else {
+        console.log(`Checkbox with value ${event.target.value} is unchecked.`);
+      }
+    }
+  });
 
   // Make sure our canvas for drawing selection lines is always the right size
   window.addEventListener('resize', handleResize);
