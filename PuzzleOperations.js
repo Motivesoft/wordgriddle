@@ -199,7 +199,9 @@ class PuzzleOperations {
             console.log(`Solve puzzle with '${letters}' from ${this.name}`);
 
             const wordLists = await this.solvePuzzle(letters);
-            res.status(200).json({ wordLists });
+            const wordCount = wordLists.required.length + wordLists.bonus.length + wordLists.excluded.length;
+
+            res.status(200).json({ wordCount, wordLists });
         } catch (error) {
             console.error("Failed to get puzzle:", error.message);
             res.status(500).json({ message: 'An error occurred', error: error.message });
