@@ -39,7 +39,8 @@ function createGrid(puzzle) {
 
   initializeGrid();
 
-  setButtonState();
+  setPuzzleLoadedState();
+  updateChangeStateDisplay();
 }
 
 // Called to (re)build the grid
@@ -81,6 +82,15 @@ function initializeGrid() {
 
   // Make sure our canvas is sized to this newly created grid
   handleResize();
+}
+
+function setPuzzleLoadedState() {
+  const disabled = currentGrid.puzzleId === -1;
+
+  const elements = document.querySelectorAll('.puzzle-required');
+  for (const element of elements) {
+    element.disabled = disabled;
+  }
 }
 
 // Dragging and drawing methods
@@ -721,6 +731,17 @@ function hasUnsavedChanges() {
 }
 
 function updateChangeStateDisplay() {
+  // Update button states
+  const wordListSaveButton = document.getElementById('saveAllWordLists');
+  wordListSaveButton.disabled = !currentGrid.wordListStateUnsaved;  
+
+  const savePuzzleButton = document.getElementById('savePuzzleButton');
+  savePuzzleButton.disabled = !currentGrid.cellStateUnsaved;  
+
+  const revertButton = document.getElementById('revertButton');
+  revertButton.disabled = !(currentGrid.cellStateUnsaved || currentGrid.wordListStateUnsaved);  
+
+  // Update the display message
   let message;
   let color = "rgb(192, 32, 32)";
 
@@ -782,7 +803,8 @@ function attachEventListeners() {
   window.onload = function () {
     document.getElementById('title').value = '';
 
-    setButtonState();
+    setPuzzleLoadedState();
+    updateChangeStateDisplay();
   };
 }
 
@@ -1023,13 +1045,3 @@ function handleResize() {
 // Initialisation
 updateWordCounts(); // Set initial word counts
 attachEventListeners();
-
-function setButtonState() {
-  const disabled = currentGrid.puzzleId === -1;
-
-  const elements = document.querySelectorAll('.puzzle-required');
-  for (const element of elements) {
-    console.log(`${element}.disabled set to ${disabled}`);
-    element.disabled = disabled;
-  }
-}
