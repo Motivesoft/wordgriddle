@@ -343,6 +343,10 @@ function updateWordList(listId, wordListItems) {
     list.removeChild(list.children[0]);
   }
 
+  // If we rebuild the word lists, make sure we're not leaving stale overlay data on the grid
+  currentGrid.overlays.clear();
+  updateOverlays();
+
   wordListItems.forEach(([word, path]) => {
     const wordLi = document.createElement("li");
     const wordLabel = document.createElement("label");
