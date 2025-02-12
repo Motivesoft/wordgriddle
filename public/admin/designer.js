@@ -84,6 +84,41 @@ function initializeGrid() {
   handleResize();
 }
 
+function showRedGrey() {
+  const grid = document.getElementById('grid');
+
+  const showRedGrey = document.getElementById("showRedGrey");
+
+  for( let i = 0; i < grid.children.length; i++) {
+    const cell = grid.children[i];
+
+    if( showRedGrey.checked) {
+      // Highlight any unused letters (grey count of zero)
+      if( cell.dataset.greyCount == 0 && cell.dataset.letter != '-' && cell.dataset.letter != '.') {
+        cell.classList.add('zerozero-designer');
+      } else {
+        cell.classList.remove('zerozero-designer');
+      }
+  
+      if (cell.dataset.redCount == 0) {
+        cell.setAttribute('red-counter', '');
+      } else {
+          cell.setAttribute('red-counter', `${cell.dataset.redCount}`);
+      }
+  
+      if (cell.dataset.greyCount == 0) {
+          cell.setAttribute('grey-counter', '');
+      } else {
+          cell.setAttribute('grey-counter', `${cell.dataset.greyCount}`);
+      }
+    } else {
+      cell.classList.remove('zerozero-designer');
+      cell.setAttribute('red-counter', '');
+      cell.setAttribute('grey-counter', '');
+    }
+  }
+}
+
 // Calculate the red/grey numbers for each cell from the supplied required word list
 function updateRedGrey(requiredWordList) {
   const grid = document.getElementById('grid');
@@ -109,19 +144,8 @@ function updateRedGrey(requiredWordList) {
       cell.dataset.greyCount++;
     });
   });
- 
-  for( let i = 0; i < grid.children.length; i++) {
-    const cell = grid.children[i];
-    
-    console.log(`Cell ${i}/${cell.dataset.index} '${cell.dataset.letter}' R:${cell.dataset.redCount} G:${cell.dataset.greyCount}`);
 
-    // Highlight any unused letters (grey count of zero)
-    if( cell.dataset.greyCount == 0 && cell.dataset.letter != '-' && cell.dataset.letter != '.') {
-      cell.classList.add('zerozero-designer');
-    } else {
-      cell.classList.remove('zerozero-designer');
-    }
-  }
+  showRedGrey();
 }
 
 function setPuzzleLoadedState() {
