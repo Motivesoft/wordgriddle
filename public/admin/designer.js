@@ -751,12 +751,11 @@ function attachEventListeners() {
   document.addEventListener('touchend', handleTouchEnd);
 
   document.body.addEventListener('change', function(event) {
+    // Track for word list selections and prepare to draw their path on the grid if so configured
     if (event.target.classList.contains('wordlist-checkbox')) {
       if (event.target.checked) {
-        console.log(`Checkbox with value ${event.target.value} is checked.`);
         currentGrid.overlays.add(event.target.value);
       } else {
-        console.log(`Checkbox with value ${event.target.value} is unchecked.`);
         currentGrid.overlays.delete(event.target.value);
       }
       updateOverlays();
