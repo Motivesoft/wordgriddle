@@ -668,6 +668,10 @@ async function handleSolve() {
 
     const data = await response.json();
     updateWordLists(data);
+
+    if (data.wordCount === 0 ) {
+      alert( "No words found.");
+    }
   } catch (error) {
     console.error("Error calling Solve API:", error);
     alert("Error calling Solve API");
